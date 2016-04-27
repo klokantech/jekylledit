@@ -9,9 +9,9 @@
   top:10%;
   left:50%;
   min-height:100px;
-  width:900px;
+  width:1000px;
   height:80%;
-  margin-left:-450px;
+  margin-left:-500px;
   z-index:10011;
   padding:0;
   background:#fff;
@@ -32,8 +32,29 @@
   top:0;
   bottom:40px;
   left:60px;
-  right:0;
+  right:200px;
   overflow:auto;
+}
+.je-popup-side{
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:40px;
+  width:200px;
+  overflow:auto;
+  background:#ccc;
+}
+.je-popup-side * {
+  font-size:0.8em;
+}
+.je-popup-side input {
+  width:100%;
+  height:auto !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+.je-popup-side label {
+  font-weight:bold;
 }
 .je-popup-actions{
   display:block;

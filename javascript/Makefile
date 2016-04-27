@@ -19,4 +19,4 @@ lint:
 	fixjsstyle --strict -r src
 	gjslint --strict -r src
 webserver:
-	java -jar $(PLOVR) soyweb --dir .
+	java -jar $(PLOVR) soyweb --dir ..

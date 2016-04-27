@@ -9,6 +9,7 @@ goog.provide('klokantech.jekylledit.Popup');
 goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
+goog.require('goog.net.XhrIo');
 goog.require('klokantech.jekylledit.utils');
 
 
@@ -41,7 +42,14 @@ klokantech.jekylledit.Popup = function() {
    */
   this.nav_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-nav');
 
-  goog.dom.append(this.element_, this.nav_, this.content_, this.actions_);
+  /**
+   * @type {!Element}
+   * @private
+   */
+  this.side_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-side');
+
+  goog.dom.append(this.element_, this.nav_, this.content_,
+                  this.side_, this.actions_);
 
   /**
    * @type {!Element}
@@ -50,10 +58,15 @@ klokantech.jekylledit.Popup = function() {
   this.root_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-bg',
                                   this.element_);
 
+  var editBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn', 'Edit');
+  goog.dom.append(this.nav_, editBtn);
+  //goog.events.listen(editBtn, goog.events.EventType.CLICK, function(e) {
+  // this.setVisible(false);
+  //}, false, this);
 
   var saveBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn', 'Save');
   var cancelBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn', 'Cancel');
-  this.appendActions(cancelBtn, saveBtn);
+  goog.dom.append(this.actions_, cancelBtn, saveBtn);
   goog.events.listen(cancelBtn, goog.events.EventType.CLICK, function(e) {
     this.setVisible(false);
   }, false, this);
@@ -72,6 +85,14 @@ klokantech.jekylledit.Popup = function() {
    * @private
    */
   this.editSource_ = null;
+
+  /**
+   * @type {Object}
+   * @private
+   */
+  this.config_ = null;
+
+  this.loadConfig();
 };
 
 
@@ -90,10 +111,61 @@ klokantech.jekylledit.Popup.prototype.setVisible = function(visible) {
 
 
 /**
- * @param {...goog.dom.Appendable} var_args The things to append to the actions.
  */
-klokantech.jekylledit.Popup.prototype.appendActions = function(var_args) {
-  goog.dom.append(this.actions_, arguments);
+klokantech.jekylledit.Popup.prototype.loadConfig = function() {
+  goog.net.XhrIo.send('config.json', goog.bind(function(e) {
+    var xhr = e.target;
+    this.config_ = xhr.getResponseJson();
+
+    goog.object.forEach(this.config_['metadata'], function(el, k) {
+      var catBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+                                      'New: ' + k);
+      goog.dom.appendChild(this.nav_, catBtn);
+    }, this);
+
+    this.loadAttributes();
+  }, this));
+};
+
+
+/**
+ */
+klokantech.jekylledit.Popup.prototype.loadAttributes = function() {
+  goog.dom.removeChildren(this.side_);
+
+  goog.net.XhrIo.send('post.json', goog.bind(function(e) {
+    var xhr = e.target;
+    var data = xhr.getResponseJson();
+
+    var type = data['type'];
+
+    var fields = (this.config_['metadata'][type] || {})['fields'] || {};
+
+    goog.object.forEach(fields, function(el, k) {
+      var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k + ':');
+      var inputType = 'text';
+      var inputValue = (data[k] || el['value']).toString();
+      if (el['type'] == 'datetime') {
+        inputType = 'datetime-local';
+        inputValue = inputValue.split('-').slice(0, 3).join('-');
+      }
+      console.log(inputType, inputValue);
+      var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
+        type: inputType,
+        value: inputValue
+      });
+      goog.dom.append(this.side_, label, dataInput);
+    }, this);
+
+    goog.object.forEach(data, function(el, k) {
+      if (!fields[k]) {
+        var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k + ':');
+        var dataInput = goog.dom.createDom(goog.dom.TagName.DIV, {},
+                                           data[k].toString());
+        goog.dom.append(this.side_, label, dataInput);
+      }
+    }, this);
+  }, this));
 };
 
 
