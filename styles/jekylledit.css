@@ -16,12 +16,22 @@
   padding:0;
   background:#fff;
   border-radius:5px;
+  overflow:hidden;
+}
+.je-popup-nav{
+  display:block;
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  width:60px;
+  background:#323439;
 }
 .je-popup-content{
   position:absolute;
   top:0;
   bottom:40px;
-  left:50px;
+  left:60px;
   right:0;
   overflow:auto;
 }

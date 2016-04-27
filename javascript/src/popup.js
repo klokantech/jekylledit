@@ -24,10 +24,10 @@ klokantech.jekylledit.Popup = function() {
   this.content_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-content');
 
   /**
-   * @type {?Element}
+   * @type {!Element}
    * @private
    */
-  this.actions_ = null;
+  this.actions_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-actions');
 
   /**
    * @type {!Element}
@@ -35,7 +35,13 @@ klokantech.jekylledit.Popup = function() {
    */
   this.element_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup');
 
-  goog.dom.appendChild(this.element_, this.content_);
+  /**
+   * @type {!Element}
+   * @private
+   */
+  this.nav_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-nav');
+
+  goog.dom.append(this.element_, this.nav_, this.content_, this.actions_);
 
   /**
    * @type {!Element}
@@ -84,22 +90,9 @@ klokantech.jekylledit.Popup.prototype.setVisible = function(visible) {
 
 
 /**
- * @param {...goog.dom.Appendable} var_args The things to append to the content.
- */
-klokantech.jekylledit.Popup.prototype.append = function(var_args) {
-  goog.dom.append(this.content_, arguments);
-};
-
-
-/**
  * @param {...goog.dom.Appendable} var_args The things to append to the actions.
  */
 klokantech.jekylledit.Popup.prototype.appendActions = function(var_args) {
-  if (!this.actions_) {
-    this.actions_ = goog.dom.createDom(goog.dom.TagName.DIV,
-                                       'je-popup-actions');
-    goog.dom.appendChild(this.element_, this.actions_);
-  }
   goog.dom.append(this.actions_, arguments);
 };
 
