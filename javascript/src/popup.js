@@ -92,6 +92,12 @@ klokantech.jekylledit.Popup = function() {
    */
   this.config_ = null;
 
+  /**
+   * @type {Object}
+   * @private
+   */
+  this.postData_ = null;
+
   this.loadConfig();
 };
 
@@ -136,6 +142,7 @@ klokantech.jekylledit.Popup.prototype.loadAttributes = function() {
   goog.net.XhrIo.send('post.json', goog.bind(function(e) {
     var xhr = e.target;
     var data = xhr.getResponseJson();
+    this.postData_ = data;
 
     var type = data['type'];
 
@@ -149,11 +156,11 @@ klokantech.jekylledit.Popup.prototype.loadAttributes = function() {
         inputType = 'datetime-local';
         inputValue = inputValue.split('-').slice(0, 3).join('-');
       }
-      console.log(inputType, inputValue);
       var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
         type: inputType,
         value: inputValue
       });
+      el['_je_input'] = dataInput;
       goog.dom.append(this.side_, label, dataInput);
     }, this);
 
@@ -217,4 +224,21 @@ klokantech.jekylledit.Popup.prototype.save = function() {
     klokantech.jekylledit.utils.cloneNodes(this.content_, this.editSource_);
     this.setVisible(false);
   }, this);
+
+  if (this.postData_) {
+    var type = this.postData_['type'];
+
+    var fields = (this.config_['metadata'][type] || {})['fields'] || {};
+
+    var result = {};
+
+    goog.object.forEach(fields, function(el, k) {
+      var dataInput = el['_je_input'];
+      if (dataInput) {
+        result[k] = dataInput.value;
+      }
+    }, this);
+
+    console.log(result);
+  }
 };
