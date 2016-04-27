@@ -1,0 +1,32 @@
+{
+  "id": "jekylledit",
+
+  "inputs": ["src/jekylledit.js"],
+  "paths": ["src"],
+
+  "externs": [
+  ],
+
+  "define": {
+    "goog.DEBUG": false
+  },
+
+  "mode": "ADVANCED",
+  "level": "VERBOSE",
+
+  "output-wrapper": "(function() {%output%})();",
+
+  "checks": {
+    "accessControls": "ERROR",
+    "visibility": "ERROR",
+    "checkTypes": "ERROR",
+    "checkRegExp": "ERROR",
+    "checkVars": "ERROR",
+    "deprecated": "ERROR",
+    "fileoverviewTags": "ERROR",
+    "invalidCasts": "ERROR",
+    "missingProperties": "ERROR",
+    "nonStandardJsDocs": "ERROR",
+    "undefinedVars": "ERROR"
+  }
+}

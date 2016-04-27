@@ -1,0 +1,12 @@
+{
+  "id": "jekylledit-debug",
+  "inherits": "jekylledit.json",
+  "mode": "ADVANCED",
+
+  "define": {
+    "goog.DEBUG": true
+  },
+
+  "pretty-print": true,
+  "debug": true
+}

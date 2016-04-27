@@ -1,0 +1,47 @@
+.je-popup-bg{
+  position:fixed;
+  top:0;bottom:0;left:0;right:0;
+  background-color:rgba(55,55,55,0.8);
+  z-index:10001;
+}
+.je-popup{
+  position:absolute;
+  top:10%;
+  left:50%;
+  min-height:100px;
+  width:900px;
+  height:80%;
+  margin-left:-450px;
+  z-index:10011;
+  padding:0;
+  background:#fff;
+  border-radius:5px;
+}
+.je-popup-content{
+  position:absolute;
+  top:0;
+  bottom:40px;
+  left:50px;
+  right:0;
+  overflow:auto;
+}
+.je-popup-actions{
+  display:block;
+  position:absolute;
+  bottom:0;
+  right:0;
+  height:40px;
+}
+.je-btn{
+  display:inline-block;
+  background:#ccc;
+  margin:4px 8px 8px 0;
+  padding:4px;
+  border-radius:2px;
+}
+*[class^="medium-editor-"] {
+  z-index:10100 !important;
+}
+.je-popup .editable {
+  border:3px solid yellow;
+}
