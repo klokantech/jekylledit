@@ -24,10 +24,12 @@ goog.addSingletonGetter(klokantech.jekylledit.JekyllEdit);
 
 
 /**
+ * @param {string} repo
+ * @param {string} path
  */
-klokantech.jekylledit.JekyllEdit.prototype.initPopup = function() {
+klokantech.jekylledit.JekyllEdit.prototype.initPopup = function(repo, path) {
   if (!this.popup_) {
-    this.popup_ = new klokantech.jekylledit.Popup();
+    this.popup_ = new klokantech.jekylledit.Popup(repo, path);
   }
   this.popup_.setVisible(true);
   this.popup_.setEditableContent(
@@ -40,17 +42,13 @@ klokantech.jekylledit.JekyllEdit.prototype.initPopup = function() {
  * @param {!Element} btn
  */
 klokantech.jekylledit.JekyllEdit.prototype.setAdminBtn = function(btn) {
+  var repo = btn.getAttribute('data-jekylledit-repo');
+  var path = btn.getAttribute('data-jekylledit-path');
   goog.events.listen(btn, goog.events.EventType.CLICK, function(e) {
-    this.initAdmin();
+    klokantech.jekylledit.utils.installStyle(
+        klokantech.jekylledit.BASE_URL + 'styles/jekylledit.css');
+    this.initPopup(repo, path);
   }, false, this);
-};
-
-
-/**
- */
-klokantech.jekylledit.JekyllEdit.prototype.initAdmin = function() {
-  klokantech.jekylledit.utils.installStyle('../styles/jekylledit.css'); //TODO
-  this.initPopup();
 };
 
 

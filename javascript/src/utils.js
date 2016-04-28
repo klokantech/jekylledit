@@ -11,6 +11,12 @@ goog.require('goog.net.jsloader');
 
 
 /**
+ * @define {string} Base path where to load other resources.
+ */
+klokantech.jekylledit.BASE_URL = '../';
+
+
+/**
  * @type {!Object.<string, *>}
  * @private
  */
