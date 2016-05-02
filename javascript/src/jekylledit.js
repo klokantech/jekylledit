@@ -29,12 +29,10 @@ goog.addSingletonGetter(klokantech.jekylledit.JekyllEdit);
  */
 klokantech.jekylledit.JekyllEdit.prototype.initPopup = function(repo, path) {
   if (!this.popup_) {
-    this.popup_ = new klokantech.jekylledit.Popup(repo, path);
+    this.popup_ = new klokantech.jekylledit.Popup(
+        repo, path, document.querySelector('[data-jekylledit-root]'));
   }
   this.popup_.setVisible(true);
-  this.popup_.setEditableContent(
-      goog.dom.getElement('article') //TODO
-  );
 };
 
 

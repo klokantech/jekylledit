@@ -32,28 +32,42 @@
   top:0;
   bottom:40px;
   left:60px;
+  right:0;
+  overflow:auto;
+}
+.je-editor-content{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
   right:200px;
   overflow:auto;
 }
-.je-popup-side{
+.je-editor-side{
   position:absolute;
   top:0;
   right:0;
-  bottom:40px;
+  bottom:0;
   width:200px;
   overflow:auto;
   background:#ccc;
 }
-.je-popup-side * {
+.je-editor-side * {
   font-size:0.8em;
 }
-.je-popup-side input {
+.je-editor-editableinline {
+  font-style:italic;
+}
+.je-editor-editableinline:before{
+  content:'\2190 [inline] ';
+}
+.je-editor-side input {
   width:100%;
   height:auto !important;
   padding:0 !important;
   margin:0 !important;
 }
-.je-popup-side label {
+.je-editor-side label {
   font-weight:bold;
 }
 .je-popup-actions{
@@ -73,7 +87,7 @@
 *[class^="medium-editor-"] {
   z-index:10100 !important;
 }
-.je-popup .editable {
+.je-editor [data-jekylledit-source] {
   border:3px solid yellow;
 }
 
