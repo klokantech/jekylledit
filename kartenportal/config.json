@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "announcement": {
+      "fields": {
+        "title": {
+          "type": "text",
+          "value": ""
+        },
+        "date": {
+          "type": "datetime",
+          "value": "''"
+        },
+        "author": {
+          "type": "text",
+          "value": "Unknown"
+        },
+        "nonexistent-field": {
+          "type": "text",
+          "value": "Default value"
+        }
+      }
+    },
+    "blogpost": {
+      "fields": {
+        "title": {
+          "type": "text",
+          "value": ""
+        },
+        "author": {
+          "type": "text",
+          "value": ""
+        },
+      },
+      "empty_content": "<h2 data-jekylledit-source='title'>Title here</h2><span data-jekylledit-source='author'>Author name here</span><hr /><div data-jekylledit-source='content'>Content of the post</div>"
+    }
+  }
+}

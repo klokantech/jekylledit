@@ -1,0 +1,118 @@
+.je-popup-bg{
+  position:fixed;
+  top:0;bottom:0;left:0;right:0;
+  background-color:rgba(55,55,55,0.8);
+  z-index:10001;
+}
+.je-popup{
+  position:absolute;
+  top:10%;
+  left:50%;
+  min-height:100px;
+  width:1000px;
+  height:80%;
+  margin-left:-500px;
+  z-index:10011;
+  padding:0;
+  background:#fff;
+  border-radius:5px;
+  overflow:hidden;
+}
+.je-popup-nav{
+  display:block;
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  width:60px;
+  background:#323439;
+}
+.je-popup-content{
+  position:absolute;
+  top:0;
+  bottom:40px;
+  left:60px;
+  right:0;
+  overflow:auto;
+}
+.je-editor-content{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:200px;
+  overflow:auto;
+}
+.je-editor-side{
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  width:200px;
+  overflow:auto;
+  background:#ccc;
+}
+.je-editor-side * {
+  font-size:0.8em;
+}
+.je-editor-editableinline {
+  font-style:italic;
+}
+.je-editor-editableinline:before{
+  content:'\2190 [inline] ';
+}
+.je-editor-side input {
+  width:100%;
+  height:auto !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+.je-editor-side label {
+  font-weight:bold;
+}
+.je-popup-actions{
+  display:block;
+  position:absolute;
+  bottom:0;
+  right:0;
+  height:40px;
+}
+.je-btn{
+  display:inline-block;
+  background:#ccc;
+  margin:4px 8px 8px 0;
+  padding:4px;
+  border-radius:2px;
+}
+*[class^="medium-editor-"] {
+  z-index:10100 !important;
+}
+.je-editor [data-jekylledit-source] {
+  border:3px solid yellow;
+}
+
+.je-auth{
+  text-align:center;
+}
+
+.je-spinner {
+  display:inline-block;
+  width:4em;
+  height:4em;
+  line-height:4em;
+  margin:1em;
+  text-align:center;
+  border-radius:50%;
+  border:0.4em solid #ccc;
+  border-top-color:#289adf;
+  -webkit-animation:je-spinner-anim 1s infinite ease;
+  animation:je-spinner-anim 1s infinite ease;
+}
+@-webkit-keyframes je-spinner-anim {
+  0% {-webkit-transform:rotate(0deg);transform:rotate(0deg);}
+  100% {-webkit-transform:rotate(360deg);transform:rotate(360deg);}
+}
+@keyframes je-spinner-anim {
+  0% {-webkit-transform:rotate(0deg);transform:rotate(0deg);}
+  100% {-webkit-transform:rotate(360deg);transform: rotate(360deg);}
+}
