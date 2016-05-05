@@ -33,3 +33,4 @@ simplejson==3.8.2
 six==1.10.0
 speaklater==1.3
 uWSGI==2.0.12
+python-frontmatter==0.3.1

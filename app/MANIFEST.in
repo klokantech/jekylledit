@@ -1,3 +1,1 @@
-graft jekylledit/migrations
-graft jekylledit/static
 graft jekylledit/templates

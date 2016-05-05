@@ -1,6 +1,6 @@
 from .base import app
 from .auth import auth, gitkit
-from . import example
+from . import site
 
 if not app.config['DEVELOPMENT']:
     gitkit.init_app(app)
