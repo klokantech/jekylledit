@@ -1,0 +1,33 @@
+version: "2"
+
+services:
+  app:
+    image: klokantech/jekylledit:$VERSION
+    container_name: com.klokantech.jekylledit
+    command: >
+        /venv/bin/uwsgi
+        --master
+        --uid nobody
+        --enable-threads
+        --socket 0.0.0.0:8000
+        --wsgi jekylledit:app
+    restart: always
+    environment:
+      - FLASK_SECRET_KEY="<<< Production key >>>"
+      - GITKIT_CLIENT_ID="<<< Client ID >>>"
+      - GITKIT_PROJECT_ID="<<< Project ID >>>"
+      - GITKIT_SERVICE_ACCOUNT_EMAIL="<<< Service account email >>>"
+      - |
+        GITKIT_SERVICE_ACCOUNT_KEY=-----BEGIN PRIVATE KEY-----
+        Insert the encoded private key here. The '|' above is intentional.
+        This is how you do big blocks of text in YAML.
+        -----END PRIVATE KEY-----
+  nginx:
+    image: klokantech/nginx
+    ports:
+      - "8000:80"
+    links:
+      - app
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./data/static:/srv/com.klokantech.jekylledit/static

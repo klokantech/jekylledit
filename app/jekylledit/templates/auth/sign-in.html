@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+Sign in
+{% endblock title %}
+
+{% block styles %}
+{% if not config['DEVELOPMENT'] %}
+<link type="text/css" rel="stylesheet" href="//www.gstatic.com/authtoolkit/css/gitkit.css" />
+{% endif %}
+{% endblock styles %}
+
+{% block scripts %}
+{% if not config['DEVELOPMENT'] %}
+<script type="text/javascript" src="//www.gstatic.com/authtoolkit/js/gitkit.js"></script>
+<script type="text/javascript">
+var config = {
+  "widgetUrl": "...",
+  "signInSuccessUrl": "...",
+  "signOutUrl": "...",
+  "oobActionUrl": "...",
+  "apiKey": "...",
+  "siteName": "...",
+  "signInOptions": "...",
+  "queryParameterForSignInSuccessUrl": "next"
+};
+window.opener = null;
+window.google.identitytoolkit.start('#gitkitWidgetDiv', config, '{{ POST_BODY }}');
+</script>
+{% endif %}
+{% endblock scripts %}
+
+{% block body %}
+{% if not config['DEVELOPMENT'] %}
+<div id="gitkitWidgetDiv"></div>
+{% else %}
+<form method="POST" action="">
+  Email: <input type="text" name="email" />
+  <input type="submit" value="Sign in" />
+</form>
+{% endif %}
+{% endblock body %}

@@ -1,0 +1,4 @@
+js/
+data/
+*.egg-info
+*.py[co]

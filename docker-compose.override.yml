@@ -1,0 +1,26 @@
+version: "2"
+
+services:
+  app:
+    build:
+      context: ./app
+      args:
+        - VERSION=$VERSION
+        - SETUP_MODE=$SETUP_MODE
+    command: /venv/bin/python -m jekylledit runserver
+    volumes:
+      - ./app/jekylledit:/venv/app/jekylledit
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_DEBUG=true
+      - FLASK_DEVELOPMENT=true
+      - FLASK_SECRET_KEY="<<< Development key >>>"
+  javascript:
+    image: klokantech/plovr:5.0.1
+    command: make serve
+    volumes:
+      - ./javascript:/data
+      - ./app/jekylledit/static/js:/mnt
+    ports:
+      - "9810:9810"

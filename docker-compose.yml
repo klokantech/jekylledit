@@ -1,0 +1,9 @@
+version: "2"
+
+services:
+  app:
+    working_dir: /venv/app/jekylledit
+    volumes:
+      - ./data:/mnt
+    environment:
+      - SQLALCHEMY_DATABASE_URI=sqlite:////mnt/database.sqlite

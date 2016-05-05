@@ -1,0 +1,10 @@
+Flask
+Flask-Babel
+Flask-Login
+Flask-Migrate
+Flask-Principal
+Flask-Script
+Flask-SQLAlchemy
+Flask-WTF
+identity-toolkit-python-client
+uWSGI

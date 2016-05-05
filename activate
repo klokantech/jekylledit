@@ -1,0 +1,74 @@
+PACKAGE_NAME=jekylledit
+
+dev () {
+    if [ "$1" = 'manage' ]; then
+        shift
+        _development $_MANAGE "$@"
+    else
+        _development "$@"
+    fi
+}
+
+production () {
+    if [ "$1" = 'manage' ]; then
+        shift
+        _production $_MANAGE "$@"
+    elif [ "$1" = 'build' ]; then
+        if [ -x production-build ]; then
+            bash production-build
+        fi
+        _release "$@"
+    else
+        _production "$@"
+    fi
+}
+
+_development () {
+    SETUP_MODE=development _compose \
+        -f docker-compose.yml \
+        -f docker-compose.override.yml \
+        "$@"
+}
+
+_release() {
+    SETUP_MODE=production _compose \
+        -f docker-compose.yml \
+        -f docker-compose.override.yml \
+        -f docker-compose.production.yml \
+        "$@"
+}
+
+_production () {
+    _compose \
+        -f docker-compose.yml \
+        -f docker-compose.production.yml \
+        "$@"
+}
+
+_compose () {
+    VERSION=$(cat VERSION) docker-compose "$@"
+}
+
+deactivate () {
+    unset -f dev
+    unset -f production
+    unset -f _development
+    unset -f _release
+    unset -f _production
+    unset -f _compose
+    unset -f deactivate
+    unset -f _MANAGE
+    PS1="$_OLD_PS1"
+    export PS1
+    unset _OLD_PS1
+}
+
+typeset -fx _development
+typeset -fx _production
+typeset -fx _compose
+
+_MANAGE="run --rm -e SQLALCHEMY_ECHO=false app /venv/bin/python -m $PACKAGE_NAME"
+
+_OLD_PS1="$PS1"
+PS1="($PACKAGE_NAME)$PS1"
+export PS1
