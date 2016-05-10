@@ -254,9 +254,11 @@ klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
 
         // HOOK to allow only simple text (no newlines, no pasting)
         goog.events.listen(editable, goog.events.EventType.INPUT, function(e) {
-          var textContent = editable.textContent;
-          editable.innerHTML = '';
-          editable.textContent = textContent;
+          if (goog.dom.getChildren(editable).length > 0) {
+            var textContent = editable.textContent;
+            editable.innerHTML = '';
+            editable.textContent = textContent;
+          }
         });
       } else {
         editable.removeAttribute('data-jekylledit-source');
@@ -285,10 +287,12 @@ klokantech.jekylledit.Editor.prototype.save = function() {
       klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
 
   goog.array.forEach(editables, function(editable) {
-    var valueToBeSaved = editable.innerHTML;
+    var valueToBeSaved = '';
     var sourceType = editable.getAttribute('data-jekylledit-source');
     if (sourceType == 'content') {
-      valueToBeSaved = goog.global['toMarkdown'](valueToBeSaved);
+      valueToBeSaved = goog.global['toMarkdown'](editable.innerHTML);
+    } else {
+      valueToBeSaved = editable.textContent;
     }
     if (this.editSource_) {
       klokantech.jekylledit.utils.cloneNodes(this.content_, this.editSource_);
