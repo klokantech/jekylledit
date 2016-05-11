@@ -44,7 +44,7 @@ klokantech.jekylledit.JekyllEdit.prototype.setAdminBtn = function(btn) {
   var path = btn.getAttribute('data-jekylledit-path');
   goog.events.listen(btn, goog.events.EventType.CLICK, function(e) {
     klokantech.jekylledit.utils.installStyle(
-        klokantech.jekylledit.BASE_URL + 'styles/jekylledit.css');
+        klokantech.jekylledit.BASE_URL + 'static/styles/jekylledit.css');
     this.initPopup(repo, path);
   }, false, this);
 };

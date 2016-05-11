@@ -6,6 +6,7 @@
  */
 goog.provide('klokantech.jekylledit.Editor');
 
+goog.require('goog.crypt.base64');
 goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
@@ -17,14 +18,14 @@ goog.require('klokantech.jekylledit.utils');
 /**
  * @param {klokantech.jekylledit.Auth} auth
  * @param {Object} config
- * @param {?string} type
+ * @param {?string} category
  * @param {string} repo
  * @param {string=} opt_path
  * @param {Node=} opt_content
  * @param {Function=} opt_callback when ready
  * @constructor
  */
-klokantech.jekylledit.Editor = function(auth, config, type, repo,
+klokantech.jekylledit.Editor = function(auth, config, category, repo,
                                         opt_path, opt_content, opt_callback) {
   /**
    * @type {klokantech.jekylledit.Auth}
@@ -42,7 +43,7 @@ klokantech.jekylledit.Editor = function(auth, config, type, repo,
    * @type {?string}
    * @private
    */
-  this.type_ = type;
+  this.category_ = category;
 
   /**
    * @type {string}
@@ -136,13 +137,17 @@ klokantech.jekylledit.Editor.prototype.loadClearData = function(opt_callback) {
       klokantech.jekylledit.utils.cloneNodes(this.editSource_, this.content_);
     }
     this.auth_.sendRequest(
-        this.repo_ + '/edit/' + this.path_,
+        'site/' + this.repo_ + '/' + goog.crypt.base64.encodeString(this.path_),
         goog.bind(function(e) {
           var xhr = e.target;
           var data = xhr.getResponseJson();
-          this.postData_ = data;
+          this.postData_ = data['metadata'];
 
-          this.type_ = data['type'];
+          this.category_ =
+          (this.postData_['category'] || this.postData_['categories']);
+          if (goog.isArray(this.category_)) {
+            this.category_ = this.category_[0];
+          }
 
           if (opt_callback) {
             opt_callback();
@@ -150,7 +155,7 @@ klokantech.jekylledit.Editor.prototype.loadClearData = function(opt_callback) {
         }, this));
   } else {
     this.content_.innerHTML =
-        (this.config_['metadata'][this.type_] || {})['empty_content'] ||
+        (this.config_['metadata'][this.category_] || {})['empty_content'] ||
         klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT;
     this.postData_ = {};
     if (opt_callback) {
@@ -174,7 +179,7 @@ klokantech.jekylledit.Editor.prototype.start = function() {
 klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
   goog.dom.removeChildren(this.side_);
 
-  var fields = (this.config_['metadata'][this.type_] || {})['fields'] || {};
+  var fields = (this.config_['metadata'][this.category_] || {})['fields'] || {};
 
   goog.object.forEach(fields, function(el, k) {
     var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k + ':');
@@ -213,7 +218,7 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
  * @private
  */
 klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
-  var fields = (this.config_['metadata'][this.type_] || {})['fields'] || {};
+  var fields = (this.config_['metadata'][this.category_] || {})['fields'] || {};
 
   var editables = document.querySelectorAll(
       klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
@@ -272,14 +277,16 @@ klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
 /**
  */
 klokantech.jekylledit.Editor.prototype.save = function() {
-  var result = {};
+  var result = {
+    'metadata': {}
+  };
 
-  var fields = (this.config_['metadata'][this.type_] || {})['fields'] || {};
+  var fields = (this.config_['metadata'][this.category_] || {})['fields'] || {};
 
   goog.object.forEach(fields, function(el, k) {
     var dataInput = el['_je_input'];
     if (dataInput) {
-      result[k] = dataInput.value;
+      result['metadata'][k] = dataInput.value;
     }
   }, this);
 
@@ -287,18 +294,23 @@ klokantech.jekylledit.Editor.prototype.save = function() {
       klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
 
   goog.array.forEach(editables, function(editable) {
-    var valueToBeSaved = '';
     var sourceType = editable.getAttribute('data-jekylledit-source');
     if (sourceType == 'content') {
-      valueToBeSaved = goog.global['toMarkdown'](editable.innerHTML);
+      result['content'] = goog.global['toMarkdown'](editable.innerHTML);
     } else {
-      valueToBeSaved = editable.textContent;
+      result['metadata'][sourceType] = editable.textContent;
     }
-    if (this.editSource_) {
-      klokantech.jekylledit.utils.cloneNodes(this.content_, this.editSource_);
-    }
-    result[sourceType] = valueToBeSaved;
   }, this);
+  if (this.editSource_) {
+    klokantech.jekylledit.utils.cloneNodes(this.content_, this.editSource_);
+  }
 
-  console.log(this.path_ || ('new ' + this.type_), result);
+  var path = this.path_ ? goog.crypt.base64.encodeString(this.path_) : 'new';
+  this.auth_.sendRequest('site/' + this.repo_ + '/' + path,
+      goog.bind(function(e) {
+        alert(this.path_ ? 'Changes saved!' : 'New post created !');
+      }, this), this.path_ ? 'PUT' : 'POST', JSON.stringify(result), {
+        'content-type': 'application/json'
+      }
+  );
 };

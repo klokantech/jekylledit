@@ -53,8 +53,8 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
     this.setVisible(false);
   }, false, this);
   goog.events.listen(saveBtn, goog.events.EventType.CLICK, function(e) {
-    if (goog.isDef(this.activeType_)) {
-      var editor = this.editorTypes_[this.activeType_];
+    if (goog.isDef(this.activeCat_)) {
+      var editor = this.editorCats_[this.activeCat_];
       if (editor) {
         editor.save();
         this.setVisible(false);
@@ -88,13 +88,13 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
    * @type {Object.<?string, klokantech.jekylledit.Editor>}
    * @private
    */
-  this.editorTypes_ = {};
+  this.editorCats_ = {};
 
   /**
    * @type {string|null|undefined}
    * @private
    */
-  this.activeType_ = undefined;
+  this.activeCat_ = undefined;
 
   /**
    * @type {Node}
@@ -127,8 +127,7 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
     this.startEditor_(null);
   }, false, this);
 
-  this.auth_.sendRequest(
-      this.repo_ + '/config.json',
+  this.auth_.sendRequest('site/' + this.repo_ + '/config',
       goog.bind(function(e) {
         var xhr = e.target;
         this.config_ = xhr.getResponseJson();
@@ -156,47 +155,47 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
  * @private
  */
 klokantech.jekylledit.Popup.prototype.clearEditors_ = function() {
-  goog.object.forEach(this.editorTypes_, function(editor, k) {
+  goog.object.forEach(this.editorCats_, function(editor, k) {
     editor.loadClearData();
   });
 };
 
 
 /**
- * @param {?string} type
+ * @param {?string} category
  * @param {Function=} opt_cb
  * @private
  */
-klokantech.jekylledit.Popup.prototype.initEditor_ = function(type, opt_cb) {
-  var editor = this.editorTypes_[type];
+klokantech.jekylledit.Popup.prototype.initEditor_ = function(category, opt_cb) {
+  var editor = this.editorCats_[category];
   if (!editor) {
     editor = new klokantech.jekylledit.Editor(
-        this.auth_, this.config_, type,
-        this.repo_, type == null ? this.path_ : undefined,
-        type == null ? this.editSource_ : undefined,
+        this.auth_, this.config_, category,
+        this.repo_, category == null ? this.path_ : undefined,
+        category == null ? this.editSource_ : undefined,
         opt_cb);
-    this.editorTypes_[type] = editor;
+    this.editorCats_[category] = editor;
   }
 };
 
 
 /**
- * @param {?string} type
+ * @param {?string} category
  * @private
  */
-klokantech.jekylledit.Popup.prototype.startEditor_ = function(type) {
+klokantech.jekylledit.Popup.prototype.startEditor_ = function(category) {
   if (!this.actions_.parentElement) {
     goog.dom.append(this.element_, this.actions_);
   }
 
-  var editor = this.editorTypes_[type];
+  var editor = this.editorCats_[category];
   if (editor) {
     goog.dom.removeChildren(this.content_);
     goog.dom.appendChild(this.content_, editor.getElement());
     editor.start();
   }
 
-  this.activeType_ = type;
+  this.activeCat_ = category;
 };
 
 
