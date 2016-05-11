@@ -10,6 +10,7 @@ goog.require('goog.crypt.base64');
 goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
+goog.require('klokantech.jekylledit.AbstractPage');
 goog.require('klokantech.jekylledit.Auth');
 goog.require('klokantech.jekylledit.utils');
 
@@ -24,6 +25,7 @@ goog.require('klokantech.jekylledit.utils');
  * @param {Node=} opt_content
  * @param {Function=} opt_callback when ready
  * @constructor
+ * @implements {klokantech.jekylledit.AbstractPage}
  */
 klokantech.jekylledit.Editor = function(auth, config, category, repo,
                                         opt_path, opt_content, opt_callback) {
@@ -101,7 +103,7 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
    */
   this.postData_ = null;
 
-  this.loadClearData(opt_callback);
+  this.loadClear(opt_callback);
 };
 
 
@@ -120,18 +122,14 @@ klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT =
     '<div data-jekylledit-source="content">Content</div>';
 
 
-/**
- * @return {Element}
- */
+/** @inheritDoc */
 klokantech.jekylledit.Editor.prototype.getElement = function() {
   return this.element_;
 };
 
 
-/**
- * @param {Function=} opt_callback when ready
- */
-klokantech.jekylledit.Editor.prototype.loadClearData = function(opt_callback) {
+/** @inheritDoc */
+klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
   if (this.path_) {
     if (this.editSource_) {
       klokantech.jekylledit.utils.cloneNodes(this.editSource_, this.content_);
@@ -165,8 +163,7 @@ klokantech.jekylledit.Editor.prototype.loadClearData = function(opt_callback) {
 };
 
 
-/**
- */
+/** @inheritDoc */
 klokantech.jekylledit.Editor.prototype.start = function() {
   this.startEditor_();
   this.initSidebar_();
@@ -274,9 +271,8 @@ klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
 };
 
 
-/**
- */
-klokantech.jekylledit.Editor.prototype.save = function() {
+/** @inheritDoc */
+klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
   var result = {
     'metadata': {}
   };
@@ -309,6 +305,9 @@ klokantech.jekylledit.Editor.prototype.save = function() {
   this.auth_.sendRequest('site/' + this.repo_ + '/' + path,
       goog.bind(function(e) {
         alert(this.path_ ? 'Changes saved!' : 'New post created !');
+        if (opt_callback) {
+          opt_callback();
+        }
       }, this), this.path_ ? 'PUT' : 'POST', JSON.stringify(result), {
         'content-type': 'application/json'
       }

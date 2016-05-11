@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import json, jsonify, request
 from flask.ext.cors import cross_origin
 from flask.ext.login import login_required
 from subprocess import call
@@ -52,4 +52,3 @@ def translations(site_id):
         return jsonify(resp)
 
         return
-
