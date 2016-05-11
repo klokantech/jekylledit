@@ -133,8 +133,8 @@
 *[class^="medium-editor-"] {
   z-index:10100 !important;
 }
-.je-editor [data-jekylledit-source] {
-  border:3px solid yellow;
+.je-editor [data-jekylledit-source]:focus {
+  outline: 3px solid yellow;
 }
 
 .je-auth{
