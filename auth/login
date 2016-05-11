@@ -1,0 +1,9 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Login</h1>
+    There will be login form here.
+    <input type="button" onclick="javascript:window.close()" value="Close" />
+  </body>
+</html>
