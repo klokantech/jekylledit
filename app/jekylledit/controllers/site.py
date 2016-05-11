@@ -11,15 +11,6 @@ SITES_FOLDER = '/var/www/jekyledit'
 JE_CONFIG_NAME = 'jekylledit.json'
 
 
-# Working with jekyll markdown file structure
-def get_frontmatter(file):
-    fm = frontmatter.loads(file)
-    return fm.metadata
-
-def get_content(file):
-    fm = frontmatter.loads(file)
-    return fm.content
-
 def commit(repository, filename):
     try:
         gitdir = SITES_FOLDER + repository + '/'
@@ -100,8 +91,9 @@ def site_get(site_id, file_id):
     # Return post's attributes
     else:
         file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r', encoding='utf-8')
-        fr = get_frontmatter(file.read())
-        return jsonify(fr)
+        fm = frontmatter.loads(file.read())
+        resp = {'metadata': fm.metadata}
+        return jsonify(resp)
 
 
 @app.route('/private')
