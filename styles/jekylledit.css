@@ -83,7 +83,7 @@
   bottom:0;
   width:200px;
   overflow:auto;
-  background:#ccc;
+  background: rgba(0, 0, 0, .1);
   padding: 10px;
 }
 .je-editor-side * {
@@ -98,11 +98,14 @@
 .je-editor-side input {
   width:100%;
   height:auto !important;
-  padding:0 !important;
+  padding: 0 6px !important;
   margin:0 !important;
+  border: 1px solid #ccc;
+  border-radius: 2px;
 }
 .je-editor-side label {
   font-weight:bold;
+  margin: 10px 0 2px 1px;
 }
 .je-popup-actions{
   display:block;
@@ -133,8 +136,16 @@
 *[class^="medium-editor-"] {
   z-index:10100 !important;
 }
+
+.je-editor [data-jekylledit-source]{
+  transition: outline .3s ease-in-out;
+}
+
 .je-editor [data-jekylledit-source]:focus {
-  outline: 3px solid yellow;
+  outline: 5px solid #f7e064;
+}
+.je-editor [data-jekylledit-source]:hover {
+  outline: 5px solid #ccd39f;
 }
 
 .je-auth{
