@@ -27,6 +27,34 @@
   width:60px;
   background:#323439;
 }
+
+.je-popup-nav .je-btn{
+  visibility: hidden;
+  display: block;
+  height: 48px;
+  color: #d5d9e0;
+}
+
+.je-popup-nav .je-btn:hover{
+  color: #289adf;
+}
+
+.je-popup-nav .je-btn:before{
+  visibility: visible;
+  content: "E";
+  font-family: "icons";
+  font-size: 28px;
+  padding: 12px;
+  display: block;
+}
+
+.je-popup-nav div:first-child:before{
+  content: "e";
+}
+.je-popup-nav div:last-child:before{
+  content: "A";
+}
+
 .je-popup-content{
   position:absolute;
   top:0;
@@ -42,6 +70,11 @@
   left:0;
   right:200px;
   overflow:auto;
+  padding: 30px;
+}
+.je-editor-content img:first-child{
+  margin-left: -31px;
+  margin-top: -30px;
 }
 .je-editor-side{
   position:absolute;
@@ -51,6 +84,7 @@
   width:200px;
   overflow:auto;
   background:#ccc;
+  padding: 10px;
 }
 .je-editor-side * {
   font-size:0.8em;
@@ -76,6 +110,7 @@
   bottom:0;
   right:0;
   height:40px;
+  padding-top: 2px;
 }
 .je-btn{
   display:inline-block;
@@ -83,6 +118,17 @@
   margin:4px 8px 8px 0;
   padding:4px;
   border-radius:2px;
+  cursor: pointer;
+}
+.je-popup-actions .je-btn{
+  padding: 8px 14px;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 12px;
+}
+.je-popup-actions .je-btn:last-child{
+  color: #fff;
+  background: #289adf;
 }
 *[class^="medium-editor-"] {
   z-index:10100 !important;
@@ -92,7 +138,22 @@
 }
 
 .je-auth{
-  text-align:center;
+  text-align: center;
+  top: 50%;
+  position: absolute;
+  left: 50%;
+  width: 100px;
+  height: 38px;
+  margin-left: -50px;
+  margin-top: -19px;
+}
+
+.je-auth .je-btn{
+  background: #289adf;
+  color: #fff;
+  padding: 10px 20px;
+  margin: 0;
+  font-weight: bold;
 }
 
 .je-spinner {
