@@ -47,7 +47,7 @@ def site_config(site_id):
 
 
 # Return post's attributes
-@app.route('/site/<string:site_id>/get/<string:file_id>')
+@app.route('/site/<string:site_id>/<string:file_id>', methods = ['GET'])
 def site_get(site_id, file_id):
     filename = b64decode(file_id)
 
@@ -56,8 +56,27 @@ def site_get(site_id, file_id):
     return jsonify(fr)
 
 
+# Save new post
+@app.route('/site/<string:site_id>/<string:file_id>', methods = ['POST'])
+def site_get(site_id, file_id):
+    filename = b64decode(file_id)
+    data = request.json
+    post = frontmatter.loads()
+
+    if 'metadata' in data:
+        post.metadata = data['metadata']
+    if 'content' in data:
+        post.content = data['content']
+
+    file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r+b')
+    file.write(frontmatter.dumps(post))
+    file.close()
+    resp = {'status': status, 'site': site_id, 'file': filename}
+    return jsonify(resp)
+
+
 # Save content of post to file
-@app.route('/site/<string:site_id>/edit/<string:file_id>', methods = ['GET', 'POST'])
+@app.route('/site/<string:site_id>/<string:file_id>', methods = ['PUT'])
 def site_edit(site_id, file_id):
     filename = b64decode(file_id)
     data = request.json
