@@ -1,5 +1,6 @@
 Flask
 Flask-Babel
+Flask-CORS
 Flask-Login
 Flask-Migrate
 Flask-Principal

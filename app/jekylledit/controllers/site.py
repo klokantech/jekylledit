@@ -1,4 +1,5 @@
 from flask import render_template, json, jsonify, request
+from flask.ext.cors import cross_origin
 from flask.ext.login import login_required
 from base64 import b64decode
 import frontmatter
@@ -38,6 +39,7 @@ def index():
 
 #site config response
 @app.route('/site/<string:site_id>/config')
+@cross_origin()
 def site_config(site_id):
 
     f = open(SITES_FOLDER + '/' + site_id + '/' + JE_CONFIG_NAME, 'r')
@@ -48,6 +50,7 @@ def site_config(site_id):
 
 # Handle working with posts
 @app.route('/site/<string:site_id>/<string:file_id>', methods = ['GET', 'POST', 'PUT'])
+@cross_origin()
 def site_get(site_id, file_id):
     filename = b64decode(file_id).decode()
 

@@ -1,4 +1,5 @@
-from flask import Blueprint, abort, current_app, redirect, render_template, request
+from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request
+from flask.ext.cors import cross_origin
 from flask.ext.login import login_user, logout_user
 from ..ext.identitytoolkit import Gitkit
 
@@ -46,3 +47,11 @@ def sign_out():
     if not current_app.config.get('DEVELOPMENT', False):
         gitkit.delete_token(response)
     return response
+
+
+@auth.route('/token')
+@cross_origin()
+def token():
+    return jsonify({
+      "accessToken": "TOKEN_HERE" # XXX
+    });
