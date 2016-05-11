@@ -58,7 +58,7 @@ def site_get(site_id, file_id):
 
 # Save new post
 @app.route('/site/<string:site_id>/<string:file_id>', methods = ['POST'])
-def site_get(site_id, file_id):
+def site_new(site_id, file_id):
     filename = b64decode(file_id)
     data = request.json
     post = frontmatter.loads()
