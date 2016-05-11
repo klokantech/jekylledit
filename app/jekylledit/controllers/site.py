@@ -46,66 +46,62 @@ def site_config(site_id):
     return jsonify(config)
 
 
-# Return post's attributes
-@app.route('/site/<string:site_id>/<string:file_id>', methods = ['GET'])
+# Handle working with posts
+@app.route('/site/<string:site_id>/<string:file_id>', methods = ['GET', 'POST', 'PUT'])
 def site_get(site_id, file_id):
-    filename = b64decode(file_id)
+    filename = b64decode(file_id).decode()
 
-    file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r')
-    fr = get_frontmatter(file.read())
-    return jsonify(fr)
-
-
-# Save new post
-@app.route('/site/<string:site_id>/<string:file_id>', methods = ['POST'])
-def site_new(site_id, file_id):
-    filename = b64decode(file_id)
-    data = request.json
-    post = frontmatter.loads()
-
-    if 'metadata' in data:
-        post.metadata = data['metadata']
-    if 'content' in data:
-        post.content = data['content']
-
-    file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r+b')
-    file.write(frontmatter.dumps(post))
-    file.close()
-    resp = {'status': status, 'site': site_id, 'file': filename}
-    return jsonify(resp)
-
-
-# Save content of post to file
-@app.route('/site/<string:site_id>/<string:file_id>', methods = ['PUT'])
-def site_edit(site_id, file_id):
-    filename = b64decode(file_id)
-    data = request.json
-
-    if data != None:
-        # Save post data to file
-        file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r+b')
-        post = frontmatter.loads(file.read())
-        file.seek(0)
-        file.truncate()
+    # Save new post
+    if request.method == 'POST':
+        data = request.json
+        post = frontmatter.loads()
 
         if 'metadata' in data:
             post.metadata = data['metadata']
         if 'content' in data:
             post.content = data['content']
 
+        file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r+b')
         file.write(frontmatter.dumps(post))
         file.close()
+        resp = {'status': status, 'site': site_id, 'file': filename}
+        return jsonify(resp)
 
-        # Commit changes
-        commited = commit(site_id, filename)
-        if commited:
-            status = 'ok'
+    # Save content of post to file
+    elif request.method == 'PUT':
+        data = request.json
+
+        if data != None:
+            # Save post data to file
+            file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r+b')
+            post = frontmatter.loads(file.read())
+            file.seek(0)
+            file.truncate()
+
+            if 'metadata' in data:
+                post.metadata = data['metadata']
+            if 'content' in data:
+                post.content = data['content']
+
+            file.write(frontmatter.dumps(post))
+            file.close()
+
+            # Commit changes
+            commited = commit(site_id, filename)
+            if commited:
+                status = 'ok'
+            else:
+                status = 'failed'
         else:
             status = 'failed'
+        resp = {'status': status, 'site': site_id, 'file': filename}
+        return jsonify(resp)
+
+    # Return post's attributes
     else:
-        status = 'failed'
-    resp = {'status': status, 'site': site_id, 'file': filename}
-    return jsonify(resp)
+        file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r', encoding='utf-8')
+        fr = get_frontmatter(file.read())
+        return jsonify(fr)
 
 
 @app.route('/private')
