@@ -7,7 +7,7 @@ from subprocess import call
 from .base import app, admin_role
 
 
-SITES_FOLDER = 'sites/'
+SITES_FOLDER = '/var/www/jekyledit'
 JE_CONFIG_NAME = 'jekylledit.json'
 
 
