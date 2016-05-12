@@ -89,7 +89,7 @@ klokantech.jekylledit.Translations.prototype.loadClear =
   });
   goog.dom.appendChild(this.table_, header);
 
-  this.auth_.sendRequest('translations/' + this.repo_,
+  this.auth_.sendRequest('site/' + this.repo_ + '/translations',
       goog.bind(function(e) {
         var xhr = e.target;
         var data = xhr.getResponseJson();
@@ -127,7 +127,7 @@ klokantech.jekylledit.Translations.prototype.save = function(opt_callback) {
     });
   }, this);
 
-  this.auth_.sendRequest('translations/' + this.repo_,
+  this.auth_.sendRequest('site/' + this.repo_ + '/translations',
       goog.bind(function(e) {
         alert('Changes saved!');
         if (opt_callback) {

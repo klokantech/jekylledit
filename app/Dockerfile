@@ -7,6 +7,7 @@ RUN apt-get -qq update && apt-get -qq -y --no-install-recommends install \
     build-essential \
     ca-certificates \
     gettext \
+    git \
     libffi-dev \
     libpq-dev \
     python3 \

@@ -1,25 +1,41 @@
+import os.path
+
+from base64 import b64decode
+from subprocess import check_call
+
+import frontmatter
+
 from flask import render_template, json, jsonify, request
 from flask.ext.cors import cross_origin
 from flask.ext.login import login_required
-from base64 import b64decode
-import frontmatter
-from subprocess import call
 
 from .base import app
 
 
 SITES_FOLDER = '/var/www/jekylledit'
+TRANSLATIONS_FILE = '_data/translations.json'
 JE_CONFIG_NAME = 'jekylledit.json'
 
 
+def git_call(dir, args):
+    cmd = [
+        'git',
+        '--git-dir={}'.format(os.path.join(dir, '.git')),
+        '--work-tree={}'.format(dir),
+    ]
+    cmd.extend(args)
+    check_call(cmd)
+
+
 def commit(repository, filename):
+    # TODO: Use '-c user.email=...' to author.
+    dir = os.path.join(SITES_FOLDER, repository)
     try:
-        gitdir = SITES_FOLDER + repository + '/'
-        call(['git', '--git-dir=' + gitdir + '.git', '--work-tree=' + gitdir, 'add', filename])
-        call(['git', '--git-dir=' + gitdir + '.git', '--work-tree=' + gitdir, 'commit', '-m', 'File ' + filename + 'updated'])
-      # call(['git', '--git-dir=' + gitdir + '.git', '--work-tree=' + gitdir, 'push'])
-        return True
-    except:
+        git_call(dir, ['add', filename])
+        git_call(dir, ['commit', '-m', 'File {} updated'.format(filename)])
+        # git_call(dir, ['push'])
+    except Exception:
+        git_call(dir, ['reset', '--hard', 'HEAD'])
         return False
 
 
@@ -29,57 +45,54 @@ def index():
 
 
 #site config response
-@app.route('/site/<string:site_id>/config')
+@app.route('/site/<site_id>/config')
 @cross_origin()
 def site_config(site_id):
-
-    f = open(SITES_FOLDER + '/' + site_id + '/' + JE_CONFIG_NAME, 'r')
-    config = json.loads(f.read())
+    with open_file(site_id, JE_CONFIG_NAME, 'r') as fp:
+        config = json.load(fp)
     # TODO: Validate
     return jsonify(config)
 
 
 # Handle working with posts
-@app.route('/site/<string:site_id>/<string:file_id>', methods = ['GET', 'POST', 'PUT'])
+@app.route('/site/<site_id>/<file_id>', methods=['GET', 'POST', 'PUT'])
 @cross_origin()
 def site_get(site_id, file_id):
     filename = b64decode(file_id).decode()
 
     # Save new post
     if request.method == 'POST':
-        data = request.json
-        post = frontmatter.loads()
-
+        data = request.get_json()
+        post = frontmatter.Post()
         if 'metadata' in data:
             post.metadata = data['metadata']
         if 'content' in data:
             post.content = data['content']
-
-        file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r+b')
-        file.write(frontmatter.dumps(post))
-        file.close()
-        resp = {'status': status, 'site': site_id, 'file': filename}
-        return jsonify(resp)
+        with open_file(site_id, filename, 'r') as fp:
+            formatter.dump(post, fp)
+        return jsonify({
+            'status': status,
+            'site': site_id,
+            'file': filename
+        })
 
     # Save content of post to file
     elif request.method == 'PUT':
-        data = request.json
-
-        if data != None:
+        data = request.get_json()
+        if data is not None:
             # Save post data to file
-            file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r+b')
-            post = frontmatter.loads(file.read())
-            file.seek(0)
-            file.truncate()
-
-            if 'metadata' in data:
-                post.metadata = data['metadata']
-            if 'content' in data:
-                post.content = data['content']
-
-            file.write(frontmatter.dumps(post))
-            file.close()
-
+            with open_file(site_id, filename, 'r+') as fp:
+                # XXX
+                # This is not PUT semantics. It should just
+                # overwrite anything that was in the file.
+                post = frontmatter.load(fp)
+                if 'metadata' in data:
+                    post.metadata = data['metadata']
+                if 'content' in data:
+                    post.content = data['content']
+                fp.seek(0)
+                fp.truncate()
+                frontmatter.dump(post, fp)
             # Commit changes
             commited = commit(site_id, filename)
             if commited:
@@ -88,12 +101,46 @@ def site_get(site_id, file_id):
                 status = 'failed'
         else:
             status = 'failed'
-        resp = {'status': status, 'site': site_id, 'file': filename}
-        return jsonify(resp)
+        return jsonify({
+            'status': status,
+            'site': site_id,
+            'file': filename
+        })
 
     # Return post's attributes
     else:
-        file = open(SITES_FOLDER + '/' + site_id + '/' + filename, 'r', encoding='utf-8')
-        fm = frontmatter.loads(file.read())
-        resp = {'metadata': fm.metadata}
-        return jsonify(resp)
+        with open_file(site_id, filename, 'r') as fp:
+            post = frontmatter.load(fp)
+        return jsonify({'metadata': post.metadata})
+
+
+#site translations
+@app.route('/site/<site_id>/translations', methods=['GET', 'PUT'])
+@cross_origin()
+def translations(site_id):
+    if request.method == 'GET':
+        with open_file(site_id, TRANSLATIONS_FILE, 'r') as fp:
+            translations = json.load(fp)
+        # TODO: Validate
+        return jsonify(translations)
+    elif request.method == 'PUT':
+        data = request.get_json()
+        # TODO: Validate
+        with open_file(site_id, TRANSLATIONS_FILE, 'w') as fp:
+            json.dump(data, fp)
+        # Commit changes
+        commited = commit(site_id, TRANSLATIONS_FILE)
+        if commited:
+            status = 'ok'
+        else:
+            status = 'failed'
+        return jsonify({
+            'status': status,
+            'site': site_id
+        })
+
+
+def open_file(site_id, filename, mode):
+    # Python in Docker has ASCII as default encoding.
+    path = os.path.join(SITES_FOLDER, site_id, filename)
+    return open(path, mode, encoding='utf-8')
