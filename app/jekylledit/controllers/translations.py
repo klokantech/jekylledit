@@ -3,7 +3,7 @@ from flask.ext.cors import cross_origin
 from flask.ext.login import login_required
 from subprocess import call
 
-from .base import app, admin_role
+from .base import app
 
 
 SITES_FOLDER = '/var/www/jekylledit'

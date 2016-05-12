@@ -5,7 +5,7 @@ from base64 import b64decode
 import frontmatter
 from subprocess import call
 
-from .base import app, admin_role
+from .base import app
 
 
 SITES_FOLDER = '/var/www/jekylledit'
@@ -97,16 +97,3 @@ def site_get(site_id, file_id):
         fm = frontmatter.loads(file.read())
         resp = {'metadata': fm.metadata}
         return jsonify(resp)
-
-
-@app.route('/private')
-@login_required
-def private():
-    return render_template('private.html')
-
-
-@app.route('/admin')
-@login_required
-@admin_role.require()
-def admin():
-    return render_template('admin.html')

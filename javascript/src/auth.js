@@ -94,7 +94,7 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
   goog.events.listen(loginBtn, goog.events.EventType.CLICK, function(e) {
     this.replaceWithSpinner_();
     var loginWindow = window.open(
-        klokantech.jekylledit.BASE_URL + 'auth/sign-in',
+        klokantech.jekylledit.BASE_URL + 'auth/widget',
         '_blank',
         'width=600,height=400'
         );

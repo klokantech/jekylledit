@@ -1,22 +1,21 @@
-PLOVR_VERSION=5.0.1
-PLOVR=plovr.jar
+SCRIPTS = jekylledit
 
-.PHONY: all plovr build serve lint webserver
+TARGET ?= .
 
+.PHONY: all
 all: build
-build: build/jekylledit.js
+
+.PHONY: serve
 serve:
 	java -jar $(PLOVR) serve *.json
-build/%.js: %.json
-	mkdir -p build
+
+.PHONY: build
+build: $(addprefix $(TARGET)/,$(addsuffix .js,$(SCRIPTS)))
+
+$(TARGET)/%.js: %.json
 	java -jar $(PLOVR) build $< > $@
-.PHONY: plovr
-plovr: $(PLOVR)
-$(PLOVR):
-	rm -f plovr.jar
-	wget --no-check-certificate https://github.com/bolinfest/plovr/releases/download/v$(PLOVR_VERSION)/plovr.jar
+
+.PHONY: lint
 lint:
 	fixjsstyle --strict -r src
 	gjslint --strict -r src
-webserver:
-	java -jar $(PLOVR) soyweb --dir ..

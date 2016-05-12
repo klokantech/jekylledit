@@ -8,5 +8,6 @@ Flask-Script
 Flask-SQLAlchemy
 Flask-WTF
 identity-toolkit-python-client
-uWSGI
 python-frontmatter
+requests
+uWSGI

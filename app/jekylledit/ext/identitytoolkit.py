@@ -4,22 +4,27 @@ from identitytoolkit import gitkitclient
 
 class Gitkit:
 
-    def __init__(self, app=None, widget_endpoint=None):
+    def __init__(self, app=None, endpoints=None):
+        if endpoints is None:
+            endpoints = {}
         self.params = None
-        self.widget_endpoint = widget_endpoint
+        self.endpoints = endpoints
         if app is not None:
             self.init_app(app)
 
     def init_app(self, app):
         app.config.setdefault('GITKIT_COOKIE_NAME', 'gtoken')
+        app.config.setdefault('GITKIT_SIGN_IN_OPTIONS', 'password')
+        self.api_key = app.config['GITKIT_API_KEY']
+        self.sign_in_options = [s.strip() for s in app.config['GITKIT_SIGN_IN_OPTIONS'].split(',')]
         self.params = {
             'client_id': app.config['GITKIT_CLIENT_ID'],
-            'service_account_email':
-                app.config['GITKIT_SERVICE_ACCOUNT_EMAIL'],
+            'service_account_email': app.config['GITKIT_SERVICE_ACCOUNT_EMAIL'],
             'service_account_key': app.config['GITKIT_SERVICE_ACCOUNT_KEY'],
             'project_id': app.config['GITKIT_PROJECT_ID'],
             'cookie_name': app.config['GITKIT_COOKIE_NAME'],
         }
+        app.add_template_global(self.config, name='gitkit_config')
 
     def get_email_verification_link(self, email):
         return self.client.GetEmailVerificationLink(email)
@@ -63,6 +68,19 @@ class Gitkit:
     def token(self):
         return request.cookies.get(self.params['cookie_name'])
 
+    def config(self, **options):
+        config = {
+            'apiKey': self.api_key,
+            'widgetUrl': self.url_for('widget'),
+            'signInSuccessUrl': self.url_for('sign_in_success'),
+            'signOutUrl': self.url_for('sign_out'),
+            'oobActionUrl': self.url_for('oob_action'),
+            'signInOptions': self.sign_in_options,
+            'queryParameterForSignInSuccessUrl': 'next',
+        }
+        config.update(options)
+        return config
+
     @property
     def client(self):
         ctx = _app_ctx_stack.top
@@ -70,10 +88,17 @@ class Gitkit:
             client = getattr(ctx, 'gitkit_client', None)
             if client is None:
                 client = gitkitclient.GitkitClient(
-                    widget_url=url_for(self.widget_endpoint, _external=True),
+                    widget_url=self.url_for('widget'),
                     **self.params)
                 ctx.gitkit_client = client
             return client
+
+    def url_for(self, name):
+        try:
+            endpoint = self.endpoints[name]
+        except KeyError:
+            return None
+        return url_for(endpoint, _external=True)
 
 
 def account_to_dict(account):

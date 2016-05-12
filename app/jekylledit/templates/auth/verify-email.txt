@@ -1,0 +1,5 @@
+You have requested to create a new Jekyll Edit account. Please
+confirm that you own this email address by clicking on the
+verification link bellow.
+
+Verification link: {{ oob_link }}

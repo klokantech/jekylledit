@@ -1,0 +1,8 @@
+You have requested to change the email address of your Jekyll Edit
+account. Please confirm that you own the new address by clicking
+on the verification link bellow.
+
+Old address: {{ email }}
+New address: {{ new_email }}
+
+Verification link: {{ oob_link }}

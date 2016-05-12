@@ -1,8 +1,5 @@
 from .base import app
-from .auth import auth, gitkit
-from . import site, translations
-
-if not app.config['DEVELOPMENT']:
-    gitkit.init_app(app)
-
-app.register_blueprint(auth, url_prefix='/auth')
+from . import auth
+from . import site
+from . import translations
+app.register_blueprint(auth.blueprint, url_prefix='/auth')

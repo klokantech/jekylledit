@@ -7,4 +7,4 @@ services:
       - ./data:/mnt
       - ./sites:/var/www/jekylledit
     environment:
-      - SQLALCHEMY_DATABASE_URI=sqlite:////mnt/database.sqlite
+      - SQLALCHEMY_DATABASE_URI=sqlite:////mnt/jekylledit.sqlite
