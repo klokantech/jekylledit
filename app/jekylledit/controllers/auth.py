@@ -1,3 +1,5 @@
+import re
+
 from datetime import datetime
 
 from flask import Blueprint, abort, jsonify, redirect, render_template, request, url_for
@@ -5,6 +7,7 @@ from flask.ext.cors import cross_origin
 from flask.ext.login import LoginManager, current_user, login_user, logout_user
 from flask.ext.principal import Identity, Permission, PermissionDenied, Principal
 from ..ext.identitytoolkit import Gitkit
+from itsdangerous import URLSafeSerializer
 
 from ..model import Account, db
 from .base import app, mailgun
@@ -24,12 +27,27 @@ else:
     gitkit = None
 
 
+token_serializer = URLSafeSerializer(app.secret_key, salt='access-token')
+token_regex = re.compile(r'Bearer\s+([-_.0-9a-zA-Z]+)$')
+
+
 admin_permission = Permission('admin')
 
 
 @login_manager.user_loader
 def load_user(id):
     return Account.query.get(id)
+
+
+@login_manager.request_loader
+def load_user_from_request(request):
+    header = request.headers.get('Authorization')
+    if header is None:
+        return None
+    match = token_regex.match(header)
+    if match is None:
+        return None
+    return Account.query.get(token_serializer.loads(match.group(1)))
 
 
 @login_manager.unauthorized_handler
@@ -162,9 +180,18 @@ def send(recipient, subject, text):
     })
 
 
-@blueprint.route('/token')
+@blueprint.route('/site/<site_id>/token')
 @cross_origin()
-def token():
-    return jsonify({
-      "accessToken": "TOKEN_HERE" # XXX
-    })
+def token(site_id):
+    # XXX Check authorization for site.
+    user = current_user._get_current_object()
+    if user.is_authenticated:
+        return jsonify({
+            'status_code': 200,
+            'access_token': token_serializer.dumps(user.id),
+        })
+    else:
+        return jsonify({
+            'status_code': 401,
+            'location': auth_url_for('widget', mode='select'),
+        })

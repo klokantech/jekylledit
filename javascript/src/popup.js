@@ -113,7 +113,7 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
    * @type {klokantech.jekylledit.Auth}
    * @private
    */
-  this.auth_ = new klokantech.jekylledit.Auth(this.content_);
+  this.auth_ = new klokantech.jekylledit.Auth(this.repo_, this.content_);
   this.auth_.login(goog.bind(this.onLogin_, this));
 };
 

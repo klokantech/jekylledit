@@ -17,12 +17,18 @@ goog.require('goog.net.XhrIo');
  * @param {Element} parentElement
  * @constructor
  */
-klokantech.jekylledit.Auth = function(parentElement) {
+klokantech.jekylledit.Auth = function(repo, parentElement) {
   /**
    * @type {?string}
    * @private
    */
   this.accessToken_ = null;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this.repo_ = repo;
 
   /**
    * @type {Element}
@@ -121,13 +127,13 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
  * @param {function(boolean)} callback
  */
 klokantech.jekylledit.Auth.prototype.checkLogin = function(callback) {
-  goog.net.XhrIo.send(klokantech.jekylledit.BASE_URL + 'auth/token',
+  goog.net.XhrIo.send(klokantech.jekylledit.BASE_URL + 'auth/site/' + this.repo_ + '/token',
       goog.bind(function(e) {
         var xhr = e.target;
         if (xhr.isSuccess()) {
           try {
             var response = xhr.getResponseJson();
-            this.accessToken_ = response && response['accessToken'];
+            this.accessToken_ = response && response['access_token'];
           } catch (e) {}
         }
         callback(goog.isString(this.accessToken_));
