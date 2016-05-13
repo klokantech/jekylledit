@@ -3,6 +3,7 @@ from base64 import b64decode
 import frontmatter
 
 from flask import json, jsonify, request
+from flask.ext.login import login_required
 from flask.ext.cors import cross_origin
 from flask.ext.login import current_user
 
@@ -37,6 +38,7 @@ def get_config(site_id):
 #site config response
 @app.route('/site/<site_id>/config')
 @cross_origin()
+@login_required
 @authorization_required('contributor', 'administrator')
 def site_config(site_id):
     config = get_config(site_id)
@@ -46,6 +48,7 @@ def site_config(site_id):
 # Handle working with posts
 @app.route('/site/<site_id>/<file_id>', methods=['GET', 'POST', 'PUT'])
 @cross_origin()
+@login_required
 @authorization_required('contributor', 'administrator')
 def site_file(site_id, file_id):
     repository = Repository(site_id)
@@ -144,6 +147,7 @@ def drafts(site_id):
 #site translations
 @app.route('/site/<site_id>/translations', methods=['GET', 'PUT'])
 @cross_origin()
+@login_required
 @authorization_required('contributor', 'administrator')
 def site_translation(site_id):
     repository = Repository(site_id)
