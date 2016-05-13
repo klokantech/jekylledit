@@ -80,7 +80,7 @@ klokantech.jekylledit.Auth.prototype.login = function(callback) {
   goog.dom.appendChild(this.parentElement_, this.element_);
 
   this.checkLogin(goog.bind(function(success) {
-    if (!goog.DEBUG && success) { //TODO
+    if (success) {
       goog.dom.removeNode(this.element_);
       callback();
     } else {
