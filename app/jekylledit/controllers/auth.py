@@ -282,7 +282,7 @@ def synchronize(site_id):
         site.mtime = mtime
         gitkit_options = data.get('gitkit_options') or None
         if gitkit_options is not None:
-            if not not set(gitkit_options).issubset(GITKIT_OPTIONS):
+            if not set(gitkit_options).issubset(GITKIT_OPTIONS):
                 raise Exception
         site.gitkit_options = gitkit_options
         roles = []
