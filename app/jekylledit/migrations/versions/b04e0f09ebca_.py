@@ -19,26 +19,26 @@ from jekylledit.model.base import JSON
 def upgrade():
     op.create_table(
         'account',
-        sa.Column('id', sa.Text(), nullable=False),
-        sa.Column('email', sa.Text(), nullable=False),
-        sa.Column('email_verified', sa.Text(), nullable=False),
+        sa.Column('id', sa.Unicode(), nullable=False),
+        sa.Column('email', sa.Unicode(), nullable=False),
+        sa.Column('email_verified', sa.Boolean(), nullable=False),
         sa.Column('email_challenged', sa.DateTime(), nullable=True),
-        sa.Column('name', sa.Text(), nullable=True),
-        sa.Column('photo_url', sa.Text(), nullable=True),
+        sa.Column('name', sa.Unicode(), nullable=True),
+        sa.Column('photo_url', sa.Unicode(), nullable=True),
         sa.PrimaryKeyConstraint('id', name=op.f('account_pkey')),
         sa.UniqueConstraint('email', name=op.f('account_email_key')),
     )
     op.create_table(
         'site',
-        sa.Column('id', sa.Text(), nullable=False),
+        sa.Column('id', sa.Unicode(), nullable=False),
         sa.Column('mtime', sa.Integer(), nullable=False),
         sa.Column('gitkit_sign_in_options', JSON(), nullable=True),
         sa.PrimaryKeyConstraint('id', name=op.f('site_pkey')),
     )
     op.create_table(
         'roles',
-        sa.Column('email', sa.Text(), nullable=False),
-        sa.Column('site_id', sa.Text(), nullable=False),
+        sa.Column('email', sa.Unicode(), nullable=False),
+        sa.Column('site_id', sa.Unicode(), nullable=False),
         sa.Column('roles', JSON(), nullable=False),
         sa.ForeignKeyConstraint(['email'], ['account.email'], name=op.f('roles_email_fkey')),
         sa.ForeignKeyConstraint(['site_id'], ['site.id'], name=op.f('roles_site_id_fkey')),
