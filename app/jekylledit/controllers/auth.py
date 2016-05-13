@@ -121,29 +121,35 @@ def widget():
     if not app.config['DEVELOPMENT']:
         url_adapter = _request_ctx_stack.top.url_adapter
         next = request.args.get('next')
-        if next is None:
+        if next is not None:
+            url = urlparse(next)
+            if url.netloc != request.host:
+                abort(400)
+            endpoint, __ = url_adapter.match(url.path, 'GET')
+            if endpoint != 'auth.sign_in_success':
+                abort(400)
+            query = parse_qs(url.query)
+            next = query.get('next')
+            if next is None:
+                abort(400)
+            url = urlparse(next[0])
+            if url.netloc != request.host:
+                abort(400)
+            endpoint, values = url_adapter.match(url.path, 'GET')
+            if endpoint != 'auth.site_authenticated':
+                abort(400)
+            site_id = values['site_id']
+            site = synchronize(site_id)
+            sign_in_options = site.gitkit_sign_in_options or gitkit.sign_in_options
+        elif request.args.get('mode') == 'select':
             abort(400)
-        url = urlparse(next)
-        if url.netloc != request.host:
-            abort(400)
-        endpoint, __ = url_adapter.match(url.path, 'GET')
-        if endpoint != 'auth.sign_in_success':
-            abort(400)
-        query = parse_qs(url.query)
-        next = query.get('next')
-        if next is None:
-            abort(400)
-        url = urlparse(next[0])
-        if url.netloc != request.host:
-            abort(400)
-        endpoint, values = url_adapter.match(url.path, 'GET')
-        if endpoint != 'auth.site_authenticated':
-            abort(400)
-        site_id = values['site_id']
-        site = synchronize(site_id)
+        else:
+            sign_in_options = gitkit.sign_in_options
         config = gitkit.config(
             siteName='Jekyll Edit',
-            signInOptions=site.gitkit_sign_in_options or gitkit.sign_in_options)
+            accountChooserEnabled=False,
+            signInOptions=sign_in_options,
+            displayMode='providerFirst')
     else:
         config=None
     return render_template('auth/widget.html', config_=config)
