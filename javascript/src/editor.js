@@ -104,6 +104,12 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
    */
   this.postData_ = null;
 
+  /**
+   * @type {Object}
+   * @private
+   */
+  this.postMeta_ = null;
+
   this.loadClear(opt_callback);
 };
 
@@ -132,21 +138,33 @@ klokantech.jekylledit.Editor.prototype.getElement = function() {
 /** @inheritDoc */
 klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
   if (this.path_) {
-    if (this.editSource_) {
-      klokantech.jekylledit.utils.cloneNodes(this.editSource_, this.content_);
-    }
     this.auth_.sendRequest(
         'site/' + this.repo_ + '/' + goog.crypt.base64.encodeString(this.path_),
         goog.bind(function(e) {
           var xhr = e.target;
           var data = xhr.getResponseJson();
-          this.postData_ = data['metadata'];
+          this.postData_ = data;
+          this.postMeta_ = this.postData_['metadata'];
 
-          this.category_ =
-          (this.postData_['category'] || this.postData_['categories']);
-          if (goog.isArray(this.category_)) {
-            this.category_ = this.category_[0];
+          var cat =
+          (this.postMeta_['category'] || this.postMeta_['categories']);
+          if (goog.isArray(cat)) {
+            this.category_ = null;
+            goog.array.forEach(cat, function(cat_) {
+              if (!this.category_ && this.config_['metadata'][cat_]) {
+                this.category_ = cat_;
+              }
+            }, this);
+            if (!this.category_) {
+              this.category_ = cat[0];
+            }
+          } else {
+            this.category_ = cat;
           }
+
+          this.content_.innerHTML =
+          (this.config_['metadata'][this.category_] || {})['empty_content'] ||
+          klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT;
 
           if (opt_callback) {
             opt_callback();
@@ -156,7 +174,11 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
     this.content_.innerHTML =
         (this.config_['metadata'][this.category_] || {})['empty_content'] ||
         klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT;
-    this.postData_ = {};
+    this.postData_ = {
+      'metadata': {},
+      'content': ''
+    };
+    this.postMeta_ = {};
     if (opt_callback) {
       opt_callback();
     }
@@ -181,22 +203,22 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
 
   goog.object.forEach(fields, function(el, k) {
     var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k + ':');
-    var inputValue = (this.postData_[k] || el['value']).toString();
+    var inputValue = (this.postMeta_[k] || el['value']).toString();
     if (this.inlineFields_[k]) {
       var value = goog.dom.createDom(goog.dom.TagName.SPAN,
                                      'je-editor-editableinline', inputValue);
       goog.dom.append(this.side_, label, value);
     } else {
       goog.dom.appendChild(this.side_, label);
-      el['_je_getval'] = this.createField_(el, this.postData_[k], this.side_);
+      el['_je_getval'] = this.createField_(el, this.postMeta_[k], this.side_);
     }
   }, this);
 
-  goog.object.forEach(this.postData_, function(el, k) {
+  goog.object.forEach(this.postMeta_, function(el, k) {
     if (!fields[k]) {
       var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k + ':');
       var dataInput = goog.dom.createDom(goog.dom.TagName.DIV, {},
-          this.postData_[k].toString());
+          this.postMeta_[k].toString());
       goog.dom.append(this.side_, label, dataInput);
     }
   }, this);
@@ -282,6 +304,13 @@ klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
           'https://cdnjs.cloudflare.com/ajax/libs/to-markdown/' +
           '3.0.0/to-markdown.min.js');
       klokantech.jekylledit.utils.installScript(
+          'https://cdnjs.cloudflare.com/ajax/libs/showdown/' +
+          '1.3.0/showdown.min.js', goog.bind(function() {
+            var showdown = new goog.global['showdown']['Converter']();
+            editable.innerHTML =
+                showdown['makeHtml'](this.postData_['content']);
+          }, this));
+      klokantech.jekylledit.utils.installScript(
           'https://cdnjs.cloudflare.com/ajax/libs/medium-editor/' +
           '5.16.1/js/medium-editor.min.js', goog.bind(function() {
             if (this.editor_) {
@@ -299,6 +328,10 @@ klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
             });
           }, this));
     } else {
+      var metaValue = this.postMeta_[sourceType];
+      if (metaValue) {
+        goog.dom.setTextContent(editable, metaValue);
+      }
       var fieldDescription = fields[sourceType];
       if (fieldDescription) {
         editable.contentEditable = true;

@@ -111,7 +111,10 @@ def site_get(site_id, file_id):
     else:
         with open_file(site_id, filename, 'r') as fp:
             post = frontmatter.load(fp)
-        return jsonify({'metadata': post.metadata})
+        return jsonify({
+            'metadata': post.metadata,
+            'content': post.content
+        })
 
 
 #site translations
