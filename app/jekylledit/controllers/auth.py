@@ -31,6 +31,9 @@ else:
     gitkit = None
 
 
+GITKIT_OPTIONS = {'accountChooserEnabled', 'displayMode', 'signInOptions'}
+
+
 token_serializer = URLSafeTimedSerializer(app.secret_key, salt='access-token')
 token_regex = re.compile(r'Bearer\s+([-_.0-9a-zA-Z]+)$')
 
@@ -140,19 +143,14 @@ def widget():
                 abort(400)
             site_id = values['site_id']
             site = synchronize(site_id)
-            sign_in_options = site.gitkit_sign_in_options or gitkit.sign_in_options
+            options = site.gitkit_options
         elif request.args.get('mode') == 'select':
             abort(400)
         else:
-            sign_in_options = gitkit.sign_in_options
-        config = gitkit.config(
-            siteName='Jekyll Edit',
-            accountChooserEnabled=False,
-            signInOptions=sign_in_options,
-            displayMode='providerFirst')
+            options = None
     else:
-        config=None
-    return render_template('auth/widget.html', config_=config)
+        options = None
+    return render_template('auth/widget.html', options=options or {})
 
 
 @blueprint.route('/sign-in-success')
@@ -282,7 +280,11 @@ def synchronize(site_id):
             site = Site(id=site_id)
             db.session.add(site)
         site.mtime = mtime
-        site.gitkit_sign_in_options = data.get('gitkit_sign_in_options') or None
+        gitkit_options = data.get('gitkit_options') or None
+        if gitkit_options is not None:
+            if not not set(gitkit_options).issubset(GITKIT_OPTIONS):
+                raise Exception
+        site.gitkit_options = gitkit_options
         roles = []
         default_roles = data.get('default_roles', ['visitor'])
         for account in data.get('accounts', []):

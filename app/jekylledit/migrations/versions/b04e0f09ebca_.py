@@ -32,7 +32,7 @@ def upgrade():
         'site',
         sa.Column('id', sa.Unicode(), nullable=False),
         sa.Column('mtime', sa.Integer(), nullable=False),
-        sa.Column('gitkit_sign_in_options', JSON(), nullable=True),
+        sa.Column('gitkit_options', JSON(), nullable=True),
         sa.PrimaryKeyConstraint('id', name=op.f('site_pkey')),
     )
     op.create_table(

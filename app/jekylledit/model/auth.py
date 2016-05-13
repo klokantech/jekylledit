@@ -9,7 +9,7 @@ class Site(db.Model):
 
     id = db.Column(db.Unicode, primary_key=True)
     mtime = db.Column(db.Integer, nullable=False)
-    gitkit_sign_in_options = db.Column(JSON)
+    gitkit_options = db.Column(JSON)
 
 
 class Account(UserMixin, db.Model):
