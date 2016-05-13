@@ -1,17 +1,15 @@
 import re
 
 from datetime import datetime
-from functools import wraps
 
 from flask import Blueprint, abort, jsonify, redirect, render_template, request, url_for
-from flask.ext.cors import cross_origin
 from flask.ext.login import LoginManager, current_user, login_user, logout_user
 from flask.ext.principal import Identity, Permission, PermissionDenied, Principal
 from ..ext.identitytoolkit import Gitkit
 from itsdangerous import URLSafeSerializer
 
 from ..model import Account, db
-from .base import app, mailgun
+from .base import app, mailgun, jsonp
 
 
 blueprint = Blueprint('auth', __name__)
@@ -34,22 +32,6 @@ token_regex = re.compile(r'Bearer\s+([-_.0-9a-zA-Z]+)$')
 
 admin_permission = Permission('admin')
 
-def jsonp(func):
-    """Wraps JSONified output for JSONP requests."""
-    @wraps(func)
-    def decorated_function(*args, **kwargs):
-        callback = request.args.get('callback', False)
-        if callback:
-            resp = func(*args, **kwargs)
-            resp.set_data('{}({})'.format(
-                str(callback),
-                resp.get_data(as_text=True)
-            ))
-            resp.mimetype = 'application/javascript'
-            return resp
-        else:
-            return func(*args, **kwargs)
-    return decorated_function
 
 @login_manager.user_loader
 def load_user(id):

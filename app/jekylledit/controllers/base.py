@@ -1,7 +1,7 @@
 import os
 import os.path
 
-from functools import lru_cache
+from functools import lru_cache, wraps
 from urllib.parse import urlparse
 
 from flask import Flask, request, url_for
@@ -18,6 +18,22 @@ if not app.config['DEVELOPMENT']:
     mailgun = Mailgun(app)
 else:
     mailgun = None
+
+
+def jsonp(func):
+    """Wrap JSONified response for JSONP requests."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        response = func(*args, **kwargs)
+        callback = request.args.get('callback')
+        if callback:
+            data = response.get_data()
+            # Working on bytes is more efficient, but Python only supports
+            # formatting on bytes since version 3.5. This will have to do.
+            response.set_data(b''.join((callback.encode(), b'(', data, b')')))
+            response.mimetype = 'application/javascript'
+        return response
+    return wrapper
 
 
 @app.url_defaults
