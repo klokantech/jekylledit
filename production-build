@@ -1,3 +1,4 @@
 #!/bin/sh
 rm -rf app/jekylledit/static/js
+mkdir app/jekylledit/static/js
 _development run --rm -e TARGET=/mnt javascript make build
