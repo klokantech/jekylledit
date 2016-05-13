@@ -1,10 +1,8 @@
-import os.path
-
 from base64 import b64decode
 
 import frontmatter
 
-from flask import render_template, json, jsonify, request
+from flask import json, jsonify, request
 from flask.ext.cors import cross_origin
 
 from ..model import Repository

@@ -1,5 +1,7 @@
 import os.path
 
+from flask.ext.login import current_user
+
 from contextlib import contextmanager
 from subprocess import Popen, PIPE
 
