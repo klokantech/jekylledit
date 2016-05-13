@@ -2,7 +2,7 @@
   "id": "jekylledit",
 
   "inputs": ["src/jekylledit.js"],
-  "paths": ["src"],
+  "paths": ["src", "library"],
 
   "externs": [
   ],

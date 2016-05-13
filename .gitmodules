@@ -1,0 +1,3 @@
+[submodule "javascript/library"]
+	path = javascript/library
+	url = https://github.com/klokantech/javascript.git

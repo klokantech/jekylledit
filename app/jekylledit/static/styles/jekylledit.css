@@ -116,3 +116,15 @@
   0% {-webkit-transform:rotate(0deg);transform:rotate(0deg);}
   100% {-webkit-transform:rotate(360deg);transform: rotate(360deg);}
 }
+
+.ac-renderer{position:absolute;border:1px solid #898989;margin-top:-1px;max-width:400px;z-index:10100;}
+.ac-row{white-space:nowrap;position:relative;cursor:pointer;padding:5px;background-color:#fff;overflow:hidden !important;text-overflow:ellipsis}
+.ac-highlighted{font-weight:bold}
+.ac-active{color:#393939;background-color:#f3f3f3}
+.ac-type{background-color:#990033;color:#FFFFFF;display:block;margin:2px;padding:2px;font-style:italic;float:right}
+.je-multichoice{background-color:#fff;border:1px solid #898989;cursor:text;display:block;padding:2px;overflow-y:auto;overflow-x:hidden;margin-bottom:0}
+.je-multichoice input{border:0 !important;outline:0 !important;margin:0 !important;padding:0 !important;width:auto !important;box-shadow:none;padding-left:3px !important;display:inline-block;}
+.je-multichoice div{display:inline-block;position:relative;font-size:11px;padding:3px 18px 3px 5px;margin:0 4px 2px 0;cursor:default;border-radius:2.5px;background-color:#898989;color:#fff}
+.je-multichoice div a{display:block;width:10px;height:10px;position:absolute;top:3px;right:2px;text-decoration:none;color:#fff;font-size:10px}
+.je-multichoice div a:hover{color:#393939}
+.je-multichoice div .mc-tag-remove{}
