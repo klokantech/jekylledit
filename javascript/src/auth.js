@@ -9,11 +9,13 @@ goog.provide('klokantech.jekylledit.Auth');
 goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
+goog.require('goog.net.Jsonp');
 goog.require('goog.net.XhrIo');
 
 
 
 /**
+ * @param {string} repo
  * @param {Element} parentElement
  * @constructor
  */
@@ -29,6 +31,13 @@ klokantech.jekylledit.Auth = function(repo, parentElement) {
    * @private
    */
   this.repo_ = repo;
+
+  /**
+   * @type {goog.net.Jsonp}
+   * @private
+   */
+  this.tokenJsonp_ = new goog.net.Jsonp(
+      klokantech.jekylledit.BASE_URL + 'auth/site/' + this.repo_ + '/token');
 
   /**
    * @type {Element}
@@ -127,17 +136,12 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
  * @param {function(boolean)} callback
  */
 klokantech.jekylledit.Auth.prototype.checkLogin = function(callback) {
-  goog.net.XhrIo.send(klokantech.jekylledit.BASE_URL + 'auth/site/' + this.repo_ + '/token',
-      goog.bind(function(e) {
-        var xhr = e.target;
-        if (xhr.isSuccess()) {
-          try {
-            var response = xhr.getResponseJson();
-            this.accessToken_ = response && response['access_token'];
-          } catch (e) {}
-        }
+  this.tokenJsonp_.send(undefined, goog.bind(function(data) {
+        this.accessToken_ = data && data['access_token'];
         callback(goog.isString(this.accessToken_));
-      }, this));
+      }, this), function() {
+        callback(false);
+      });
 };
 
 

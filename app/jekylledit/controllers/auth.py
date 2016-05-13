@@ -1,6 +1,7 @@
 import re
 
 from datetime import datetime
+from functools import wraps
 
 from flask import Blueprint, abort, jsonify, redirect, render_template, request, url_for
 from flask.ext.cors import cross_origin
@@ -33,6 +34,22 @@ token_regex = re.compile(r'Bearer\s+([-_.0-9a-zA-Z]+)$')
 
 admin_permission = Permission('admin')
 
+def jsonp(func):
+    """Wraps JSONified output for JSONP requests."""
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        callback = request.args.get('callback', False)
+        if callback:
+            resp = func(*args, **kwargs)
+            resp.set_data('{}({})'.format(
+                str(callback),
+                resp.get_data(as_text=True)
+            ))
+            resp.mimetype = 'application/javascript'
+            return resp
+        else:
+            return func(*args, **kwargs)
+    return decorated_function
 
 @login_manager.user_loader
 def load_user(id):
@@ -181,7 +198,7 @@ def send(recipient, subject, text):
 
 
 @blueprint.route('/site/<site_id>/token')
-@cross_origin()
+@jsonp
 def token(site_id):
     # XXX Check authorization for site.
     user = current_user._get_current_object()
