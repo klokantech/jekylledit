@@ -187,7 +187,7 @@ def sign_out():
 
 @blueprint.route('/account/<id>/verify-email', methods={'GET', 'POST'})
 def verify_email(id):
-    account = Account.get_or_404(id)
+    account = Account.query.get_or_404(id)
     if request.method == 'POST' and not account.email_verified:
         send_email_challenge(account)
         db.session.commit()
