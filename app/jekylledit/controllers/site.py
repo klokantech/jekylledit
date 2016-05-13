@@ -26,11 +26,6 @@ def commit(repository, filename):
         return False
 
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
 #site config response
 @app.route('/site/<site_id>/config')
 @cross_origin()
