@@ -27,17 +27,17 @@ klokantech.jekylledit.Auth = function(repo, parentElement) {
   this.accessToken_ = null;
 
   /**
-   * @type {string}
+   * @type {?string}
    * @private
    */
-  this.repo_ = repo;
+  this.signInUrl_ = null;
 
   /**
    * @type {goog.net.Jsonp}
    * @private
    */
   this.tokenJsonp_ = new goog.net.Jsonp(
-      klokantech.jekylledit.BASE_URL + 'auth/site/' + this.repo_ + '/token');
+      klokantech.jekylledit.BASE_URL + 'auth/site/' + repo + '/token');
 
   /**
    * @type {Element}
@@ -109,7 +109,7 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
   goog.events.listen(loginBtn, goog.events.EventType.CLICK, function(e) {
     this.replaceWithSpinner_();
     var loginWindow = window.open(
-        klokantech.jekylledit.BASE_URL + 'auth/widget',
+        this.signInUrl_,
         '_blank',
         'width=600,height=400'
         );
@@ -137,8 +137,14 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
  */
 klokantech.jekylledit.Auth.prototype.checkLogin = function(callback) {
   this.tokenJsonp_.send(undefined, goog.bind(function(data) {
-        this.accessToken_ = data && data['access_token'];
-        callback(goog.isString(this.accessToken_));
+        var statusCode = data['status_code'];
+        if (statusCode == 200) {
+          this.accessToken_ = data['access_token'];
+          callback(true);
+        } else if (statusCode == 401) {
+          this.signInUrl_ = data['location'];
+          callback(false);
+        }
       }, this), function() {
         callback(false);
       });

@@ -7,13 +7,13 @@ services:
     command: >
         /venv/bin/uwsgi
         --master
-        --uid nobody
         --enable-threads
         --socket 0.0.0.0:8000
         --wsgi jekylledit:app
     restart: always
     environment:
       - FLASK_SECRET_KEY="<<< Production key >>>"
+      - GITKIT_API_KEY="<<< API KEY >>>"
       - GITKIT_CLIENT_ID="<<< Client ID >>>"
       - GITKIT_PROJECT_ID="<<< Project ID >>>"
       - GITKIT_SERVICE_ACCOUNT_EMAIL="<<< Service account email >>>"
@@ -22,6 +22,8 @@ services:
         Insert the encoded private key here. The '|' above is intentional.
         This is how you do big blocks of text in YAML.
         -----END PRIVATE KEY-----
+      - MAILGUN_KEY=bla
+      - MAILGUN_DOMAIN=jekylledit.klokantech.com
   nginx:
     image: klokantech/nginx
     ports:

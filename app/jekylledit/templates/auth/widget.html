@@ -17,7 +17,7 @@ Authentication
 window.opener = null;
 window.google.identitytoolkit.start(
   '#gitkitWidgetDiv',
-  {{ gitkit_config(siteName='Jekyll Edit')|tojson }},
+  {{ config_|tojson }},
   '{{ POST_BODY }}'
 );
 </script>

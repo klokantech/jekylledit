@@ -1,6 +1,9 @@
+import json
+
 from flask.ext.migrate import Migrate
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+from sqlalchemy.types import TypeDecorator
 
 
 # Necessary for proper migrations.
@@ -15,3 +18,16 @@ metadata = MetaData(naming_convention={
 
 db = SQLAlchemy(metadata=metadata)
 migrate = Migrate(db=db)
+
+
+class JSON(TypeDecorator):
+
+    impl = db.Text
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            return json.dumps(value)
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            return json.loads(value)
