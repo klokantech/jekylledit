@@ -11,6 +11,7 @@ goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('klokantech.jekylledit.Auth');
 goog.require('klokantech.jekylledit.Editor');
+goog.require('klokantech.jekylledit.Profile');
 goog.require('klokantech.jekylledit.Translations');
 goog.require('klokantech.jekylledit.utils');
 
@@ -158,6 +159,16 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
         goog.dom.appendChild(this.nav_, transBtn);
         goog.events.listen(transBtn, goog.events.EventType.CLICK, function(e) {
           this.startPage_('translations/');
+        }, false, this);
+
+        // profile
+        this.pages_['profile/'] = new klokantech.jekylledit.Profile(
+            this.auth_, this.config_, this.repo_);
+        var profBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+                                         'Profile');
+        goog.dom.appendChild(this.nav_, profBtn);
+        goog.events.listen(profBtn, goog.events.EventType.CLICK, function(e) {
+          this.startPage_('profile/');
         }, false, this);
       }, this));
 };

@@ -11,9 +11,7 @@ goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('klokantech.jekylledit.AbstractPage');
-goog.require('klokantech.jekylledit.Auth');
 goog.require('klokantech.jekylledit.utils');
-goog.require('kt.MultiComplete');
 
 
 
@@ -210,7 +208,8 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
       goog.dom.append(this.side_, label, value);
     } else {
       goog.dom.appendChild(this.side_, label);
-      el['_je_getval'] = this.createField_(el, this.postMeta_[k], this.side_);
+      el['_je_getval'] = klokantech.jekylledit.utils.createField(
+                             el, this.postMeta_[k], this.side_);
     }
   }, this);
 
@@ -222,63 +221,6 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
       goog.dom.append(this.side_, label, dataInput);
     }
   }, this);
-};
-
-
-/**
- * @param {Object.<string, *>} field
- * @param {?*} currentValue
- * @param {Node} parent
- * @return {function(): *} Value getter
- * @private
- */
-klokantech.jekylledit.Editor.prototype.createField_ =
-    function(field, currentValue, parent) {
-  var type = field['type'];
-  var value = currentValue || field['value'];
-  if (type == 'datetime') {
-    var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
-      type: 'datetime-local',
-      value: value.split('-').slice(0, 3).join('-')
-    });
-    goog.dom.appendChild(parent, dataInput);
-    return function() { return dataInput.value; };
-  } else if (type == 'boolean') {
-    var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
-      type: 'checkbox',
-      checked: value
-    });
-    goog.dom.appendChild(parent, dataInput);
-    return function() { return dataInput.checked; };
-  } else if (type == 'select') {
-    var select = goog.dom.createDom(goog.dom.TagName.SELECT);
-    goog.array.forEach(
-        /** @type {Array} */(field['values']) || [], function(opt) {
-          goog.dom.appendChild(select,
-          goog.dom.createDom(goog.dom.TagName.OPTION, {
-            value: opt
-          }, opt));
-        });
-    select.value = value;
-    goog.dom.appendChild(parent, select);
-    return function() { return select.value; };
-  } else if (type == 'multichoice') {
-    var span = goog.dom.createDom(goog.dom.TagName.SPAN, 'je-multichoice');
-    var mc = new kt.MultiComplete(
-        span, /** @type {Array} */(field['values']) || [], undefined, true);
-    goog.array.forEach(/** @type {Array} */(value) || [], function(opt) {
-      mc.addValue(opt);
-    });
-    goog.dom.appendChild(parent, span);
-    return function() { return mc.getValues(); };
-  } else {
-    var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
-      type: 'text',
-      value: value.toString()
-    });
-    goog.dom.appendChild(parent, dataInput);
-    return function() { return dataInput.value; };
-  }
 };
 
 

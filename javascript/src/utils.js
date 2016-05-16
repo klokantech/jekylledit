@@ -6,8 +6,10 @@
  */
 goog.provide('klokantech.jekylledit.utils');
 
+goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.net.jsloader');
+goog.require('kt.MultiComplete');
 
 
 /**
@@ -79,5 +81,61 @@ klokantech.jekylledit.utils.cloneNodes = function(origin, destination) {
             goog.dom.append(destination, el.cloneNode(true));
           }
         });
+  }
+};
+
+
+/**
+ * @param {Object.<string, *>} field
+ * @param {?*} currentValue
+ * @param {Node} parent
+ * @return {function(): *} Value getter
+ */
+klokantech.jekylledit.utils.createField =
+    function(field, currentValue, parent) {
+  var type = field['type'];
+  var value = currentValue || field['value'];
+  if (type == 'datetime') {
+    var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
+      type: 'datetime-local',
+      value: value.split('-').slice(0, 3).join('-')
+    });
+    goog.dom.appendChild(parent, dataInput);
+    return function() { return dataInput.value; };
+  } else if (type == 'boolean') {
+    var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
+      type: 'checkbox',
+      checked: value
+    });
+    goog.dom.appendChild(parent, dataInput);
+    return function() { return dataInput.checked; };
+  } else if (type == 'select') {
+    var select = goog.dom.createDom(goog.dom.TagName.SELECT);
+    goog.array.forEach(
+        /** @type {Array} */(field['values']) || [], function(opt) {
+          goog.dom.appendChild(select,
+          goog.dom.createDom(goog.dom.TagName.OPTION, {
+            value: opt
+          }, opt));
+        });
+    select.value = value;
+    goog.dom.appendChild(parent, select);
+    return function() { return select.value; };
+  } else if (type == 'multichoice') {
+    var span = goog.dom.createDom(goog.dom.TagName.SPAN, 'je-multichoice');
+    var mc = new kt.MultiComplete(
+        span, /** @type {Array} */(field['values']) || [], undefined, true);
+    goog.array.forEach(/** @type {Array} */(value) || [], function(opt) {
+      mc.addValue(opt);
+    });
+    goog.dom.appendChild(parent, span);
+    return function() { return mc.getValues(); };
+  } else {
+    var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
+      type: 'text',
+      value: value.toString()
+    });
+    goog.dom.appendChild(parent, dataInput);
+    return function() { return dataInput.value; };
   }
 };
