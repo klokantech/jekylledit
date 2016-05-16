@@ -79,14 +79,7 @@ klokantech.jekylledit.Auth.prototype.login = function(callback) {
   this.replaceWithSpinner_();
   goog.dom.appendChild(this.parentElement_, this.element_);
 
-  this.checkLogin(goog.bind(function(success) {
-    if (success) {
-      goog.dom.removeNode(this.element_);
-      callback();
-    } else {
-      this.showLoginBtn_(callback);
-    }
-  }, this));
+  this.checkLogin_(callback);
 };
 
 
@@ -101,7 +94,7 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
   if (opt_retry) {
     goog.dom.appendChild(this.element_,
         goog.dom.createDom(goog.dom.TagName.DIV, undefined,
-            'Log in failed or not authorized!'));
+            'Log in failed!'));
   }
   var loginBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
                                     opt_retry ? 'Retry' : 'Log in');
@@ -117,14 +110,7 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
       try {
         if (loginWindow == null || loginWindow.closed) {
           clearInterval(intervalId);
-          this.checkLogin(goog.bind(function(success) {
-            if (success) {
-              goog.dom.removeNode(this.element_);
-              callback();
-            } else {
-              this.showLoginBtn_(callback, true);
-            }
-          }, this));
+          this.checkLogin_(callback, true);
         }
       } catch (e) {}
     }, this), 500);
@@ -133,21 +119,36 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
 
 
 /**
- * @param {function(boolean)} callback
+ * @private
  */
-klokantech.jekylledit.Auth.prototype.checkLogin = function(callback) {
+klokantech.jekylledit.Auth.prototype.showNotAuthorized_ = function() {
+  goog.dom.removeChildren(this.element_);
+  goog.dom.appendChild(this.element_,
+      goog.dom.createDom(goog.dom.TagName.DIV, undefined,
+          'You are not authorized to modify this site!'));
+};
+
+
+/**
+ * @param {Function} callback
+ * @param {boolean=} opt_retry
+ * @private
+ */
+klokantech.jekylledit.Auth.prototype.checkLogin_ =
+    function(callback, opt_retry) {
   this.tokenJsonp_.send(undefined, goog.bind(function(data) {
         var statusCode = data['status_code'];
         if (statusCode == 200) {
           this.accessToken_ = data['access_token'];
-          callback(true);
+          goog.dom.removeNode(this.element_);
+          callback();
         } else if (statusCode == 401) {
           this.signInUrl_ = data['location'];
-          callback(false);
+          this.showLoginBtn_(callback, opt_retry);
+        } else if (statusCode == 403) {
+          this.showNotAuthorized_();
         }
-      }, this), function() {
-        callback(false);
-      });
+      }, this));
 };
 
 
