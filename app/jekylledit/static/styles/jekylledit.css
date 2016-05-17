@@ -35,7 +35,33 @@
   right:0;
   overflow:auto;
 }
-.je-editor-content{
+.je-editor-tabbtns {
+  position:absolute;
+  top:0;
+  height:50px;
+}
+.je-editor-tabs {
+  position:absolute;
+  top:50px;
+  bottom:0;
+  width:100%;
+  border-top:1px solid #ccc;
+}
+.je-editor-tab-btn {
+  display:inline-block;
+  padding:10px;
+  border:1px solid black;
+}
+.je-editor-tab-btn.active {
+  font-weight:bold;
+}
+.je-editor-tab {
+  display:none;
+}
+.je-editor-tab.active {
+  display:block;
+}
+.je-editor-tab-content{
   position:absolute;
   top:0;
   bottom:0;
@@ -44,11 +70,7 @@
   overflow:auto;
   padding: 30px;
 }
-.je-editor-content img:first-child{
-  margin-left: -31px;
-  margin-top: -30px;
-}
-.je-editor-side{
+.je-editor-tab-side{
   position:absolute;
   top:0;
   right:0;
@@ -58,7 +80,7 @@
   background:#ccc;
   padding: 10px;
 }
-.je-editor-side * {
+.je-editor-tab-side * {
   font-size:0.8em;
 }
 .je-editor-editableinline {
@@ -67,13 +89,13 @@
 .je-editor-editableinline:before{
   content:'\2190 [inline] ';
 }
-.je-editor-side input {
+.je-editor-tab-side input {
   width:100%;
   height:auto !important;
   padding:0 !important;
   margin:0 !important;
 }
-.je-editor-side label {
+.je-editor-tab-side label {
   font-weight:bold;
 }
 .je-popup-actions{
