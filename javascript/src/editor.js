@@ -29,6 +29,12 @@ goog.require('klokantech.jekylledit.utils');
 klokantech.jekylledit.Editor = function(auth, config, category, repo,
                                         opt_path, opt_content, opt_callback) {
   /**
+   * @type {string}
+   * @private
+   */
+  this.lang_ = 'en';
+
+  /**
    * @type {klokantech.jekylledit.Auth}
    * @private
    */
@@ -210,14 +216,17 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
   var fields = this.catConfig_['fields'] || {};
 
   goog.object.forEach(fields, function(el, k) {
-    var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k + ':');
+    var label = klokantech.jekylledit.utils.getLocalized(
+                    el['label'], this.lang_, this.config_['languages']);
+    var labelEl = goog.dom.createDom(goog.dom.TagName.LABEL, undefined,
+                                     (label || k) + ':');
     var inputValue = (this.postMeta_[k] || el['value']).toString();
     if (this.inlineFields_[k]) {
       var value = goog.dom.createDom(goog.dom.TagName.SPAN,
                                      'je-editor-editableinline', inputValue);
-      goog.dom.append(this.side_, label, value);
+      goog.dom.append(this.side_, labelEl, value);
     } else {
-      goog.dom.appendChild(this.side_, label);
+      goog.dom.appendChild(this.side_, labelEl);
       el['_je_getval'] = klokantech.jekylledit.utils.createField(
                              el, this.postMeta_[k], this.side_);
     }

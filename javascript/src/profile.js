@@ -21,6 +21,12 @@ goog.require('klokantech.jekylledit.utils');
  */
 klokantech.jekylledit.Profile = function(auth, config, repo) {
   /**
+   * @type {string}
+   * @private
+   */
+  this.lang_ = 'en';
+
+  /**
    * @type {klokantech.jekylledit.Auth}
    * @private
    */
@@ -65,8 +71,11 @@ klokantech.jekylledit.Profile.prototype.loadClear = function(opt_callback) {
   var fields = (this.config_['profile'] || {})['fields'] || {};
 
   goog.object.forEach(fields, function(el, k) {
-    var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k + ':');
-    goog.dom.appendChild(this.element_, label);
+    var label = klokantech.jekylledit.utils.getLocalized(
+                    el['label'], this.lang_, this.config_['languages']);
+    var labelEl = goog.dom.createDom(goog.dom.TagName.LABEL, undefined,
+                                     (label || k) + ':');
+    goog.dom.appendChild(this.element_, labelEl);
     el['_je_getval'] = klokantech.jekylledit.utils.createField(
                            el, '', this.element_); //TODO: value
   }, this);

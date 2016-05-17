@@ -149,15 +149,18 @@ klokantech.jekylledit.utils.createField =
  * @return {string}
  */
 klokantech.jekylledit.utils.getLocalized = function(label, lang, langs) {
-  if (goog.isString(label)) {
+  if (!label) {
+    return '';
+  } else if (goog.isString(label)) {
     return label;
   } else {
     if (label[lang]) {
       return label[lang];
     } else {
-      return goog.array.find(langs, function(el) {
+      var bestLang = goog.array.find(langs, function(el) {
         return !!label[el];
-      }) || '';
+      });
+      return bestLang ? label[bestLang] : '';
     }
   }
 };
