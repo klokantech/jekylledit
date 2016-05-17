@@ -47,6 +47,12 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
   this.category_ = category;
 
   /**
+   * @type {?Object}
+   * @private
+   */
+  this.catConfig_ = null;
+
+  /**
    * @type {string}
    * @private
    */
@@ -149,7 +155,7 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
           if (goog.isArray(cat)) {
             this.category_ = null;
             goog.array.forEach(cat, function(cat_) {
-              if (!this.category_ && this.config_['metadata'][cat_]) {
+              if (!this.category_ && this.config_['categories'][cat_]) {
                 this.category_ = cat_;
               }
             }, this);
@@ -160,17 +166,21 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
             this.category_ = cat;
           }
 
-          this.content_.innerHTML =
-          (this.config_['metadata'][this.category_] || {})['empty_content'] ||
-          klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT;
+          this.catConfig_ = goog.object.clone(
+              (this.config_['categories'][this.category_] || {}));
+
+          this.content_.innerHTML = this.catConfig_['empty_content'] ||
+              klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT;
 
           if (opt_callback) {
             opt_callback();
           }
         }, this));
   } else {
-    this.content_.innerHTML =
-        (this.config_['metadata'][this.category_] || {})['empty_content'] ||
+    this.catConfig_ = goog.object.clone(
+        (this.config_['categories'][this.category_] || {}));
+
+    this.content_.innerHTML = this.catConfig_['empty_content'] ||
         klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT;
     this.postData_ = {
       'metadata': {},
@@ -197,7 +207,7 @@ klokantech.jekylledit.Editor.prototype.start = function() {
 klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
   goog.dom.removeChildren(this.side_);
 
-  var fields = (this.config_['metadata'][this.category_] || {})['fields'] || {};
+  var fields = this.catConfig_['fields'] || {};
 
   goog.object.forEach(fields, function(el, k) {
     var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k + ':');
@@ -228,7 +238,7 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
  * @private
  */
 klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
-  var fields = (this.config_['metadata'][this.category_] || {})['fields'] || {};
+  var fields = this.catConfig_['fields'] || {};
 
   var editables = document.querySelectorAll(
       klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
@@ -301,7 +311,7 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
     'metadata': {}
   };
 
-  var fields = (this.config_['metadata'][this.category_] || {})['fields'] || {};
+  var fields = this.catConfig_['fields'] || {};
 
   goog.object.forEach(fields, function(el, k) {
     var valueGetter = el['_je_getval'];

@@ -28,6 +28,12 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
    * @type {string}
    * @private
    */
+  this.lang_ = 'en';
+
+  /**
+   * @type {string}
+   * @private
+   */
   this.repo_ = repo;
 
   /**
@@ -134,9 +140,15 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
         var xhr = e.target;
         this.config_ = xhr.getResponseJson();
 
-        goog.object.forEach(this.config_['metadata'], function(el, k) {
-          var catBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
-          'New: ' + k);
+        goog.object.forEach(this.config_['categories'], function(el, k) {
+          var label = 'New: ' + klokantech.jekylledit.utils.getLocalized(
+          el['label'], this.lang_, this.config_['languages']);
+          var content = el['symbol'] || label;
+          var catBtn = goog.dom.createDom(goog.dom.TagName.DIV, {
+            'class': 'je-btn',
+            'title': label
+          });
+          catBtn.innerHTML = content;
           goog.dom.appendChild(this.nav_, catBtn);
           var id = this.initEditor_(k);
           goog.events.listen(catBtn, goog.events.EventType.CLICK, function(e) {
