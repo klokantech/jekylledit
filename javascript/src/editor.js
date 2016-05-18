@@ -230,7 +230,8 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
             }
 
             var catCfg = (this.config_['categories'][this.category_] || {});
-            lang.fields = goog.object.clone(catCfg['fields']) || {};
+            lang.fields = /** @type {Object} */
+                          (goog.object.unsafeClone(catCfg['fields'])) || {};
 
             lang.content.innerHTML = catCfg['empty_content'] ||
                 klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT;
@@ -256,7 +257,8 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
       goog.dom.classlist.enable(lang.tab, 'disabled', !lang.check.checked);
 
       var catCfg = (this.config_['categories'][this.category_] || {});
-      lang.fields = goog.object.clone(catCfg['fields']) || {};
+      lang.fields = /** @type {Object} */
+                    (goog.object.unsafeClone(catCfg['fields'])) || {};
 
       lang.content.innerHTML = catCfg['empty_content'] ||
           klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT;
