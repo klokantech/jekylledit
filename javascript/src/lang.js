@@ -139,5 +139,8 @@ klokantech.jekylledit.lang.data_ = {
   },
   'trans_saved': {
     'en': 'Changes saved!'
+  },
+  'drafts_empty': {
+    'en': 'There are currently no drafts waiting to be published.'
   }
 };

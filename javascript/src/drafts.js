@@ -8,6 +8,7 @@ goog.provide('klokantech.jekylledit.Drafts');
 
 goog.require('goog.dom');
 goog.require('klokantech.jekylledit.AbstractPage');
+goog.require('klokantech.jekylledit.lang');
 goog.require('klokantech.jekylledit.utils');
 
 
@@ -100,6 +101,12 @@ klokantech.jekylledit.Drafts.prototype.loadClear = function(opt_callback) {
             e.preventDefault();
           }, false, this);
         }, this);
+
+        if (!data.length) {
+          goog.dom.appendChild(this.element_,
+          goog.dom.createDom(goog.dom.TagName.DIV, 'je-drafts-empty',
+              klokantech.jekylledit.lang.get('drafts_empty')));
+        }
 
         if (opt_callback) {
           opt_callback();

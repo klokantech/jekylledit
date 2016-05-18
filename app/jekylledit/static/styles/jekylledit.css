@@ -240,6 +240,10 @@
   padding: 30px;
 }
 
+.je-drafts-empty {
+  padding:10px;
+  text-align:center;
+}
 .je-drafts-draft {
   border:1px solid #ccc;
   margin:15px;
