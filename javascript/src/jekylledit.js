@@ -10,6 +10,7 @@ goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('klokantech.jekylledit.Popup');
+goog.require('klokantech.jekylledit.lang');
 goog.require('klokantech.jekylledit.utils');
 
 
@@ -42,7 +43,9 @@ klokantech.jekylledit.JekyllEdit.prototype.initPopup = function(repo, path) {
 klokantech.jekylledit.JekyllEdit.prototype.setAdminBtn = function(btn) {
   var repo = btn.getAttribute('data-jekylledit-repo');
   var path = btn.getAttribute('data-jekylledit-path');
+  var lang = btn.getAttribute('data-jekylledit-lang');
   goog.events.listen(btn, goog.events.EventType.CLICK, function(e) {
+    klokantech.jekylledit.lang.setLanguage(lang);
     klokantech.jekylledit.utils.installStyle(
         klokantech.jekylledit.BASE_URL + 'static/styles/jekylledit.css');
     this.initPopup(repo, path);

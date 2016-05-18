@@ -8,6 +8,7 @@ goog.provide('klokantech.jekylledit.Profile');
 
 goog.require('goog.dom');
 goog.require('klokantech.jekylledit.AbstractPage');
+goog.require('klokantech.jekylledit.lang');
 goog.require('klokantech.jekylledit.utils');
 
 
@@ -20,12 +21,6 @@ goog.require('klokantech.jekylledit.utils');
  * @implements {klokantech.jekylledit.AbstractPage}
  */
 klokantech.jekylledit.Profile = function(auth, config, repo) {
-  /**
-   * @type {string}
-   * @private
-   */
-  this.lang_ = 'en';
-
   /**
    * @type {klokantech.jekylledit.Auth}
    * @private
@@ -73,8 +68,8 @@ klokantech.jekylledit.Profile.prototype.loadClear = function(opt_callback) {
   var fields = (this.config_['profile'] || {})['fields'] || {};
 
   goog.object.forEach(fields, function(el, k) {
-    var label = klokantech.jekylledit.utils.getLocalized(
-                    el['label'], this.lang_, this.config_['languages']);
+    var label = klokantech.jekylledit.lang.getFrom(
+                    el['label'], this.config_['languages']);
     var labelEl = goog.dom.createDom(goog.dom.TagName.LABEL, undefined,
                                      (label || k) + ':');
     goog.dom.appendChild(this.element_, labelEl);
@@ -105,7 +100,7 @@ klokantech.jekylledit.Profile.prototype.save = function(opt_callback) {
 
   this.auth_.sendRequest('site/' + this.repo_ + '/profile',
       goog.bind(function(e) {
-        alert('Changes saved!');
+        alert(klokantech.jekylledit.lang.get('profile_saved'));
         if (opt_callback) {
           opt_callback();
         }

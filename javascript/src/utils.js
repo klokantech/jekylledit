@@ -182,28 +182,3 @@ klokantech.jekylledit.utils.createField =
     return function() { return dataInput.value; };
   }
 };
-
-
-/**
- * Gets localized label value based on language preference and available langs.
- * @param {string|Object.<string, string>} label
- * @param {string} lang
- * @param {Array.<string>} langs
- * @return {string}
- */
-klokantech.jekylledit.utils.getLocalized = function(label, lang, langs) {
-  if (!label) {
-    return '';
-  } else if (goog.isString(label)) {
-    return label;
-  } else {
-    if (label[lang]) {
-      return label[lang];
-    } else {
-      var bestLang = goog.array.find(langs, function(el) {
-        return !!label[el];
-      });
-      return bestLang ? label[bestLang] : '';
-    }
-  }
-};

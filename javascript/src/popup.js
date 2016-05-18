@@ -14,7 +14,7 @@ goog.require('klokantech.jekylledit.Drafts');
 goog.require('klokantech.jekylledit.Editor');
 goog.require('klokantech.jekylledit.Profile');
 goog.require('klokantech.jekylledit.Translations');
-goog.require('klokantech.jekylledit.utils');
+goog.require('klokantech.jekylledit.lang');
 
 
 
@@ -25,12 +25,6 @@ goog.require('klokantech.jekylledit.utils');
  * @constructor
  */
 klokantech.jekylledit.Popup = function(repo, path, editableContent) {
-  /**
-   * @type {string}
-   * @private
-   */
-  this.lang_ = 'en';
-
   /**
    * @type {string}
    * @private
@@ -55,8 +49,10 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
    */
   this.actions_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-actions');
 
-  var saveBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn', 'Save');
-  var cancelBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn', 'Cancel');
+  var saveBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+      klokantech.jekylledit.lang.get('popup_save'));
+  var cancelBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+      klokantech.jekylledit.lang.get('popup_cancel'));
   goog.dom.append(this.actions_, cancelBtn, saveBtn);
   goog.events.listen(cancelBtn, goog.events.EventType.CLICK, function(e) {
     this.setVisible(false);
@@ -131,7 +127,8 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
  * @private
  */
 klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
-  var editBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn', 'Edit');
+  var editBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+      klokantech.jekylledit.lang.get('popup_btn_edit'));
   goog.dom.append(this.nav_, editBtn);
   goog.events.listen(editBtn, goog.events.EventType.CLICK, function(e) {
     this.startPage_('editor/');
@@ -143,8 +140,9 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
         this.config_ = xhr.getResponseJson();
 
         goog.object.forEach(this.config_['categories'], function(el, k) {
-          var label = 'New: ' + klokantech.jekylledit.utils.getLocalized(
-          el['label'], this.lang_, this.config_['languages']);
+          var label = klokantech.jekylledit.lang.get('popup_btn_newx') +
+                      klokantech.jekylledit.lang.getFrom(
+                          el['label'], this.config_['languages']);
           var content = el['symbol'] || label;
           var catBtn = goog.dom.createDom(goog.dom.TagName.DIV, {
             'class': 'je-btn',
@@ -169,7 +167,7 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
         this.pages_['translations/'] = new klokantech.jekylledit.Translations(
             this.auth_, this.config_, this.repo_);
         var transBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
-                                          'Trans');
+            klokantech.jekylledit.lang.get('popup_btn_trans'));
         goog.dom.appendChild(this.nav_, transBtn);
         goog.events.listen(transBtn, goog.events.EventType.CLICK, function(e) {
           this.startPage_('translations/');
@@ -179,7 +177,7 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
         this.pages_['profile/'] = new klokantech.jekylledit.Profile(
             this.auth_, this.config_, this.repo_);
         var profBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
-                                         'Profile');
+            klokantech.jekylledit.lang.get('popup_btn_profile'));
         goog.dom.appendChild(this.nav_, profBtn);
         goog.events.listen(profBtn, goog.events.EventType.CLICK, function(e) {
           this.startPage_('profile/');
@@ -189,7 +187,7 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
         this.pages_['drafts/'] = new klokantech.jekylledit.Drafts(
             this.auth_, this.config_, this.repo_);
         var draftBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
-                                          'Drafts');
+            klokantech.jekylledit.lang.get('popup_btn_drafts'));
         goog.dom.appendChild(this.nav_, draftBtn);
         goog.events.listen(draftBtn, goog.events.EventType.CLICK, function(e) {
           this.startPage_('drafts/');

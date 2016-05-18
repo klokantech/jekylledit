@@ -21,12 +21,6 @@ goog.require('klokantech.jekylledit.utils');
  */
 klokantech.jekylledit.Drafts = function(auth, config, repo) {
   /**
-   * @type {string}
-   * @private
-   */
-  this.lang_ = 'en';
-
-  /**
    * @type {klokantech.jekylledit.Auth}
    * @private
    */

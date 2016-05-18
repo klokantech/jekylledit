@@ -11,6 +11,7 @@ goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.net.Jsonp');
 goog.require('goog.net.XhrIo');
+goog.require('klokantech.jekylledit.lang');
 goog.require('klokantech.jekylledit.utils');
 
 
@@ -85,10 +86,10 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
   if (opt_retry) {
     goog.dom.appendChild(this.element_,
         goog.dom.createDom(goog.dom.TagName.DIV, undefined,
-            'Log in failed!'));
+            klokantech.jekylledit.lang.get('login_failed')));
   }
   var loginBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
-                                    opt_retry ? 'Retry' : 'Log in');
+      klokantech.jekylledit.lang.get(opt_retry ? 'login_retry' : 'login'));
   goog.dom.appendChild(this.element_, loginBtn);
   goog.events.listen(loginBtn, goog.events.EventType.CLICK, function(e) {
     klokantech.jekylledit.utils.replaceWithSpinner(this.element_);
@@ -116,7 +117,7 @@ klokantech.jekylledit.Auth.prototype.showNotAuthorized_ = function() {
   goog.dom.removeChildren(this.element_);
   goog.dom.appendChild(this.element_,
       goog.dom.createDom(goog.dom.TagName.DIV, undefined,
-          'You are not authorized to modify this site!'));
+          klokantech.jekylledit.lang.get('login_not_authorized')));
 };
 
 

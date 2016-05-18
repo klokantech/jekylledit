@@ -10,6 +10,7 @@ goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('klokantech.jekylledit.AbstractPage');
+goog.require('klokantech.jekylledit.lang');
 
 
 
@@ -134,7 +135,7 @@ klokantech.jekylledit.Translations.prototype.save = function(opt_callback) {
 
   this.auth_.sendRequest('site/' + this.repo_ + '/translations',
       goog.bind(function(e) {
-        alert('Changes saved!');
+        alert(klokantech.jekylledit.lang.get('trans_saved'));
         if (opt_callback) {
           opt_callback();
         }
