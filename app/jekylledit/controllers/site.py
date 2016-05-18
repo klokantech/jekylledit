@@ -17,9 +17,8 @@ TRANSLATIONS_FILE = '_data/translations.json'
 def commit(repository, filenames):
     try:
         with repository.transaction():
-            for filename in filenames:
-                repository.execute(['add', filename])
-            repository.execute(['commit', '-m', 'File {} updated'.format(filename)])
+            repository.execute(['add'] + filenames)
+            repository.execute(['commit', '-m', '"File {} updated"'.format(filenames[0])])
             # repository.execute(['push'])
     except Exception:
         app.logger.exception('Commit failed')
@@ -88,24 +87,25 @@ def site_file(site_id, file_id):
         data = request.get_json()
         tocommit = []
         for language in languages:
-            post = frontmatter.Post()
             langdata = data[language]
             lfilename = filemask.format(language)
             # Replace post's data in file
             with repository.open(lfilename, 'r+') as fp:
                 post = frontmatter.load(fp)
-                post.metadata = data['metadata']
-                post.content = data['content']
+                if 'metadata' in data:
+                    post.metadata = data['metadata']
+                if 'content' in data:
+                    post.content = data['content']
                 fp.seek(0)
                 fp.truncate()
                 frontmatter.dump(post, fp)
                 tocommit.append(lfilename)
             # Commit changes
-            commited = commit(repository, tocommit)
-            if commited:
-                status = 'ok'
-            else:
-                status = 'failed'
+        commited = commit(repository, tocommit)
+        if commited:
+            status = 'ok'
+        else:
+            status = 'failed'
         return jsonify({
             'status': status,
             'site': site_id,
