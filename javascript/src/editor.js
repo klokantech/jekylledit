@@ -243,7 +243,7 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
     goog.object.forEach(this.languages_, function(lang, langId) {
       lang.data = {
         'metadata': {
-          'author': 'TODO: this.user@example.com',
+          'author': this.auth_.getUserEmail(),
           'post_id': uniquePostId,
           'lang': langId
         },

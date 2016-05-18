@@ -81,7 +81,13 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
    */
   this.nav_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-nav');
 
-  goog.dom.append(this.element_, this.nav_, this.content_);
+  /**
+   * @type {!Element}
+   * @private
+   */
+  this.userNav_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-user');
+
+  goog.dom.append(this.element_, this.userNav_, this.nav_, this.content_);
 
   /**
    * @type {!Element}
@@ -124,9 +130,29 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
 
 
 /**
+ * @param {boolean} authorized
  * @private
  */
-klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
+klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
+  var logoutBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+      klokantech.jekylledit.lang.get('popup_logout'));
+  goog.events.listen(logoutBtn, goog.events.EventType.CLICK, function(e) {
+    goog.dom.removeChildren(this.userNav_);
+    goog.dom.removeChildren(this.nav_);
+    goog.dom.removeChildren(this.content_);
+    goog.dom.removeNode(this.actions_);
+    this.auth_.logout(goog.bind(function() {
+      this.auth_.login(goog.bind(this.onLogin_, this));
+    }, this));
+  }, false, this);
+  goog.dom.append(this.userNav_,
+      this.auth_.getUserName() + ' (' + this.auth_.getUserEmail() + ')',
+      logoutBtn);
+
+  if (!authorized) {
+    return;
+  }
+
   var editBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
       klokantech.jekylledit.lang.get('popup_btn_edit'));
   goog.dom.append(this.nav_, editBtn);
@@ -222,6 +248,10 @@ klokantech.jekylledit.Popup.prototype.initEditor_ = function(category, opt_cb) {
         category == null ? this.editSource_ : undefined,
         opt_cb);
     this.pages_[id] = editor;
+  } else {
+    if (opt_cb) {
+      setTimeout(opt_cb, 0);
+    }
   }
   return id;
 };
@@ -252,7 +282,7 @@ klokantech.jekylledit.Popup.prototype.startPage_ = function(id) {
  */
 klokantech.jekylledit.Popup.prototype.setVisible = function(visible) {
   if (visible) {
-    if (this.editSource_) {
+    if (this.editSource_ && this.config_) {
       this.startPage_('editor/');
     }
     goog.dom.appendChild(document.body, this.root_);

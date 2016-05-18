@@ -64,6 +64,22 @@ klokantech.jekylledit.Auth.prototype.getElement = function() {
 
 
 /**
+ * @return {string}
+ */
+klokantech.jekylledit.Auth.prototype.getUserName = function() {
+  return 'John Doe';
+};
+
+
+/**
+ * @return {string}
+ */
+klokantech.jekylledit.Auth.prototype.getUserEmail = function() {
+  return 'john.doe@example.com';
+};
+
+
+/**
  * @param {Function} callback Called when the user authorizes.
  *                            May not be called at all.
  */
@@ -72,6 +88,29 @@ klokantech.jekylledit.Auth.prototype.login = function(callback) {
   goog.dom.appendChild(this.parentElement_, this.element_);
 
   this.checkLogin_(callback);
+};
+
+
+/**
+ * @param {Function} callback
+ */
+klokantech.jekylledit.Auth.prototype.logout = function(callback) {
+  klokantech.jekylledit.utils.replaceWithSpinner(this.element_);
+  goog.dom.appendChild(this.parentElement_, this.element_);
+
+  var logoutWindow = window.open(
+      klokantech.jekylledit.BASE_URL + 'auth/sign-out', // TODO
+      '_blank',
+      'width=600,height=400'
+      );
+  var intervalId = setInterval(goog.bind(function() {
+    try {
+      if (logoutWindow == null || logoutWindow.closed) {
+        clearInterval(intervalId);
+        callback();
+      }
+    } catch (e) {}
+  }, this), 500);
 };
 
 
@@ -133,12 +172,13 @@ klokantech.jekylledit.Auth.prototype.checkLogin_ =
         if (statusCode == 200) {
           this.accessToken_ = data['access_token'];
           goog.dom.removeNode(this.element_);
-          callback();
+          callback(true);
         } else if (statusCode == 401) {
           this.signInUrl_ = data['location'];
           this.showLoginBtn_(callback, opt_retry);
         } else if (statusCode == 403) {
           this.showNotAuthorized_();
+          callback(false);
         }
       }, this));
 };

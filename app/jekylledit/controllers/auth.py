@@ -178,7 +178,7 @@ def sign_in_success():
 @blueprint.route('/sign-out')
 def sign_out():
     logout_user()
-    response = redirect(request.url_root)
+    response = render_template('auth/signed-out.html')
     if not app.config['DEVELOPMENT']:
         gitkit.delete_token(response)
     return response

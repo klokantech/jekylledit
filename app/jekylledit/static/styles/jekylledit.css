@@ -139,6 +139,15 @@
   padding:4px;
   border-radius:2px;
 }
+.je-popup-user{
+  position:absolute;
+  left:65px;
+  bottom:0;
+  z-index:10111;
+}
+.je-popup-user .je-btn{
+  margin-left:5px;
+}
 .je-popup-nav .je-btn{
   display:inline-block;
   margin: 10px 0;

@@ -92,6 +92,9 @@ klokantech.jekylledit.lang.get = function(id) {
  * @private
  */
 klokantech.jekylledit.lang.data_ = {
+  'popup_logout': {
+    'en': 'Log out'
+  },
   'popup_save': {
     'en': 'Save'
   },
