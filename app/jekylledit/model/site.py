@@ -1,5 +1,8 @@
-import os.path
+import os.path, os
 
+import frontmatter
+
+from flask import json
 from flask.ext.login import current_user
 
 from contextlib import contextmanager
@@ -43,3 +46,38 @@ class Repository:
         if proc.returncode != 0:
             raise Exception(err)
         return out
+
+
+class Site:
+
+    def __init__(self, name):
+        self.name = name
+        self.repository = Repository(name)
+
+    def get_config(self, filename = None):
+        if filename is None:
+            filename = 'jekylledit.json'
+        with self.repository.open(filename, 'r') as fp:
+            self.config = json.load(fp)
+            if not 'languages' in self.config:
+                self.config.update({'languages': ['en']})
+            return self.config
+
+    def get_drafts(self, category=None):
+        drafts = []
+        directory = self.repository.path(category)
+        files = os.listdir(directory)
+        for f in files:
+            filename = os.path.join(directory, f)
+            with self.repository.open(filename, 'r') as fp:
+                post = frontmatter.load(fp)
+                if 'published' in post.metadata \
+                and post.metadata['published'] is True:
+                    drafts.append({
+                        'author': post.metadata['author'],
+                        'category': category,
+                        'date' : post.metadata['date'],
+                        'filename': os.path.join(category, f),
+                        'title': post.metadata['title']
+                    })
+        return drafts
