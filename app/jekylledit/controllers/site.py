@@ -167,3 +167,21 @@ def site_translation(site_id):
             'status': status,
             'site': site_id
         })
+
+
+@app.route('/site/<site_id>/update', methods=['POST'])
+def update(site_id):
+    # TODO: Secure
+    repository = Repository(site_id)
+    try:
+        with repository.transaction():
+            repository.execute(['pull'])
+            status = 'ok'
+    except Exception:
+        app.logger.exception('Pull of {} failed'.format(site_id))
+        status = 'failed'
+
+    return jsonify({
+            'status': status,
+            'site': site_id
+        })
