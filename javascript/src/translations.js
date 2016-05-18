@@ -84,20 +84,20 @@ klokantech.jekylledit.Translations.prototype.loadClear =
 
   var langs = this.config_['languages'] || [];
 
-  var header = goog.dom.createDom(goog.dom.TagName.TR, undefined,
-      goog.dom.createDom(goog.dom.TagName.TH, undefined, ''));
-  goog.array.forEach(langs, function(lang) {
-    goog.dom.appendChild(header,
-        goog.dom.createDom(goog.dom.TagName.TH, undefined, lang));
-  });
-  goog.dom.appendChild(this.table_, header);
-
   this.auth_.sendRequest('site/' + this.repo_ + '/translations',
       goog.bind(function(e) {
         var xhr = e.target;
         var data = xhr.getResponseJson();
 
         goog.dom.removeChildren(this.table_);
+
+        var header = goog.dom.createDom(goog.dom.TagName.TR, undefined,
+            goog.dom.createDom(goog.dom.TagName.TH, undefined, ''));
+        goog.array.forEach(langs, function(lang) {
+          goog.dom.appendChild(header,
+              goog.dom.createDom(goog.dom.TagName.TH, undefined, lang));
+        });
+        goog.dom.appendChild(this.table_, header);
 
         goog.object.forEach(data, function(el, key) {
           this.inputs_[key] = {};
