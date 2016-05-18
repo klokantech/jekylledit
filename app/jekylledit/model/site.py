@@ -48,7 +48,7 @@ class Repository:
         return out
 
 
-class Site:
+class Sites:
 
     def __init__(self, name):
         self.name = name
@@ -72,7 +72,7 @@ class Site:
             with self.repository.open(filename, 'r') as fp:
                 post = frontmatter.load(fp)
                 if 'published' in post.metadata \
-                and post.metadata['published'] is True:
+                and post.metadata['published'] is False:
                     drafts.append({
                         'author': post.metadata['author'],
                         'category': category,

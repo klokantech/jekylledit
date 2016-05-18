@@ -4,6 +4,7 @@ import frontmatter
 
 from flask import json, jsonify, request
 from flask.ext.cors import cross_origin
+from flask.ext.login import current_user
 
 from ..model import Repository, Site
 from .base import app
@@ -127,15 +128,15 @@ def site_file(site_id, file_id):
 # Response related drafts
 @app.route('/site/<site_id>/drafts', methods=['GET'])
 @cross_origin()
-#@authorization_required('contributor', 'administrator')
+@authorization_required('contributor', 'administrator')
 def drafts(site_id):
-    site = Site(site_id)
+    site = Sites(site_id)
     drafts = site.get_drafts('_posts')
-    # TODO: Filter by loged person's role
-    person = {'role': 'contributor', 'email':'kartenportal@klokantech.com'}
-    if person['role'] is 'contributor':
+    user = current_user._get_current_object()
+    if 'administrator' not in user.roles:
         for draft in drafts:
-            if draft['author'] == person['email']:
+            print(draft['author'], user.email)
+            if draft['author'] is not user.email:
                 drafts.remove(draft)
     return json.dumps(drafts)
 

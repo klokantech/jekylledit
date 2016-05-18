@@ -2,4 +2,4 @@
 
 from .base import db, migrate
 from .auth import Account, Roles, Site
-from .site import Repository, Site
+from .site import Repository, Sites
