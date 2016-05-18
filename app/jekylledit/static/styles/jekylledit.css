@@ -193,6 +193,10 @@
 
 .je-spinner {
   display:inline-block;
+  position:absolute;
+  left:50%;
+  top:10%;
+  margin-left:-2em;
   width:4em;
   height:4em;
   line-height:4em;
@@ -234,6 +238,19 @@
 
 .je-profile{
   padding: 30px;
+}
+
+.je-drafts-draft {
+  border:1px solid #ccc;
+  margin:15px;
+  padding:2px;
+  cursor:pointer;
+}
+.je-drafts-draft span {
+  padding:5px;
+}
+.je-drafts-draft-title {
+  font-weight:bold;
 }
 
 .ac-renderer{position:absolute;border:1px solid #898989;margin-top:-1px;max-width:400px;z-index:10100;}

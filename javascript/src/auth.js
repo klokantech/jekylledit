@@ -11,6 +11,7 @@ goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.net.Jsonp');
 goog.require('goog.net.XhrIo');
+goog.require('klokantech.jekylledit.utils');
 
 
 
@@ -62,21 +63,11 @@ klokantech.jekylledit.Auth.prototype.getElement = function() {
 
 
 /**
- * @private
- */
-klokantech.jekylledit.Auth.prototype.replaceWithSpinner_ = function() {
-  goog.dom.removeChildren(this.element_);
-  goog.dom.appendChild(this.element_,
-                       goog.dom.createDom(goog.dom.TagName.DIV, 'je-spinner'));
-};
-
-
-/**
  * @param {Function} callback Called when the user authorizes.
  *                            May not be called at all.
  */
 klokantech.jekylledit.Auth.prototype.login = function(callback) {
-  this.replaceWithSpinner_();
+  klokantech.jekylledit.utils.replaceWithSpinner(this.element_);
   goog.dom.appendChild(this.parentElement_, this.element_);
 
   this.checkLogin_(callback);
@@ -100,7 +91,7 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
                                     opt_retry ? 'Retry' : 'Log in');
   goog.dom.appendChild(this.element_, loginBtn);
   goog.events.listen(loginBtn, goog.events.EventType.CLICK, function(e) {
-    this.replaceWithSpinner_();
+    klokantech.jekylledit.utils.replaceWithSpinner(this.element_);
     var loginWindow = window.open(
         this.signInUrl_,
         '_blank',

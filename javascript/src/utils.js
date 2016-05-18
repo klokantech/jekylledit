@@ -68,6 +68,16 @@ klokantech.jekylledit.utils.installScript = function(url, opt_callback) {
 
 
 /**
+ * @param {Node} element
+ */
+klokantech.jekylledit.utils.replaceWithSpinner = function(element) {
+  goog.dom.removeChildren(element);
+  goog.dom.appendChild(element,
+                       goog.dom.createDom(goog.dom.TagName.DIV, 'je-spinner'));
+};
+
+
+/**
  * Clone all child nodes from origin to destination.
  * @param {Node} origin
  * @param {Node} destination
@@ -94,7 +104,8 @@ klokantech.jekylledit.utils.cloneNodes = function(origin, destination) {
 klokantech.jekylledit.utils.createField =
     function(field, currentValue, parent) {
   var type = field['type'];
-  var value = currentValue || field['value'];
+  var value = goog.isDefAndNotNull(currentValue) ?
+              currentValue : field['value'];
   if (type == 'datetime') {
     var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
       type: 'datetime-local',

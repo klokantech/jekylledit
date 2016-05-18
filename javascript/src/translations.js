@@ -71,13 +71,15 @@ klokantech.jekylledit.Translations.prototype.getElement = function() {
 
 
 /** @inheritDoc */
-klokantech.jekylledit.Translations.prototype.start = function() {};
+klokantech.jekylledit.Translations.prototype.start = function() {
+  this.loadClear();
+};
 
 
 /** @inheritDoc */
 klokantech.jekylledit.Translations.prototype.loadClear =
     function(opt_callback) {
-  goog.dom.removeChildren(this.table_);
+  klokantech.jekylledit.utils.replaceWithSpinner(this.table_);
 
   var langs = this.config_['languages'] || [];
 
@@ -93,6 +95,9 @@ klokantech.jekylledit.Translations.prototype.loadClear =
       goog.bind(function(e) {
         var xhr = e.target;
         var data = xhr.getResponseJson();
+
+        goog.dom.removeChildren(this.table_);
+
         goog.object.forEach(data, function(el, key) {
           this.inputs_[key] = {};
           var row = goog.dom.createDom(goog.dom.TagName.TR, undefined,

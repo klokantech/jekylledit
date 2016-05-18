@@ -61,7 +61,9 @@ klokantech.jekylledit.Profile.prototype.getElement = function() {
 
 
 /** @inheritDoc */
-klokantech.jekylledit.Profile.prototype.start = function() {};
+klokantech.jekylledit.Profile.prototype.start = function() {
+  this.loadClear();
+};
 
 
 /** @inheritDoc */

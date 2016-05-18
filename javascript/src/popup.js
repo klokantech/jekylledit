@@ -10,6 +10,7 @@ goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('klokantech.jekylledit.Auth');
+goog.require('klokantech.jekylledit.Drafts');
 goog.require('klokantech.jekylledit.Editor');
 goog.require('klokantech.jekylledit.Profile');
 goog.require('klokantech.jekylledit.Translations');
@@ -59,6 +60,7 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
   goog.dom.append(this.actions_, cancelBtn, saveBtn);
   goog.events.listen(cancelBtn, goog.events.EventType.CLICK, function(e) {
     this.setVisible(false);
+    this.clearPages_();
   }, false, this);
   goog.events.listen(saveBtn, goog.events.EventType.CLICK, function(e) {
     if (goog.isDef(this.activePage_)) {
@@ -181,6 +183,16 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function() {
         goog.dom.appendChild(this.nav_, profBtn);
         goog.events.listen(profBtn, goog.events.EventType.CLICK, function(e) {
           this.startPage_('profile/');
+        }, false, this);
+
+        // drafts
+        this.pages_['drafts/'] = new klokantech.jekylledit.Drafts(
+            this.auth_, this.config_, this.repo_);
+        var draftBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+                                          'Drafts');
+        goog.dom.appendChild(this.nav_, draftBtn);
+        goog.events.listen(draftBtn, goog.events.EventType.CLICK, function(e) {
+          this.startPage_('drafts/');
         }, false, this);
       }, this));
 };
