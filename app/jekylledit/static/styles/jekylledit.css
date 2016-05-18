@@ -61,6 +61,14 @@
 .je-editor-tab.active {
   display:block;
 }
+.je-editor-tab.disabled .je-editor-tab-content,
+.je-editor-tab.disabled .je-editor-tab-side {
+  -webkit-filter: grayscale(80%);
+  -moz-filter: grayscale(80%);
+  filter: grayscale(80%);
+  opacity:0.6;
+  pointer-events:none !important;
+}
 .je-editor-tab-content{
   position:absolute;
   top:0;

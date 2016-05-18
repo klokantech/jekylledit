@@ -91,7 +91,8 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
   goog.dom.append(this.element_, this.tabbtns_, this.tabs_);
 
   /**
-   * @type {!Object.<string, {content: !Element, side: !Element,
+   * @type {!Object.<string, {content: !Element, side: !Element, check: !Element,
+   *                          tab: !Element, tabBtn: !Element,
    *                          data: Object, editor: Object, fields: !Object}>}
    * @private
    */
@@ -105,11 +106,18 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
                                      'je-editor-tab-content');
     var side = goog.dom.createDom(goog.dom.TagName.DIV, 'je-editor-tab-side');
     var tab = goog.dom.createDom(goog.dom.TagName.DIV, 'je-editor-tab');
+    var tabCheck = goog.dom.createDom(goog.dom.TagName.INPUT, {
+      'type': 'checkbox',
+      'class': 'je-editor-tab-check'
+    });
     var tabBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-editor-tab-btn',
-                                    langId);
+                                    langId, tabCheck);
     this.languages_[langId] = {
       content: content,
       side: side,
+      check: tabCheck,
+      tab: tab,
+      tabBtn: tabBtn,
       data: null,
       editor: null,
       fields: {}
@@ -126,6 +134,9 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
     tabs.push(tab);
 
     goog.events.listen(tabBtn, goog.events.EventType.CLICK, function(e) {
+      if (e.target != tabBtn) {
+        return;
+      }
       goog.array.forEach(tabBtns, function(tabBtn) {
         goog.dom.classlist.remove(tabBtn, 'active');
       });
@@ -135,6 +146,12 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
       goog.dom.classlist.add(tabBtn, 'active');
       goog.dom.classlist.add(tab, 'active');
       e.preventDefault();
+    }, false, this);
+
+    goog.events.listen(tabCheck, goog.events.EventType.CHANGE, function(e) {
+      tabCheck.disabled = tabCheck.checked;
+      goog.dom.classlist.enable(tab, 'disabled', !tabCheck.checked);
+      e.stopPropagation();
     }, false, this);
   }, this);
 
@@ -189,6 +206,10 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
             }
             var lang = this.languages_[langId];
             lang.data = post;
+            lang.check.disabled = lang.check.checked =
+                !lang.data['metadata']['jekylledit_copyof'];
+            goog.dom.classlist.enable(lang.tab, 'disabled',
+                                      !lang.check.checked);
 
             if (!this.category_) {
               var meta = post['metadata'];
@@ -231,6 +252,8 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
         },
         'content': ''
       };
+      lang.check.disabled = lang.check.checked = langId == this.lang_;
+      goog.dom.classlist.enable(lang.tab, 'disabled', !lang.check.checked);
 
       var catCfg = (this.config_['categories'][this.category_] || {});
       lang.fields = goog.object.clone(catCfg['fields']) || {};
@@ -388,13 +411,15 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
   var editables = document.querySelectorAll(
       klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
   goog.object.forEach(this.languages_, function(lang, langId) {
-    result[langId] = {
-      'metadata': goog.object.clone(lang.data['metadata'])
+    var langData = {
+      'metadata': goog.object.clone(lang.data['metadata']),
+      'content': lang.data['content']
     };
+    result[langId] = langData;
 
     goog.object.forEach(lang.fields, function(el, k) {
       var valueGetter = el['_je_getval'];
-      result[langId]['metadata'][k] = valueGetter ? valueGetter() : el['value'];
+      langData['metadata'][k] = valueGetter ? valueGetter() : el['value'];
     }, this);
 
     goog.array.forEach(editables, function(editable) {
@@ -404,12 +429,30 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
 
       var sourceType = editable.getAttribute('data-jekylledit-source');
       if (sourceType == 'content') {
-        result[langId]['content'] = goog.global['toMarkdown'](
-            editable.innerHTML);
+        langData['content'] = goog.global['toMarkdown'](editable.innerHTML);
       } else {
-        result[langId]['metadata'][sourceType] = editable.textContent;
+        langData['metadata'][sourceType] = editable.textContent;
       }
     }, this);
+  }, this);
+
+  var firstFilledLanguage = goog.array.find(this.config_['languages'],
+      function(langId) {
+        return this.languages_[langId].check.checked;
+      }, this);
+
+  goog.object.forEach(this.languages_, function(lang, langId) {
+    if (lang.check.checked) {
+      delete result[langId]['metadata']['jekylledit_copyof'];
+    } else {
+      var copyof = lang.data['metadata']['jekylledit_copyof'] ||
+                   firstFilledLanguage;
+      result[langId] = goog.object.unsafeClone(result[copyof]);
+
+      // fix special fields
+      result[langId]['metadata']['lang'] = langId;
+      result[langId]['metadata']['jekylledit_copyof'] = copyof;
+    }
   }, this);
 
   if (this.editSource_ && this.languages_[this.lang_]) {
