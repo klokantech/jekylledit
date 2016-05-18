@@ -29,6 +29,9 @@ class Account(UserMixin, db.Model):
     def is_active(self):
         return self.email_verified
 
+    def roles_by_site(self, site_id):
+        # XXX
+        return db.session.query(Roles).with_parent(self).filter(Roles.site_id==site_id).first().roles
 
 class Roles(db.Model):
 

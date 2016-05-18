@@ -6,7 +6,7 @@ from flask import json, jsonify, request
 from flask.ext.cors import cross_origin
 from flask.ext.login import current_user
 
-from ..model import Repository, Site
+from ..model import Repository, Sites
 from .base import app
 from .auth import authorization_required
 
@@ -133,7 +133,7 @@ def drafts(site_id):
     site = Sites(site_id)
     drafts = site.get_drafts('_posts')
     user = current_user._get_current_object()
-    if 'administrator' not in user.roles:
+    if 'administrator' not in user.roles_by_site(site_id):
         for draft in drafts:
             print(draft['author'], user.email)
             if draft['author'] is not user.email:
