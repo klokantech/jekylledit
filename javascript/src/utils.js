@@ -130,6 +130,38 @@ klokantech.jekylledit.utils.createField =
     });
     goog.dom.appendChild(parent, span);
     return function() { return mc.getValues(); };
+  } else if (type == 'media') {
+    var file = goog.dom.createDom(goog.dom.TagName.INPUT, {
+      'type': 'file',
+      'accept': 'image/*',
+      'class': 'je-mediaupload'
+    });
+    var preview = goog.dom.createDom(goog.dom.TagName.IMG, {
+                    'class': 'je-mediaupload-preview',
+                    'src': value,
+                    'alt': value
+                  });
+    var filereader = new FileReader();
+    filereader.onload = function(e) {
+      preview.src = filereader.result;
+      preview.alt = '';
+    };
+
+    goog.events.listen(file, goog.events.EventType.CHANGE, function(e) {
+      if (file.files && file.files[0]) {
+        var f = file.files[0];
+        if (f.size > 5 * 1024 * 1024) {
+          alert('Maximum file size is 5 MB!');
+          e.preventDefault();
+        } else {
+          filereader.readAsDataURL(file.files[0]);
+        }
+      }
+    });
+    if (parent) {
+      goog.dom.append(parent, file, preview);
+    }
+    return function() { return filereader.result || ''; };
   } else {
     var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
       type: 'text',

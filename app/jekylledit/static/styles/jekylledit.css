@@ -247,3 +247,5 @@
 .je-multichoice div a{display:block;width:10px;height:10px;position:absolute;top:3px;right:2px;text-decoration:none;color:#fff;font-size:10px}
 .je-multichoice div a:hover{color:#393939}
 .je-multichoice div .mc-tag-remove{}
+
+.je-mediaupload-preview {width:100%;}
