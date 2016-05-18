@@ -261,6 +261,15 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
   goog.object.forEach(this.languages_, function(lang, langId) {
     goog.dom.removeChildren(lang.side);
 
+    var editable = goog.dom.createDom(goog.dom.TagName.DIV,
+                                      'je-editor-side-editable');
+    var readonly = goog.dom.createDom(goog.dom.TagName.DIV,
+                                      'je-editor-side-readonly');
+    var extra = goog.dom.createDom(goog.dom.TagName.DIV,
+                                   'je-editor-side-extra');
+
+    goog.dom.append(lang.side, editable, readonly, extra);
+
     var meta = lang.data['metadata'];
 
     goog.object.forEach(lang.fields, function(el, k) {
@@ -272,11 +281,15 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
       if (this.inlineFields_[k]) {
         var value = goog.dom.createDom(goog.dom.TagName.SPAN,
                                        'je-editor-editableinline', inputValue);
-        goog.dom.append(lang.side, labelEl, value);
+        goog.dom.append(editable, labelEl, value);
+      } else if (el['readonly']) {
+        var value = goog.dom.createDom(goog.dom.TagName.SPAN,
+                                       'je-editor-readonly', inputValue);
+        goog.dom.append(readonly, labelEl, value);
       } else {
-        goog.dom.appendChild(lang.side, labelEl);
+        goog.dom.appendChild(editable, labelEl);
         el['_je_getval'] = klokantech.jekylledit.utils.createField(
-                               el, meta[k], lang.side);
+                               el, meta[k], editable);
       }
     }, this);
 
@@ -285,7 +298,7 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
         var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k + ':');
         var dataInput = goog.dom.createDom(goog.dom.TagName.DIV, {},
             meta[k].toString());
-        goog.dom.append(lang.side, label, dataInput);
+        goog.dom.append(extra, label, dataInput);
       }
     }, this);
   }, this);
@@ -376,14 +389,12 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
       klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
   goog.object.forEach(this.languages_, function(lang, langId) {
     result[langId] = {
-      'metadata': {}
+      'metadata': goog.object.clone(lang.data['metadata'])
     };
 
     goog.object.forEach(lang.fields, function(el, k) {
       var valueGetter = el['_je_getval'];
-      if (valueGetter) {
-        result[langId]['metadata'][k] = valueGetter();
-      }
+      result[langId]['metadata'][k] = valueGetter ? valueGetter() : el['value'];
     }, this);
 
     goog.array.forEach(editables, function(editable) {

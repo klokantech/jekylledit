@@ -78,16 +78,17 @@
   width:200px;
   overflow:auto;
   background:#ccc;
-  padding: 10px;
-}
-.je-editor-tab-side * {
+  padding:5px;
   font-size:0.8em;
 }
-.je-editor-editableinline {
+.je-editor-editableinline, .je-editor-readonly {
   font-style:italic;
 }
 .je-editor-editableinline:before{
   content:'\2190 [inline] ';
+}
+.je-editor-readonly:before{
+  content:'[readonly] ';
 }
 .je-editor-tab-side input {
   width:100%;
@@ -97,6 +98,23 @@
 }
 .je-editor-tab-side label {
   font-weight:bold;
+  font-size:1.1em;
+}
+.je-editor-side-readonly, .je-editor-side-extra {
+  border:1px solid #666;
+  margin:10px 0;
+}
+.je-editor-side-readonly:before, .je-editor-side-extra:before {
+  border-bottom:1px dashed #666;
+  display:block;
+  font-size:1.2em;
+  font-weight:bold;
+}
+.je-editor-side-readonly:before {
+  content: 'Readonly:';
+}
+.je-editor-side-extra:before {
+  content: 'Extra attributes:';
 }
 .je-popup-actions{
   display:block;
