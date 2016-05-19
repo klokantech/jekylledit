@@ -3,9 +3,9 @@ from base64 import b64decode
 import frontmatter
 
 from flask import json, jsonify, request
-from flask.ext.login import login_required
 from flask.ext.cors import cross_origin
-from flask.ext.login import current_user
+from flask.ext.login import current_user, login_required
+from flask.ext.principal import Permission
 
 from ..model import Repository, Sites
 from .base import app
@@ -135,11 +135,11 @@ def site_file(site_id, file_id):
 def drafts(site_id):
     site = Sites(site_id)
     drafts = site.get_drafts('_posts')
-    user = current_user._get_current_object()
-    if 'administrator' not in user.roles_by_site(site_id):
+    if Permission(('administrator', site_id)):
+        email = current_user.email
         for draft in drafts:
-            print(draft['author'], user.email)
-            if draft['author'] is not user.email:
+            print(draft['author'], email)
+            if draft['author'] is not email:
                 drafts.remove(draft)
     return json.dumps(drafts)
 
