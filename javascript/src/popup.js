@@ -223,6 +223,8 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
         goog.events.listen(draftBtn, goog.events.EventType.CLICK, function(e) {
           this.startPage_('drafts/');
         }, false, this);
+
+        this.clearPages_();
       }, this));
 };
 
