@@ -145,9 +145,14 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
       this.auth_.login(goog.bind(this.onLogin_, this));
     }, this));
   }, false, this);
-  goog.dom.append(this.userNav_,
-      this.auth_.getUserName() + ' (' + this.auth_.getUserEmail() + ')',
-      logoutBtn);
+  var userString = this.auth_.getUserEmail();
+  if (this.auth_.getUserName().length) {
+    userString = this.auth_.getUserName() + ' <' + userString + '>';
+  }
+  if (this.auth_.getUserRoles().length > 0) {
+    userString += ' [' + this.auth_.getUserRoles().join(', ') + ']';
+  }
+  goog.dom.append(this.userNav_, userString, logoutBtn);
 
   if (!authorized) {
     return;

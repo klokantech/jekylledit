@@ -238,6 +238,11 @@ def site_token(site_id):
             })
     return jsonify({
         'status_code': 403,
+        'account': {
+            'email': current_user.email,
+            'name': current_user.name
+        },
+        'sign_out': url_for('.sign_out', _external=True),
     })
 
 

@@ -35,6 +35,12 @@ klokantech.jekylledit.Auth = function(repo, parentElement) {
   this.signInUrl_ = null;
 
   /**
+   * @type {?string}
+   * @private
+   */
+  this.signOutUrl_ = null;
+
+  /**
    * @type {goog.net.Jsonp}
    * @private
    */
@@ -52,6 +58,12 @@ klokantech.jekylledit.Auth = function(repo, parentElement) {
    * @private
    */
   this.element_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-auth');
+
+  /**
+   * @type {!Object.<string, string|!Array.<string>>}
+   * @private
+   */
+  this.accountData_ = {};
 };
 
 
@@ -67,7 +79,7 @@ klokantech.jekylledit.Auth.prototype.getElement = function() {
  * @return {string}
  */
 klokantech.jekylledit.Auth.prototype.getUserName = function() {
-  return 'John Doe';
+  return /** @type {string} */(this.accountData_['name'] || '');
 };
 
 
@@ -75,7 +87,15 @@ klokantech.jekylledit.Auth.prototype.getUserName = function() {
  * @return {string}
  */
 klokantech.jekylledit.Auth.prototype.getUserEmail = function() {
-  return 'john.doe@example.com';
+  return /** @type {string} */(this.accountData_['email'] || '');
+};
+
+
+/**
+ * @return {!Array.<string>}
+ */
+klokantech.jekylledit.Auth.prototype.getUserRoles = function() {
+  return /** @type {!Array.<string>} */(this.accountData_['roles'] || []);
 };
 
 
@@ -99,7 +119,7 @@ klokantech.jekylledit.Auth.prototype.logout = function(callback) {
   goog.dom.appendChild(this.parentElement_, this.element_);
 
   var logoutWindow = window.open(
-      klokantech.jekylledit.BASE_URL + 'auth/sign-out', // TODO
+      this.signOutUrl_,
       '_blank',
       'width=600,height=400'
       );
@@ -169,6 +189,8 @@ klokantech.jekylledit.Auth.prototype.checkLogin_ =
     function(callback, opt_retry) {
   this.tokenJsonp_.send(undefined, goog.bind(function(data) {
         var statusCode = data['status_code'];
+        this.signOutUrl_ = data['sign_out'] || null;
+        this.accountData_ = data['account'] || {};
         if (statusCode == 200) {
           this.accessToken_ = data['access_token'];
           goog.dom.removeNode(this.element_);
