@@ -224,13 +224,20 @@ def site_token(site_id):
             'status_code': 401,
             'location': location,
         })
-    if not any(roles.site_id == site_id for roles in current_user.roles):
-        return jsonify({
-            'status_code': 403,
-        })
+    for roles in current_user.roles:
+        if roles.site_id == site_id:
+            return jsonify({
+                'status_code': 200,
+                'access_token': token_serializer.dumps(current_user.id),
+                'account': {
+                    'email': current_user.email,
+                    'name': current_user.name,
+                    'roles': roles.roles,
+                },
+                'sign_out': url_for('.sign_out', _external=True),
+            })
     return jsonify({
-        'status_code': 200,
-        'access_token': token_serializer.dumps(current_user.id),
+        'status_code': 403,
     })
 
 
