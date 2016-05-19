@@ -10,6 +10,7 @@ goog.require('goog.crypt.base64');
 goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
+goog.require('goog.string.format');
 goog.require('klokantech.jekylledit.AbstractPage');
 goog.require('klokantech.jekylledit.lang');
 goog.require('klokantech.jekylledit.utils');
@@ -100,31 +101,48 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
                   this.tabbtns_, this.tabs_);
 
   /**
-   * @type {!Object.<string, {content: !Element, side: !Element, check: !Element,
-   *                          tab: !Element, tabBtn: !Element,
+   * @type {!Object.<string, {content: !Element, side: !Element,
+   *                          tab: !Element, tabBtn: !Element, is_copy: boolean,
    *                          data: Object, editor: Object, fields: !Object}>}
    * @private
    */
   this.languages_ = {};
 
   var langs = this.config_['languages'];
+  var interfaceLang = klokantech.jekylledit.lang.getLanguage();
+  var activeLang = goog.array.contains(langs, interfaceLang) ?
+                   interfaceLang : langs[0];
   var tabBtns = [], tabs = [];
+
+  var activeTabLang = activeLang;
+  var createLangBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn');
+  var createLangDialog = goog.dom.createDom(goog.dom.TagName.DIV,
+      'je-editor-create-lang',
+      goog.dom.createDom(goog.dom.TagName.DIV, undefined,
+      klokantech.jekylledit.lang.get('editor_create_lang')),
+      createLangBtn
+      );
+  goog.events.listen(createLangBtn, goog.events.EventType.CLICK, function(e) {
+    goog.dom.removeNode(createLangDialog);
+
+    var lang = this.languages_[activeTabLang];
+    lang.is_copy = false;
+    goog.dom.classlist.remove(lang.tab, 'disabled');
+    goog.dom.classlist.remove(lang.tabBtn, 'disabled');
+  }, false, this);
+
 
   goog.array.forEach(langs, function(langId, i) {
     var content = goog.dom.createDom(goog.dom.TagName.DIV,
                                      'je-editor-tab-content');
     var side = goog.dom.createDom(goog.dom.TagName.DIV, 'je-editor-tab-side');
     var tab = goog.dom.createDom(goog.dom.TagName.DIV, 'je-editor-tab');
-    var tabCheck = goog.dom.createDom(goog.dom.TagName.INPUT, {
-      'type': 'checkbox',
-      'class': 'je-editor-tab-check'
-    });
     var tabBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-editor-tab-btn',
-                                    langId, tabCheck);
+                                    langId);
     this.languages_[langId] = {
       content: content,
       side: side,
-      check: tabCheck,
+      is_copy: langId != activeLang,
       tab: tab,
       tabBtn: tabBtn,
       data: null,
@@ -134,9 +152,7 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
     goog.dom.append(tab, content, side);
     goog.dom.appendChild(this.tabs_, tab);
     goog.dom.appendChild(this.tabbtns_, tabBtn);
-    if (langId == klokantech.jekylledit.lang.getLanguage() ||
-        (!goog.array.contains(langs,
-              klokantech.jekylledit.lang.getLanguage()) && i == 0)) {
+    if (langId == activeLang) {
       goog.dom.classlist.add(tabBtn, 'active');
       goog.dom.classlist.add(tab, 'active');
     }
@@ -155,13 +171,17 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
       });
       goog.dom.classlist.add(tabBtn, 'active');
       goog.dom.classlist.add(tab, 'active');
-      e.preventDefault();
-    }, false, this);
 
-    goog.events.listen(tabCheck, goog.events.EventType.CHANGE, function(e) {
-      tabCheck.disabled = tabCheck.checked;
-      goog.dom.classlist.enable(tab, 'disabled', !tabCheck.checked);
-      e.stopPropagation();
+      activeTabLang = langId;
+      if (goog.dom.classlist.contains(tab, 'disabled')) {
+        goog.dom.appendChild(this.tabs_, createLangDialog);
+        goog.dom.setTextContent(createLangBtn, goog.string.format(
+            klokantech.jekylledit.lang.get('editor_create_lang_btn'), langId));
+      } else {
+        goog.dom.removeNode(createLangDialog);
+      }
+
+      e.preventDefault();
     }, false, this);
   }, this);
 
@@ -222,10 +242,9 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
             }
             var lang = this.languages_[langId];
             lang.data = post;
-            lang.check.disabled = lang.check.checked =
-                !lang.data['metadata']['jekylledit_copyof'];
-            goog.dom.classlist.enable(lang.tab, 'disabled',
-                                      !lang.check.checked);
+            lang.is_copy = !!lang.data['metadata']['jekylledit_copyof'];
+            goog.dom.classlist.enable(lang.tab, 'disabled', lang.is_copy);
+            goog.dom.classlist.enable(lang.tabBtn, 'disabled', lang.is_copy);
 
             anyPublished = lang.data['metadata']['published'] != false;
 
@@ -275,8 +294,8 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
         },
         'content': ''
       };
-      lang.check.disabled = lang.check.checked = false;
-      goog.dom.classlist.enable(lang.tab, 'disabled', !lang.check.checked);
+      goog.dom.classlist.enable(lang.tab, 'disabled', lang.is_copy);
+      goog.dom.classlist.enable(lang.tabBtn, 'disabled', lang.is_copy);
 
       var catCfg = (this.config_['categories'][this.category_] || {});
       lang.fields = /** @type {Object} */
@@ -462,11 +481,11 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
 
   var firstFilledLanguage = goog.array.find(this.config_['languages'],
       function(langId) {
-        return this.languages_[langId].check.checked;
+        return !this.languages_[langId].is_copy;
       }, this);
 
   goog.object.forEach(this.languages_, function(lang, langId) {
-    if (lang.check.checked) {
+    if (!lang.is_copy) {
       delete result[langId]['metadata']['jekylledit_copyof'];
     } else {
       var copyof = lang.data['metadata']['jekylledit_copyof'] ||

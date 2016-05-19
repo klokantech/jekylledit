@@ -122,6 +122,13 @@ klokantech.jekylledit.lang.data_ = {
   'editor_publish': {
     'en': 'Publish this post'
   },
+  'editor_create_lang': {
+    'en': 'This post does not exist in this language yet. ' +
+        'Do you want to create it now?'
+  },
+  'editor_create_lang_btn': {
+    'en': 'Create "%s" variant of this post'
+  },
   'editor_saved': {
     'en': 'Changes saved!'
   },

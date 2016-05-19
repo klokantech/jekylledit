@@ -63,6 +63,9 @@
   padding:10px;
   border:1px solid black;
 }
+.je-editor-tab-btn.disabled {
+  color:#ccc;
+}
 .je-editor-tab-btn.active {
   font-weight:bold;
 }
@@ -79,6 +82,12 @@
   filter: grayscale(80%);
   opacity:0.6;
   pointer-events:none !important;
+}
+.je-editor-create-lang {
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  text-align:center;
+  padding-top:150px;
 }
 .je-editor-tab-content{
   position:absolute;
