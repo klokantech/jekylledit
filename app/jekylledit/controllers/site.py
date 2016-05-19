@@ -2,7 +2,7 @@ from base64 import b64decode
 
 import frontmatter
 
-from flask import json, jsonify, request
+from flask import json, jsonify, request, abort
 from flask.ext.cors import cross_origin
 from flask.ext.login import current_user, login_required
 from flask.ext.principal import Permission
@@ -19,20 +19,11 @@ def commit(repository, filenames):
     try:
         with repository.transaction():
             repository.execute(['add'] + filenames)
-            repository.execute(['commit', '-m', '"File {} updated"'.format(filenames[0])])
+            repository.execute(['commit', '-m', 'File {} updated'.format(filenames[0])])
             # repository.execute(['push'])
+        return True
     except Exception:
-        app.logger.exception('Commit failed')
         return False
-
-
-def get_config(site_id):
-    repository = Repository(site_id)
-    with repository.open('jekylledit.json', 'r') as fp:
-        config = json.load(fp)
-        if not 'languages' in config:
-            config.update({'languages': ['en']})
-        return config
 
 
 #site config response
@@ -41,7 +32,8 @@ def get_config(site_id):
 @login_required
 @authorization_required('contributor', 'administrator')
 def site_config(site_id):
-    config = get_config(site_id)
+    site = Sites(site_id)
+    config = site.get_config()
     return jsonify(config)
 
 
@@ -55,7 +47,8 @@ def site_file(site_id, file_id):
     filename = b64decode(file_id).decode()
     # Filemask is independent on language
     filemask = filename.rsplit('-', 1)[0] + '-{}.' + filename.rsplit('.', 1)[1]
-    config = get_config(site_id)
+    site = Sites(site_id)
+    config = site.get_config()
     languages = config['languages']
 
     # Save new post
@@ -76,14 +69,9 @@ def site_file(site_id, file_id):
         # Commit changes
         commited = commit(repository, tocommit)
         if commited:
-            status = 'ok'
+            return 'OK'
         else:
-            status = 'failed'
-        return jsonify({
-            'status': status,
-            'site': site_id,
-            'file': filename
-        })
+            abort(500)
 
     # Save content of post to file
     elif request.method == 'PUT':
@@ -106,14 +94,9 @@ def site_file(site_id, file_id):
             # Commit changes
         commited = commit(repository, tocommit)
         if commited:
-            status = 'ok'
+            return 'OK'
         else:
-            status = 'failed'
-        return jsonify({
-            'status': status,
-            'site': site_id,
-            'file': filename
-        })
+            abort(500)
 
     # Return post in all languages
     else:
@@ -131,6 +114,7 @@ def site_file(site_id, file_id):
 # Response related drafts
 @app.route('/site/<site_id>/drafts', methods=['GET'])
 @cross_origin()
+@login_required
 @authorization_required('contributor', 'administrator')
 def drafts(site_id):
     site = Sites(site_id)
@@ -138,7 +122,6 @@ def drafts(site_id):
     if Permission(('administrator', site_id)):
         email = current_user.email
         for draft in drafts:
-            print(draft['author'], email)
             if draft['author'] is not email:
                 drafts.remove(draft)
     return json.dumps(drafts)
@@ -154,23 +137,17 @@ def site_translation(site_id):
     if request.method == 'GET':
         with repository.open(TRANSLATIONS_FILE, 'r') as fp:
             translations = json.load(fp)
-        # TODO: Validate
         return jsonify(translations)
     elif request.method == 'PUT':
         data = request.get_json()
-        # TODO: Validate
         with repository.open(TRANSLATIONS_FILE, 'w') as fp:
             json.dump(data, fp)
         # Commit changes
         commited = commit(repository, TRANSLATIONS_FILE)
         if commited:
-            status = 'ok'
+            return 'OK'
         else:
-            status = 'failed'
-        return jsonify({
-            'status': status,
-            'site': site_id
-        })
+            abort(500)
 
 
 @app.route('/site/<site_id>/update', methods=['POST'])
@@ -180,12 +157,6 @@ def update(site_id):
     try:
         with repository.transaction():
             repository.execute(['pull'])
-            status = 'ok'
+            return 'OK'
     except Exception:
-        app.logger.exception('Pull of {} failed'.format(site_id))
-        status = 'failed'
-
-    return jsonify({
-            'status': status,
-            'site': site_id
-        })
+        abort(500)
