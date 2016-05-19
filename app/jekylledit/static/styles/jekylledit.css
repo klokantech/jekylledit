@@ -35,6 +35,17 @@
   right:0;
   overflow:auto;
 }
+.je-editor-publish {
+  position:absolute;
+  top:0;
+  right:0;
+  line-height:40px;
+  margin-right:5px;
+}
+.je-editor-publish input {
+  vertical-align:text-bottom;
+  margin-right:5px;
+}
 .je-editor-tabbtns {
   position:absolute;
   top:0;

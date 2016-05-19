@@ -119,6 +119,9 @@ klokantech.jekylledit.lang.data_ = {
   'popup_btn_drafts': {
     'en': 'Drafts'
   },
+  'editor_publish': {
+    'en': 'Publish this post'
+  },
   'editor_saved': {
     'en': 'Changes saved!'
   },

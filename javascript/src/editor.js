@@ -75,6 +75,19 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
    * @type {!Element}
    * @private
    */
+  this.publishCheckbox_ = goog.dom.createDom(goog.dom.TagName.INPUT, {
+    'type': 'checkbox'
+  });
+
+  var publishCheckboxBox = goog.dom.createDom(goog.dom.TagName.LABEL,
+      'je-editor-publish',
+      this.publishCheckbox_,
+      klokantech.jekylledit.lang.get('editor_publish'));
+
+  /**
+   * @type {!Element}
+   * @private
+   */
   this.tabbtns_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-editor-tabbtns');
 
   /**
@@ -83,7 +96,8 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
    */
   this.tabs_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-editor-tabs');
 
-  goog.dom.append(this.element_, this.tabbtns_, this.tabs_);
+  goog.dom.append(this.element_, publishCheckboxBox,
+                  this.tabbtns_, this.tabs_);
 
   /**
    * @type {!Object.<string, {content: !Element, side: !Element, check: !Element,
@@ -190,12 +204,18 @@ klokantech.jekylledit.Editor.prototype.getElement = function() {
 
 /** @inheritDoc */
 klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
+  this.publishCheckbox_.disabled =
+      !goog.array.contains(this.auth_.getUserRoles(), 'administrator');
+
   if (this.path_) {
     this.auth_.sendRequest(
         'site/' + this.repo_ + '/' + goog.crypt.base64.encodeString(this.path_),
         goog.bind(function(e) {
           var xhr = e.target;
           var data = xhr.getResponseJson();
+
+          var anyPublished = false;
+
           goog.object.forEach(data, function(post, langId) {
             if (!this.languages_[langId]) {
               return;
@@ -206,6 +226,8 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
                 !lang.data['metadata']['jekylledit_copyof'];
             goog.dom.classlist.enable(lang.tab, 'disabled',
                                       !lang.check.checked);
+
+            anyPublished = lang.data['metadata']['published'] != false;
 
             if (!this.category_) {
               var meta = post['metadata'];
@@ -233,12 +255,16 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
                 klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT;
           }, this);
 
+          this.publishCheckbox_.checked = anyPublished;
+
           if (opt_callback) {
             opt_callback();
           }
         }, this));
   } else {
     var uniquePostId = goog.string.getRandomString();
+
+    this.publishCheckbox_.checked = false;
 
     goog.object.forEach(this.languages_, function(lang, langId) {
       lang.data = {
@@ -451,6 +477,7 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
       result[langId]['metadata']['lang'] = langId;
       result[langId]['metadata']['jekylledit_copyof'] = copyof;
     }
+    result[langId]['metadata']['published'] = this.publishCheckbox_.checked;
   }, this);
 
   if (this.editSource_) {
