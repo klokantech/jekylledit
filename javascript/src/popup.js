@@ -134,7 +134,8 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
  * @private
  */
 klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
-  var logoutBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+  var logoutBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+      'je-btn je-btn-logout',
       klokantech.jekylledit.lang.get('popup_logout'));
   goog.events.listen(logoutBtn, goog.events.EventType.CLICK, function(e) {
     goog.dom.removeChildren(this.userNav_);
@@ -158,7 +159,7 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
     return;
   }
 
-  var editBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+  var editBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn je-btn-edit',
       klokantech.jekylledit.lang.get('popup_btn_edit'));
   goog.dom.append(this.nav_, editBtn);
   goog.events.listen(editBtn, goog.events.EventType.CLICK, function(e) {
@@ -176,7 +177,7 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
                           el['label'], this.config_['languages']);
           var content = el['symbol'] || label;
           var catBtn = goog.dom.createDom(goog.dom.TagName.DIV, {
-            'class': 'je-btn',
+            'class': 'je-btn je-btn-newx',
             'title': label
           });
           catBtn.innerHTML = content;
@@ -197,7 +198,8 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
         // translations
         this.pages_['translations/'] = new klokantech.jekylledit.Translations(
             this.auth_, this.config_, this.repo_);
-        var transBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+        var transBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+            'je-btn je-btn-trans',
             klokantech.jekylledit.lang.get('popup_btn_trans'));
         goog.dom.appendChild(this.nav_, transBtn);
         goog.events.listen(transBtn, goog.events.EventType.CLICK, function(e) {
@@ -207,7 +209,8 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
         // profile
         this.pages_['profile/'] = new klokantech.jekylledit.Profile(
             this.auth_, this.config_, this.repo_);
-        var profBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+        var profBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+            'je-btn je-btn-profile',
             klokantech.jekylledit.lang.get('popup_btn_profile'));
         goog.dom.appendChild(this.nav_, profBtn);
         goog.events.listen(profBtn, goog.events.EventType.CLICK, function(e) {
@@ -217,7 +220,8 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
         // drafts
         this.pages_['drafts/'] = new klokantech.jekylledit.Drafts(
             this.auth_, this.config_, this.repo_);
-        var draftBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
+        var draftBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+            'je-btn je-btn-drafts',
             klokantech.jekylledit.lang.get('popup_btn_drafts'));
         goog.dom.appendChild(this.nav_, draftBtn);
         goog.events.listen(draftBtn, goog.events.EventType.CLICK, function(e) {
