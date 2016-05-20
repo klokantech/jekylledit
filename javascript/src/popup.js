@@ -64,7 +64,7 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
       if (page) {
         page.save();
         this.setVisible(false);
-        this.clearPages_();
+        this.doesNeedClearLoad_ = true;
       }
     }
   }, false, this);
@@ -249,6 +249,7 @@ klokantech.jekylledit.Popup.prototype.clearPages_ = function() {
   goog.object.forEach(this.pages_, function(page, k) {
     page.loadClear();
   });
+  this.doesNeedClearLoad_ = false;
 };
 
 
@@ -302,6 +303,9 @@ klokantech.jekylledit.Popup.prototype.startPage_ = function(id) {
  */
 klokantech.jekylledit.Popup.prototype.setVisible = function(visible) {
   if (visible) {
+    if (this.doesNeedClearLoad_) {
+      this.clearPages_();
+    }
     if (this.editSource_ && this.config_) {
       this.startPage_('editor/');
     }

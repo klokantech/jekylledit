@@ -277,7 +277,7 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
 
           this.publishCheckbox_.checked = anyPublished;
 
-          this.startEditor_();
+          this.start();
 
           if (opt_callback) {
             opt_callback();
@@ -516,7 +516,6 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
     'post': postData,
     'media': extracted
   };
-  console.log(result);
 
   var path = this.path_ ? goog.crypt.base64.encodeString(this.path_) : 'new';
   this.auth_.sendRequest('site/' + this.repo_ + '/' + path,
