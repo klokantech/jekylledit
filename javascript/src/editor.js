@@ -277,6 +277,8 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
 
           this.publishCheckbox_.checked = anyPublished;
 
+          this.startEditor_();
+
           if (opt_callback) {
             opt_callback();
           }

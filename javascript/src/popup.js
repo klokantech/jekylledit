@@ -126,6 +126,12 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
    */
   this.auth_ = new klokantech.jekylledit.Auth(this.repo_, this.content_);
   this.auth_.login(goog.bind(this.onLogin_, this));
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.doesNeedClearLoad_ = false;
 };
 
 
@@ -142,6 +148,7 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
     goog.dom.removeChildren(this.nav_);
     goog.dom.removeChildren(this.content_);
     goog.dom.removeNode(this.actions_);
+    this.doesNeedClearLoad_ = true;
     this.auth_.logout(goog.bind(function() {
       this.auth_.login(goog.bind(this.onLogin_, this));
     }, this));
@@ -228,7 +235,9 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
           this.startPage_('drafts/');
         }, false, this);
 
-        this.clearPages_();
+        if (this.doesNeedClearLoad_) {
+          this.clearPages_();
+        }
       }, this));
 };
 
