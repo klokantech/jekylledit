@@ -135,6 +135,9 @@ klokantech.jekylledit.lang.data_ = {
   'editor_created': {
     'en': 'New post created !'
   },
+  'editor_save_error': {
+    'en': 'There was an error saving the post!'
+  },
   'login': {
     'en': 'Log in'
   },
@@ -150,8 +153,14 @@ klokantech.jekylledit.lang.data_ = {
   'profile_saved': {
     'en': 'Changes saved!'
   },
+  'profile_save_error': {
+    'en': 'There was an error saving the changes!'
+  },
   'trans_saved': {
     'en': 'Changes saved!'
+  },
+  'trans_save_error': {
+    'en': 'There was an error saving the changes!'
   },
   'drafts_empty': {
     'en': 'There are currently no drafts waiting to be published.'

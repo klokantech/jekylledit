@@ -100,7 +100,11 @@ klokantech.jekylledit.Profile.prototype.save = function(opt_callback) {
 
   this.auth_.sendRequest('site/' + this.repo_ + '/profile',
       goog.bind(function(e) {
-        alert(klokantech.jekylledit.lang.get('profile_saved'));
+        if (e.target.isSuccess()) {
+          alert(klokantech.jekylledit.lang.get('profile_saved'));
+        } else {
+          alert(klokantech.jekylledit.lang.get('profile_save_error'));
+        }
         if (opt_callback) {
           opt_callback();
         }

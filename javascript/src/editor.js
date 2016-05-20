@@ -520,8 +520,12 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
   var path = this.path_ ? goog.crypt.base64.encodeString(this.path_) : 'new';
   this.auth_.sendRequest('site/' + this.repo_ + '/' + path,
       goog.bind(function(e) {
-        alert(klokantech.jekylledit.lang.get(
-                  this.path_ ? 'editor_saved' : 'editor_created'));
+        if (e.target.isSuccess()) {
+          alert(klokantech.jekylledit.lang.get(
+                    this.path_ ? 'editor_saved' : 'editor_created'));
+        } else {
+          alert(klokantech.jekylledit.lang.get('editor_save_error'));
+        }
         if (opt_callback) {
           opt_callback();
         }

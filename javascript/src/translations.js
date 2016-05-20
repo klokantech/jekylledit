@@ -135,7 +135,11 @@ klokantech.jekylledit.Translations.prototype.save = function(opt_callback) {
 
   this.auth_.sendRequest('site/' + this.repo_ + '/translations',
       goog.bind(function(e) {
-        alert(klokantech.jekylledit.lang.get('trans_saved'));
+        if (e.target.isSuccess()) {
+          alert(klokantech.jekylledit.lang.get('trans_saved'));
+        } else {
+          alert(klokantech.jekylledit.lang.get('trans_save_error'));
+        }
         if (opt_callback) {
           opt_callback();
         }
