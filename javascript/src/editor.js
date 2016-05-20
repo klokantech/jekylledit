@@ -233,6 +233,7 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
         goog.bind(function(e) {
           var xhr = e.target;
           var data = xhr.getResponseJson();
+          data = data['post'] || {};
 
           var anyPublished = false;
 
@@ -449,7 +450,7 @@ klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
 
 /** @inheritDoc */
 klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
-  var result = {};
+  var postData = {};
 
   var editables = document.querySelectorAll(
       klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
@@ -458,7 +459,7 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
       'metadata': goog.object.clone(lang.data['metadata']),
       'content': lang.data['content']
     };
-    result[langId] = langData;
+    postData[langId] = langData;
 
     goog.object.forEach(lang.fields, function(el, k) {
       var valueGetter = el['_je_getval'];
@@ -486,17 +487,17 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
 
   goog.object.forEach(this.languages_, function(lang, langId) {
     if (!lang.is_copy) {
-      delete result[langId]['metadata']['jekylledit_copyof'];
+      delete postData[langId]['metadata']['jekylledit_copyof'];
     } else {
       var copyof = lang.data['metadata']['jekylledit_copyof'] ||
                    firstFilledLanguage;
-      result[langId] = goog.object.unsafeClone(result[copyof]);
+      postData[langId] = goog.object.unsafeClone(postData[copyof]);
 
       // fix special fields
-      result[langId]['metadata']['lang'] = langId;
-      result[langId]['metadata']['jekylledit_copyof'] = copyof;
+      postData[langId]['metadata']['lang'] = langId;
+      postData[langId]['metadata']['jekylledit_copyof'] = copyof;
     }
-    result[langId]['metadata']['published'] = this.publishCheckbox_.checked;
+    postData[langId]['metadata']['published'] = this.publishCheckbox_.checked;
   }, this);
 
   if (this.editSource_) {
@@ -505,6 +506,15 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
       klokantech.jekylledit.utils.cloneNodes(lang.content, this.editSource_);
     }
   }
+
+  // deduplicate images
+  var extracted = {};
+  postData = klokantech.jekylledit.utils.extractImages(postData, extracted);
+  var result = {
+    'post': postData,
+    'media': extracted
+  };
+  console.log(result);
 
   var path = this.path_ ? goog.crypt.base64.encodeString(this.path_) : 'new';
   this.auth_.sendRequest('site/' + this.repo_ + '/' + path,

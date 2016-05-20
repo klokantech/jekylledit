@@ -7,6 +7,7 @@
 goog.provide('klokantech.jekylledit.utils');
 
 goog.require('goog.array');
+goog.require('goog.crypt.Md5');
 goog.require('goog.dom');
 goog.require('goog.net.jsloader');
 goog.require('kt.MultiComplete');
@@ -180,5 +181,58 @@ klokantech.jekylledit.utils.createField =
     });
     goog.dom.appendChild(parent, dataInput);
     return function() { return dataInput.value; };
+  }
+};
+
+
+/**
+ * @type {RegExp}
+ */
+klokantech.jekylledit.utils.BASE64_IMAGE_REGEXP =
+    /([\'\"]?)(data:image\/(\w+);base64,([A-Za-z0-9+\/=\s]+))\1/g;
+
+
+/**
+ * @typedef {string|Object.<string, klokantech.jekylledit.utils.Extractable>}
+ */
+klokantech.jekylledit.utils.Extractable;
+
+
+/**
+ * Deduplicates inline base64 images.
+ * @param {klokantech.jekylledit.utils.Extractable} lookIn
+ * @param {Object} extracted
+ * @param {goog.crypt.Hash=} opt_hasher
+ * @return {klokantech.jekylledit.utils.Extractable} Modified lookIn
+ */
+klokantech.jekylledit.utils.extractImages =
+    function(lookIn, extracted, opt_hasher) {
+  var hasher = opt_hasher || new goog.crypt.Md5();
+  if (goog.isString(lookIn)) {
+    return lookIn.replace(klokantech.jekylledit.utils.BASE64_IMAGE_REGEXP,
+        function(match, p1, p2, p3, p4) {
+          var base64stripped = p4.replace(/\s/g, ''); // without whitespace
+          hasher.reset();
+          hasher.update(base64stripped); // the bytes
+          var identifier = goog.crypt.byteArrayToHex(hasher.digest());
+          identifier += '.' + p3; // image/xxx
+
+          if (goog.DEBUG && extracted[identifier]) {
+            console.log('Deduplicated', identifier);
+          }
+
+          extracted[identifier] = {
+            'data': base64stripped,
+            'placeholder': '_je_placeholder:{' + identifier + '}'
+          };
+
+          return extracted[identifier]['placeholder'];
+        });
+  } else {
+    goog.object.forEach(lookIn, function(value, key) {
+      lookIn[key] =
+          klokantech.jekylledit.utils.extractImages(value, extracted, hasher);
+    });
+    return lookIn;
   }
 };

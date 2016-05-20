@@ -54,10 +54,12 @@ def site_file(site_id, file_id):
     # Save new post
     if request.method == 'POST':
         data = request.get_json()
+        postData = data['post']
+        media = data['media'] # TODO
         tocommit = []
         for language in languages:
             post = frontmatter.Post()
-            langdata = data[language]
+            langdata = postData[language]
             if 'metadata' in langdata:
                 post.metadata = langdata['metadata']
             if 'content' in langdata:
@@ -76,17 +78,19 @@ def site_file(site_id, file_id):
     # Save content of post to file
     elif request.method == 'PUT':
         data = request.get_json()
+        postData = data['post']
+        media = data['media'] # TODO
         tocommit = []
         for language in languages:
-            langdata = data[language]
+            langdata = postData[language]
             lfilename = filemask.format(language)
             # Replace post's data in file
             with repository.open(lfilename, 'r+') as fp:
                 post = frontmatter.load(fp)
-                if 'metadata' in data:
-                    post.metadata = data['metadata']
-                if 'content' in data:
-                    post.content = data['content']
+                if 'metadata' in langdata:
+                    post.metadata = langdata['metadata']
+                if 'content' in langdata:
+                    post.content = langdata['content']
                 fp.seek(0)
                 fp.truncate()
                 frontmatter.dump(post, fp)
@@ -100,15 +104,17 @@ def site_file(site_id, file_id):
 
     # Return post in all languages
     else:
-        resp = {}
+        postData = {}
         for language in languages:
             with repository.open(filemask.format(language), 'r') as fp:
                 post = frontmatter.load(fp)
-                resp[language] = {
+                postData[language] = {
                     'metadata': post.metadata,
                     'content': post.content
                 }
-        return jsonify(resp)
+        return jsonify({
+            'post': postData
+        })
 
 
 # Response related drafts
