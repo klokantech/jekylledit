@@ -148,6 +148,7 @@ klokantech.jekylledit.utils.createField =
       'accept': 'image/*',
       'class': 'je-mediaupload'
     });
+    var fieldValue = value;
     var preview = goog.dom.createDom(goog.dom.TagName.IMG, {
                     'class': 'je-mediaupload-preview',
                     'src': value,
@@ -155,7 +156,7 @@ klokantech.jekylledit.utils.createField =
                   });
     var filereader = new FileReader();
     filereader.onload = function(e) {
-      preview.src = filereader.result;
+      preview.src = fieldValue = filereader.result;
       preview.alt = '';
     };
 
@@ -173,7 +174,7 @@ klokantech.jekylledit.utils.createField =
     if (parent) {
       goog.dom.append(parent, file, preview);
     }
-    return function() { return filereader.result || ''; };
+    return function() { return fieldValue; };
   } else {
     var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
       type: 'text',
