@@ -10,7 +10,7 @@ goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('klokantech.jekylledit.Auth');
-goog.require('klokantech.jekylledit.Drafts');
+goog.require('klokantech.jekylledit.Dashboard');
 goog.require('klokantech.jekylledit.Editor');
 goog.require('klokantech.jekylledit.Profile');
 goog.require('klokantech.jekylledit.Translations');
@@ -166,17 +166,40 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
     return;
   }
 
-  var editBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn je-btn-edit',
-      klokantech.jekylledit.lang.get('popup_btn_edit'));
-  goog.dom.append(this.nav_, editBtn);
-  goog.events.listen(editBtn, goog.events.EventType.CLICK, function(e) {
-    this.startPage_('editor/');
-  }, false, this);
-
   this.auth_.sendRequest('site/' + this.repo_ + '/config',
       goog.bind(function(e) {
         var xhr = e.target;
         this.config_ = xhr.getResponseJson();
+
+        // dashboard
+        this.pages_['dash/'] = new klokantech.jekylledit.Dashboard(
+            this.auth_, this.config_, this.repo_, goog.bind(function(cat) {
+              this.startPage_('editor/' + (cat || ''));
+            }, this));
+        var draftBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+            'je-btn je-btn-dash',
+            klokantech.jekylledit.lang.get('popup_btn_dash'));
+        goog.dom.appendChild(this.nav_, draftBtn);
+        goog.events.listen(draftBtn, goog.events.EventType.CLICK, function(e) {
+          this.startPage_('dash/');
+        }, false, this);
+
+        if (this.editSource_) {
+          var id;
+          id = this.initEditor_(null, goog.bind(function() {
+            this.startPage_(id);
+          }, this));
+
+          var editBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+              'je-btn je-btn-edit',
+              klokantech.jekylledit.lang.get('popup_btn_edit'));
+          goog.dom.append(this.nav_, editBtn);
+          goog.events.listen(editBtn, goog.events.EventType.CLICK, function(e) {
+            this.startPage_('editor/');
+          }, false, this);
+        } else {
+          this.startPage_('dash/');
+        }
 
         goog.object.forEach(this.config_['categories'], function(el, k) {
           var label = klokantech.jekylledit.lang.get('popup_btn_newx') +
@@ -194,13 +217,6 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
             this.startPage_(id);
           }, false, this);
         }, this);
-
-        if (this.editSource_) {
-          var id;
-          id = this.initEditor_(null, goog.bind(function() {
-            this.startPage_(id);
-          }, this));
-        }
 
         // translations
         this.pages_['translations/'] = new klokantech.jekylledit.Translations(
@@ -222,17 +238,6 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
         goog.dom.appendChild(this.nav_, profBtn);
         goog.events.listen(profBtn, goog.events.EventType.CLICK, function(e) {
           this.startPage_('profile/');
-        }, false, this);
-
-        // drafts
-        this.pages_['drafts/'] = new klokantech.jekylledit.Drafts(
-            this.auth_, this.config_, this.repo_);
-        var draftBtn = goog.dom.createDom(goog.dom.TagName.DIV,
-            'je-btn je-btn-drafts',
-            klokantech.jekylledit.lang.get('popup_btn_drafts'));
-        goog.dom.appendChild(this.nav_, draftBtn);
-        goog.events.listen(draftBtn, goog.events.EventType.CLICK, function(e) {
-          this.startPage_('drafts/');
         }, false, this);
 
         if (this.doesNeedClearLoad_) {

@@ -116,8 +116,8 @@ klokantech.jekylledit.lang.data_ = {
   'popup_btn_trans': {
     'en': 'Translations'
   },
-  'popup_btn_drafts': {
-    'en': 'Drafts'
+  'popup_btn_dash': {
+    'en': 'Dashboard'
   },
   'editor_publish': {
     'en': 'Publish this post'
@@ -162,7 +162,13 @@ klokantech.jekylledit.lang.data_ = {
   'trans_save_error': {
     'en': 'There was an error saving the changes!'
   },
-  'drafts_empty': {
+  'dash_create_new': {
+    'en': 'Create new post'
+  },
+  'dash_drafts': {
+    'en': 'Drafts'
+  },
+  'dash_drafts_empty': {
     'en': 'There are currently no drafts waiting to be published.'
   }
 };
