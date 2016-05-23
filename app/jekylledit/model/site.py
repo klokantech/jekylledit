@@ -50,6 +50,8 @@ class Repository:
 
 class Sites:
 
+    USERS_FILE = '_data/users.json'
+
     def __init__(self, name):
         self.name = name
         self.repository = Repository(name)
@@ -81,3 +83,29 @@ class Sites:
                         'title': post.metadata['title']
                     })
         return drafts
+
+    def get_users(self):
+        with self.repository.open(self.USERS_FILE, 'r') as fp:
+            users = json.load(fp)
+            return users
+
+    def get_user(self, user_id):
+        users = self.get_users()
+        user_data = {}
+        for user in users:
+            if user['id'] == user_id:
+                user_data = user
+                break
+        return user_data
+
+    def edit_user(self, data):
+        with self.repository.open(self.USERS_FILE, 'r+') as fp:
+            users = json.load(fp)
+            for idx, user in enumerate(users):
+                if user['id'] == data['id']:
+                    users[idx] = data
+                    break
+            fp.seek(0)
+            fp.truncate()
+            json.dump(users, fp)
+

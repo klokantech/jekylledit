@@ -14,6 +14,7 @@ from .auth import authorization_required
 
 
 TRANSLATIONS_FILE = '_data/translations.json'
+USERS_FILE = '_data/users.json'
 
 
 def commit(repository, filenames):
@@ -41,8 +42,8 @@ def site_config(site_id):
 # Handle working with posts
 @app.route('/site/<site_id>/<file_id>', methods=['GET', 'POST', 'PUT'])
 @cross_origin()
-#@login_required
-#@authorization_required('contributor', 'administrator')
+@login_required
+@authorization_required('contributor', 'administrator')
 def site_file(site_id, file_id):
     repository = Repository(site_id)
     site = Sites(site_id)
@@ -159,6 +160,31 @@ def site_translation(site_id):
             json.dump(data, fp)
         # Commit changes
         commited = commit(repository, TRANSLATIONS_FILE)
+        if commited:
+            return 'OK'
+        else:
+            abort(500)
+
+
+#user proflies
+@app.route('/site/<site_id>/user/<user_id>/profile', methods=['GET', 'PUT'])
+@cross_origin()
+@login_required
+@authorization_required('contributor', 'administrator')
+def user_profile(site_id, user_id):
+    site = Sites(site_id)
+    #  Get current user
+    # JE uses emails as identificators
+    if user_id == 'current':
+        user_id = 'current_user.email'
+    if request.method == 'GET':
+        user = site.get_user(user_id)
+        return jsonify(user)
+    elif request.method == 'PUT':
+        data = request.get_json()
+        return json.dumps(site.edit_user(data))
+        # Commit changes
+        commited = commit(site.repository, USERS_FILE)
         if commited:
             return 'OK'
         else:
