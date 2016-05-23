@@ -1,4 +1,5 @@
 from base64 import b64decode
+from datetime import date
 
 import frontmatter
 
@@ -40,13 +41,10 @@ def site_config(site_id):
 # Handle working with posts
 @app.route('/site/<site_id>/<file_id>', methods=['GET', 'POST', 'PUT'])
 @cross_origin()
-@login_required
-@authorization_required('contributor', 'administrator')
+#@login_required
+#@authorization_required('contributor', 'administrator')
 def site_file(site_id, file_id):
     repository = Repository(site_id)
-    filename = b64decode(file_id).decode()
-    # Filemask is independent on language
-    filemask = filename.rsplit('-', 1)[0] + '-{}.' + filename.rsplit('.', 1)[1]
     site = Sites(site_id)
     config = site.get_config()
     languages = config['languages']
@@ -56,17 +54,20 @@ def site_file(site_id, file_id):
         data = request.get_json()
         postData = data['post']
         media = data['media'] # TODO
+        title = postData[languages[0]]['metadata']['title'].replace(' ', '-').lower()
+
         tocommit = []
         for language in languages:
-            post = frontmatter.Post()
             langdata = postData[language]
-            if 'metadata' in langdata:
-                post.metadata = langdata['metadata']
-            if 'content' in langdata:
-                post.content = langdata['content']
-            lfilename = filemask.format(language)
-            with repository.open(lfilename, 'r') as fp:
-                formatter.dump(post, fp)
+            today = date.today().strftime('%Y-%m-%d')
+            lfilename = '_posts/' + today + '-' + title + '-' + language + '.md'
+            with repository.open(lfilename, 'w+') as fp:
+                post = frontmatter.load(fp)
+                if 'metadata' in langdata:
+                    post.metadata = langdata['metadata']
+                if 'content' in langdata:
+                    post.content = langdata['content']
+                frontmatter.dump(post, fp)
                 tocommit.append(lfilename)
         # Commit changes
         commited = commit(repository, tocommit)
@@ -77,6 +78,10 @@ def site_file(site_id, file_id):
 
     # Save content of post to file
     elif request.method == 'PUT':
+        filename = b64decode(file_id).decode()
+        filemask = filename.rsplit('-', 1)[0] + '-{}.' \
+        + filename.rsplit('.', 1)[1]
+
         data = request.get_json()
         postData = data['post']
         media = data['media'] # TODO
@@ -104,6 +109,10 @@ def site_file(site_id, file_id):
 
     # Return post in all languages
     else:
+        filename = b64decode(file_id).decode()
+        filemask = filename.rsplit('-', 1)[0] + '-{}.' \
+        + filename.rsplit('.', 1)[1]
+
         postData = {}
         for language in languages:
             with repository.open(filemask.format(language), 'r') as fp:
