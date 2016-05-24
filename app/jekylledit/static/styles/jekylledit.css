@@ -30,6 +30,9 @@
   width:60px;
   background:#323439;
 }
+.je-popup-nav .je-btn.je-btn-active{
+  color: #289adf;
+}
 .je-popup-content{
   position:absolute;
   top:0;
@@ -384,20 +387,23 @@
   padding: 30px;
 }
 
-.je-drafts-empty {
+.je-dash-empty {
   padding:10px;
   text-align:center;
 }
-.je-drafts-draft {
-  border:1px solid #ccc;
-  margin:15px;
-  padding:2px;
+.je-dash-draft {
+  border-bottom:1px solid #ccc;
+  margin: 0;
+  padding: 6px;
   cursor:pointer;
 }
-.je-drafts-draft span {
+.je-dash-draft:last-child{
+  border-bottom: none;
+}
+.je-dash-draft span {
   padding:5px;
 }
-.je-drafts-draft-title {
+.je-dash-draft-title {
   font-weight:bold;
 }
 
