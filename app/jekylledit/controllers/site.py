@@ -22,7 +22,8 @@ def commit(repository, filenames):
         with repository.transaction():
             repository.execute(['add'] + filenames)
             repository.execute(['commit', '-m', 'File {} updated'.format(filenames[0])])
-            # repository.execute(['push'])
+            if not app.config['DEVELOPMENT']:
+                repository.execute(['push'])
         return True
     except Exception:
         return False
