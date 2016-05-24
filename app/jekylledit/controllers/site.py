@@ -154,7 +154,7 @@ def site_translation(site_id):
         with repository.open(TRANSLATIONS_FILE, 'w') as fp:
             json.dump(data, fp)
         # Commit changes
-        commit(repository, TRANSLATIONS_FILE)
+        commit(repository, [TRANSLATIONS_FILE])
         return 'OK'
 
 
@@ -177,7 +177,7 @@ def user_profile(site_id, user_id):
         data['id'] = user_id
         site.edit_user(data)
         # Commit changes
-        commit(site.repository, USERS_FILE)
+        commit(site.repository, [USERS_FILE])
         return 'OK'
 
 
