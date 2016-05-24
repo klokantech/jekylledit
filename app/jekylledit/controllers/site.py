@@ -18,15 +18,11 @@ USERS_FILE = '_data/users.json'
 
 
 def commit(repository, filenames):
-    try:
-        with repository.transaction():
-            repository.execute(['add'] + filenames)
-            repository.execute(['commit', '-m', 'File {} updated'.format(filenames[0])])
-            if not app.config['DEVELOPMENT']:
-                repository.execute(['push'])
-        return True
-    except Exception:
-        return False
+    with repository.transaction():
+        repository.execute(['add'] + filenames)
+        repository.execute(['commit', '-m', 'File {} updated'.format(filenames[0])])
+        if not app.config['DEVELOPMENT']:
+            repository.execute(['push'])
 
 
 #site config response
@@ -72,11 +68,8 @@ def site_file(site_id, file_id):
                 frontmatter.dump(post, fp)
                 tocommit.append(lfilename)
         # Commit changes
-        commited = commit(repository, tocommit)
-        if commited:
-            return 'OK'
-        else:
-            abort(500)
+        commit(repository, tocommit)
+        return 'OK'
 
     # Save content of post to file
     elif request.method == 'PUT':
@@ -103,11 +96,8 @@ def site_file(site_id, file_id):
                 frontmatter.dump(post, fp)
                 tocommit.append(lfilename)
             # Commit changes
-        commited = commit(repository, tocommit)
-        if commited:
-            return 'OK'
-        else:
-            abort(500)
+        commit(repository, tocommit)
+        return 'OK'
 
     # Return post in all languages
     else:
@@ -160,11 +150,8 @@ def site_translation(site_id):
         with repository.open(TRANSLATIONS_FILE, 'w') as fp:
             json.dump(data, fp)
         # Commit changes
-        commited = commit(repository, TRANSLATIONS_FILE)
-        if commited:
-            return 'OK'
-        else:
-            abort(500)
+        commit(repository, TRANSLATIONS_FILE)
+        return 'OK'
 
 
 #user proflies
@@ -186,20 +173,14 @@ def user_profile(site_id, user_id):
         data['id'] = user_id
         site.edit_user(data)
         # Commit changes
-        commited = commit(site.repository, USERS_FILE)
-        if commited:
-            return 'OK'
-        else:
-            abort(500)
+        commit(site.repository, USERS_FILE)
+        return 'OK'
 
 
 @app.route('/site/<site_id>/update', methods=['POST'])
 def update(site_id):
     # TODO: Secure
     repository = Repository(site_id)
-    try:
-        with repository.transaction():
-            repository.execute(['pull'])
-            return 'OK'
-    except Exception:
-        abort(500)
+    with repository.transaction():
+        repository.execute(['pull'])
+    return 'OK'
