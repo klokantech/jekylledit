@@ -63,23 +63,32 @@ klokantech.jekylledit.Profile.prototype.start = function() {
 
 /** @inheritDoc */
 klokantech.jekylledit.Profile.prototype.loadClear = function(opt_callback) {
-  goog.dom.removeChildren(this.element_);
+  klokantech.jekylledit.utils.replaceWithSpinner(this.element_);
 
-  var fields = (this.config_['profile'] || {})['fields'] || {};
+  this.auth_.sendRequest('site/' + this.repo_ + '/user/current/profile',
+      goog.bind(function(e) {
+        var xhr = e.target;
+        var data = xhr.getResponseJson();
 
-  goog.object.forEach(fields, function(el, k) {
-    var label = klokantech.jekylledit.lang.getFrom(
-                    el['label'], this.config_['languages']);
-    var labelEl = goog.dom.createDom(goog.dom.TagName.LABEL, undefined,
-                                     (label || k) + ':');
-    goog.dom.appendChild(this.element_, labelEl);
-    el['_je_getval'] = klokantech.jekylledit.utils.createField(
-                           el, '', this.element_); //TODO: value
-  }, this);
+        goog.dom.removeChildren(this.element_);
 
-  if (opt_callback) {
-    opt_callback();
-  }
+        var fields = (this.config_['profile'] || {})['fields'] || {};
+
+        goog.object.forEach(fields, function(el, k) {
+          var label = klokantech.jekylledit.lang.getFrom(
+                          el['label'], this.config_['languages']);
+          var labelEl = goog.dom.createDom(goog.dom.TagName.LABEL, undefined,
+          (label || k) + ':');
+          goog.dom.appendChild(this.element_, labelEl);
+          var value = data[k];
+          el['_je_getval'] = klokantech.jekylledit.utils.createField(
+                                 el, value, this.element_);
+        }, this);
+
+        if (opt_callback) {
+          opt_callback();
+        }
+      }, this));
 };
 
 
@@ -98,7 +107,7 @@ klokantech.jekylledit.Profile.prototype.save = function(opt_callback) {
     }
   }, this);
 
-  this.auth_.sendRequest('site/' + this.repo_ + '/profile',
+  this.auth_.sendRequest('site/' + this.repo_ + '/user/current/profile',
       goog.bind(function(e) {
         if (e.target.isSuccess()) {
           alert(klokantech.jekylledit.lang.get('profile_saved'));
@@ -106,7 +115,7 @@ klokantech.jekylledit.Profile.prototype.save = function(opt_callback) {
           alert(klokantech.jekylledit.lang.get('profile_save_error'));
         }
         if (opt_callback) {
-          opt_callback();
+          opt_callback(e.target.isSuccess());
         }
       }, this), 'PUT', JSON.stringify(result), {
         'content-type': 'application/json'
