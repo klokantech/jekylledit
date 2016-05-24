@@ -176,7 +176,7 @@ def user_profile(site_id, user_id):
     #  Get current user
     # JE uses emails as identificators
     if user_id == 'current':
-        user_id = 'current_user.email'
+        user_id = current_user.email
     if request.method == 'GET':
         user = site.get_user(user_id)
         return jsonify(user)
