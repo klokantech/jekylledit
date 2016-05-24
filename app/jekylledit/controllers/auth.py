@@ -140,7 +140,9 @@ def widget():
             site = synchronize(site_id)
             options = site.gitkit_options
         elif request.args.get('mode') == 'select':
-            abort(400)
+            return render_template(
+                'auth/close-window.html',
+                 message='You can only sign in to a specific site.')
         else:
             options = None
     else:
@@ -178,7 +180,8 @@ def sign_in_success():
 @blueprint.route('/sign-out')
 def sign_out():
     logout_user()
-    response = render_template('auth/signed-out.html')
+    text = render_template('auth/close-window.html', message='You have signed out.')
+    response = make_response(text)
     if not app.config['DEVELOPMENT']:
         gitkit.delete_token(response)
     return response
@@ -248,7 +251,7 @@ def site_token(site_id):
 
 @blueprint.route('/site/<site_id>/authenticated')
 def site_authenticated(site_id):
-    return render_template('auth/site-authenticated.html')
+    return render_template('auth/close-window.html', message='You have signed in.')
 
 
 def send_email_challenge(account):
