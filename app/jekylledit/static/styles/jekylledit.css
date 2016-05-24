@@ -7,16 +7,19 @@
 .je-popup{
   position:absolute;
   top:10%;
-  left:50%;
-  min-height:100px;
-  width:1000px;
+  left: 45px;
+  right: 50px;
+  margin-left: auto;
+  margin-right: auto;  min-height:100px;
+  min-width: 800px;
+  max-width: 1200px;
   height:80%;
-  margin-left:-500px;
   z-index:10011;
   padding:0;
   background:#fff;
   border-radius:5px;
   overflow:hidden;
+  font-size: 12px;
 }
 .je-popup-nav{
   display:block;
@@ -50,24 +53,32 @@
   position:absolute;
   top:0;
   height:50px;
+  padding-left: 30px
 }
 .je-editor-tabs {
   position:absolute;
   top:50px;
   bottom:0;
   width:100%;
-  border-top:1px solid #ccc;
+  border-top: 2px solid #289adf;
 }
 .je-editor-tab-btn {
   display:inline-block;
-  padding:10px;
-  border:1px solid black;
+  padding: 8px 20px 5px 20px;
+  background: #f3f3f3;
+  margin: 19px 1px 0 0px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 13px;
 }
 .je-editor-tab-btn.disabled {
   color:#ccc;
+  font-weight: normal;
 }
 .je-editor-tab-btn.active {
   font-weight:bold;
+  color: #fff;
+  background-color: #289adf;
 }
 .je-editor-tab {
   display:none;
@@ -94,18 +105,18 @@
   top:0;
   bottom:0;
   left:0;
-  right:200px;
+  right:280px;
   overflow:auto;
   padding: 30px;
 }
 .je-editor-tab-side{
-  position:absolute;
-  top:0;
-  right:0;
-  bottom:0;
-  width:200px;
-  overflow:auto;
-  background:#ccc;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 280px;
+  overflow: auto;
+  background: #f4f4f4;
   padding:5px;
   font-size:0.8em;
 }
@@ -158,6 +169,7 @@
   margin:4px 8px 8px 0;
   padding:4px;
   border-radius:2px;
+  cursor: pointer;
 }
 .je-popup-user{
   position:absolute;
@@ -170,8 +182,10 @@
 }
 .je-popup-nav .je-btn{
   display:inline-block;
-  margin: 10px 0;
-  padding: 4px;
+  margin: 0;
+  padding: 10px;
+  line-height: 40px;
+  vertical-align: middle;
   cursor: pointer;
   color: #fff;
   font-weight: bold;
@@ -183,6 +197,26 @@
 }
 .je-popup-nav .je-btn:hover{
   background: #3d3d3d;
+}
+.je-popup-nav .je-btn-dash{
+
+}
+.je-popup-nav .je-btn-dash:before{
+  content: 'h';
+  font-family: 'icons';
+  font-size: 26px;
+  padding: 9px;
+  vertical-align: middle;
+  line-height: 28px;
+  display: block;
+}
+.je-popup-nav .je-btn-newx{
+  font-family: 'icons';
+  font-size: 24px;
+  padding: 18px 0 0 18px;
+  vertical-align: middle;
+  line-height: 28px;
+  font-weight: normal;
 }
 .je-popup-actions .je-btn{
   padding: 8px 14px;
@@ -244,6 +278,24 @@
 @keyframes je-spinner-anim {
   0% {-webkit-transform:rotate(0deg);transform:rotate(0deg);}
   100% {-webkit-transform:rotate(360deg);transform: rotate(360deg);}
+}
+.je-dash{
+  padding: 30px 200px;
+}
+.je-dash .je-dash-new{
+  color: #289adf;
+  font-size: 18px;
+  padding: 15px;
+  cursor: pointer;
+}
+.je-dash .je-dash-new:hover{
+  color: #005d8e;
+}
+.je-dash .je-dash-new .je-dash-new-symbol{
+  font-size: 26px;
+  font-family: 'icons';
+  color: #289adf;
+  margin-right: 20px;
 }
 .je-translations-table{
   margin: 0;
