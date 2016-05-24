@@ -12,12 +12,15 @@ RUN apt-get -qq update && apt-get -qq -y --no-install-recommends install \
     libpq-dev \
     python3 \
     python3-dev \
-    python3-venv
+    python3-venv \
+    ssh
 
 COPY requirements.txt /venv/requirements.txt
 RUN python3 -m venv /venv \
 && /venv/bin/pip install -r /venv/requirements.txt \
 && /venv/bin/pip freeze > /venv/requirements-freezed.txt
+
+RUN git config --global push.default matching
 
 COPY . /venv/app
 

@@ -3,7 +3,6 @@ import os.path, os
 import frontmatter
 
 from flask import json
-from flask.ext.login import current_user
 
 from contextlib import contextmanager
 from subprocess import Popen, PIPE
@@ -38,7 +37,6 @@ class Repository:
             'git',
             '--git-dir={}'.format(self.path('.git')),
             '--work-tree={}'.format(self.path()),
-            '-c', 'user.email={}'.format(current_user.email),
         ]
         cmd.extend(args)
         proc = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
