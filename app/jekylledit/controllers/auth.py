@@ -6,7 +6,7 @@ from datetime import datetime
 from functools import wraps
 from urllib.parse import urlparse, parse_qs
 
-from flask import Blueprint, _request_ctx_stack, abort, jsonify, \
+from flask import Blueprint, _request_ctx_stack, abort, jsonify, make_response, \
     redirect, render_template, request, url_for
 from flask.ext.login import LoginManager, current_user, login_user, logout_user
 from flask.ext.principal import Identity, Permission, PermissionDenied, Principal
