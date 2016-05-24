@@ -1,4 +1,4 @@
-# jekylledit
+# jekylledit [![Build Status](https://jenkins.klokantech.com/buildStatus/icon?job=jekylledit-build)](https://jenkins.klokantech.com/job/jekylledit-build/)
 Jekyll Visual Content Editor - WYSIWYG administration with custom logins
 
 Ideas at:
