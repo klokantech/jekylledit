@@ -141,7 +141,7 @@ klokantech.jekylledit.Translations.prototype.save = function(opt_callback) {
           alert(klokantech.jekylledit.lang.get('trans_save_error'));
         }
         if (opt_callback) {
-          opt_callback();
+          opt_callback(e.target.isSuccess());
         }
       }, this), 'PUT', JSON.stringify(result), {
         'content-type': 'application/json'

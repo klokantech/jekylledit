@@ -129,6 +129,9 @@ klokantech.jekylledit.lang.data_ = {
   'editor_create_lang_btn': {
     'en': 'Create "%s" variant of this post'
   },
+  'editor_required_missing': {
+    'en': 'These fields are required and need to be filled in all languages: %s'
+  },
   'editor_saved': {
     'en': 'Changes saved!'
   },

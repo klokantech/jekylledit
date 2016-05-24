@@ -115,7 +115,7 @@ klokantech.jekylledit.Profile.prototype.save = function(opt_callback) {
           alert(klokantech.jekylledit.lang.get('profile_save_error'));
         }
         if (opt_callback) {
-          opt_callback();
+          opt_callback(e.target.isSuccess());
         }
       }, this), 'PUT', JSON.stringify(result), {
         'content-type': 'application/json'

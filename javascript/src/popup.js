@@ -62,9 +62,12 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
     if (goog.isDef(this.activePage_)) {
       var page = this.pages_[this.activePage_];
       if (page) {
-        page.save();
-        this.setVisible(false);
-        this.doesNeedClearLoad_ = true;
+        page.save(goog.bind(function(success) {
+          if (success) {
+            this.setVisible(false);
+            this.doesNeedClearLoad_ = true;
+          }
+        }, this));
       }
     }
   }, false, this);

@@ -32,6 +32,6 @@ klokantech.jekylledit.AbstractPage.prototype.start = goog.abstractMethod;
 
 
 /**
- * @param {Function=} opt_callback when done
+ * @param {function(boolean)=} opt_callback when done
  */
 klokantech.jekylledit.AbstractPage.prototype.save = goog.abstractMethod;

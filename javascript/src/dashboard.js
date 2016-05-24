@@ -154,6 +154,10 @@ klokantech.jekylledit.Dashboard.prototype.loadClear = function(opt_callback) {
 /** @inheritDoc */
 klokantech.jekylledit.Dashboard.prototype.save = function(opt_callback) {
   if (this.editor_) {
-    this.editor_.save();
+    this.editor_.save(opt_callback);
+  } else {
+    if (opt_callback) {
+      opt_callback(false);
+    }
   }
 };
