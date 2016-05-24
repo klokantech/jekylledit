@@ -183,7 +183,8 @@ def user_profile(site_id, user_id):
         return jsonify(user)
     elif request.method == 'PUT':
         data = request.get_json()
-        return json.dumps(site.edit_user(data))
+        data['id'] = user_id
+        site.edit_user(data)
         # Commit changes
         commited = commit(site.repository, USERS_FILE)
         if commited:
