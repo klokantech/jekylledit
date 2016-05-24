@@ -70,6 +70,7 @@ deactivate () {
 typeset -fx _development
 typeset -fx _production
 typeset -fx _compose
+typeset -fx _version
 
 _MANAGE="run --rm -e SQLALCHEMY_ECHO=false app /venv/bin/python -m $PACKAGE_NAME"
 
