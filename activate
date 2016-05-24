@@ -46,7 +46,11 @@ _production () {
 }
 
 _compose () {
-    VERSION=$(cat VERSION) docker-compose "$@"
+    VERSION=$(_version) docker-compose "$@"
+}
+
+_version () {
+    git describe --tags --long | cut -d- -f1 | cut -c2-10
 }
 
 deactivate () {
