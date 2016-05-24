@@ -50,7 +50,7 @@ _compose () {
 }
 
 _version () {
-    git describe --tags --long | cut -d- -f1
+    git describe --tags --long | cut -d- -f1 | cut -c2-10
 }
 
 deactivate () {
