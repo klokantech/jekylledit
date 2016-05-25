@@ -131,6 +131,30 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
     goog.dom.classlist.remove(lang.tabBtn, 'disabled');
   }, false, this);
 
+  /**
+   * @type {function(string)}
+   * @private
+   */
+  this.changeLangugeTab_ = goog.bind(function(langId) {
+    goog.array.forEach(tabBtns, function(tabBtn) {
+      goog.dom.classlist.remove(tabBtn, 'active');
+    });
+    goog.array.forEach(tabs, function(tab) {
+      goog.dom.classlist.remove(tab, 'active');
+    });
+    var lang = this.languages_[langId];
+    goog.dom.classlist.add(lang.tabBtn, 'active');
+    goog.dom.classlist.add(lang.tab, 'active');
+
+    activeTabLang = langId;
+    if (goog.dom.classlist.contains(lang.tab, 'disabled')) {
+      goog.dom.appendChild(this.tabs_, createLangDialog);
+      goog.dom.setTextContent(createLangBtn, goog.string.format(
+          klokantech.jekylledit.lang.get('editor_create_lang_btn'), langId));
+    } else {
+      goog.dom.removeNode(createLangDialog);
+    }
+  }, this);
 
   goog.array.forEach(langs, function(langId, i) {
     var content = goog.dom.createDom(goog.dom.TagName.DIV,
@@ -163,23 +187,7 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
       if (e.target != tabBtn) {
         return;
       }
-      goog.array.forEach(tabBtns, function(tabBtn) {
-        goog.dom.classlist.remove(tabBtn, 'active');
-      });
-      goog.array.forEach(tabs, function(tab) {
-        goog.dom.classlist.remove(tab, 'active');
-      });
-      goog.dom.classlist.add(tabBtn, 'active');
-      goog.dom.classlist.add(tab, 'active');
-
-      activeTabLang = langId;
-      if (goog.dom.classlist.contains(tab, 'disabled')) {
-        goog.dom.appendChild(this.tabs_, createLangDialog);
-        goog.dom.setTextContent(createLangBtn, goog.string.format(
-            klokantech.jekylledit.lang.get('editor_create_lang_btn'), langId));
-      } else {
-        goog.dom.removeNode(createLangDialog);
-      }
+      this.changeLangugeTab_(langId);
 
       e.preventDefault();
     }, false, this);
@@ -243,10 +251,13 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
             }
             var lang = this.languages_[langId];
             lang.data = post;
-            lang.is_copy = !!lang.data['metadata']['jekylledit_copyof'];
+            var copyof = lang.data['metadata']['jekylledit_copyof'];
+            lang.is_copy = !!copyof;
             goog.dom.classlist.enable(lang.tab, 'disabled', lang.is_copy);
             goog.dom.classlist.enable(lang.tabBtn, 'disabled', lang.is_copy);
-
+            if (lang.is_copy) {
+              this.changeLangugeTab_(copyof);
+            }
             anyPublished = lang.data['metadata']['published'] != false;
 
             if (!this.category_) {
