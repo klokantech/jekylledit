@@ -49,10 +49,10 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
    */
   this.actions_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-actions');
 
-  var saveBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
-      klokantech.jekylledit.lang.get('popup_save'));
-  var cancelBtn = goog.dom.createDom(goog.dom.TagName.DIV, 'je-btn',
-      klokantech.jekylledit.lang.get('popup_cancel'));
+  var saveBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+      'je-btn je-btn-save', klokantech.jekylledit.lang.get('popup_save'));
+  var cancelBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+      'je-btn je-btn-cancel', klokantech.jekylledit.lang.get('popup_cancel'));
   goog.dom.append(this.actions_, cancelBtn, saveBtn);
   goog.events.listen(cancelBtn, goog.events.EventType.CLICK, function(e) {
     this.setVisible(false);
@@ -62,7 +62,9 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
     if (goog.isDef(this.activePage_)) {
       var page = this.pages_[this.activePage_];
       if (page) {
+        goog.dom.classlist.add(this.element_, 'je-btn-saving');
         page.save(goog.bind(function(success) {
+          goog.dom.classlist.remove(this.element_, 'je-btn-saving');
           if (success) {
             this.setVisible(false);
             this.doesNeedClearLoad_ = true;
