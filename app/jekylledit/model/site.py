@@ -107,3 +107,26 @@ class Sites:
             fp.truncate()
             json.dump(users, fp)
 
+    def create_post(self, filename, data):
+        with self.repository.open(filename, 'w+') as fp:
+            post = frontmatter.load(fp)
+            if 'metadata' in data:
+                post.metadata = data['metadata']
+            if 'content' in data:
+                #TODO: parse from media
+                post.content = data['content']
+            frontmatter.dump(post, fp)
+            return filename
+
+    def edit_post(self, filename, data):
+        # Replace post's data in file
+        with self.repository.open(filename, 'r+') as fp:
+            post = frontmatter.load(fp)
+            if 'metadata' in data:
+                post.metadata = data['metadata']
+            if 'content' in data:
+                post.content = data['content']
+            fp.seek(0)
+            fp.truncate()
+            frontmatter.dump(post, fp)
+            return filename

@@ -63,14 +63,8 @@ def site_file(site_id, file_id):
             langdata = postData[language]
             today = date.today().strftime('%Y-%m-%d')
             lfilename = '_posts/' + today + '-' + title + '-' + language + '.md'
-            with repository.open(lfilename, 'w+') as fp:
-                post = frontmatter.load(fp)
-                if 'metadata' in langdata:
-                    post.metadata = langdata['metadata']
-                if 'content' in langdata:
-                    post.content = langdata['content']
-                frontmatter.dump(post, fp)
-                tocommit.append(lfilename)
+            site.create_post(lfilename, langdata)
+            tocommit.append(lfilename)
         # Commit changes
         commit(repository, tocommit)
         return 'OK'
@@ -88,17 +82,8 @@ def site_file(site_id, file_id):
         for language in languages:
             langdata = postData[language]
             lfilename = filemask.format(language)
-            # Replace post's data in file
-            with repository.open(lfilename, 'r+') as fp:
-                post = frontmatter.load(fp)
-                if 'metadata' in langdata:
-                    post.metadata = langdata['metadata']
-                if 'content' in langdata:
-                    post.content = langdata['content']
-                fp.seek(0)
-                fp.truncate()
-                frontmatter.dump(post, fp)
-                tocommit.append(lfilename)
+            site.edit_post(lfilename, langdata)
+            tocommit.append(lfilename)
             # Commit changes
         commit(repository, tocommit)
         return 'OK'
