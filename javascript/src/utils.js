@@ -234,7 +234,7 @@ klokantech.jekylledit.utils.extractImages =
             'data': base64stripped
           };
 
-          return mediaPath + '/' + identifier;
+          return '/' + mediaPath + '/' + identifier;
         });
   } else {
     goog.object.forEach(lookIn, function(value, key) {
