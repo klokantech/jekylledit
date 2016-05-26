@@ -109,9 +109,7 @@ klokantech.jekylledit.utils.createField =
               currentValue : field['value'];
   if (type == 'datetime') {
     if (value == 'now') {
-      var now = new Date();
-      value = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-          .toISOString().substring(0, 16);
+      value = new Date().toISOString().substring(0, 16);
     } else {
       value = value.split('-').slice(0, 3).join('-');
     }
