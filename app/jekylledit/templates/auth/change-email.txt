@@ -1,4 +1,4 @@
-You have requested to change the email address of your Jekyll Edit
+You have requested to change the email address of your JekyllEdit
 account. Please confirm that you own the new address by clicking
 on the verification link bellow.
 
