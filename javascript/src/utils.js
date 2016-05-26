@@ -108,9 +108,16 @@ klokantech.jekylledit.utils.createField =
   var value = goog.isDefAndNotNull(currentValue) ?
               currentValue : field['value'];
   if (type == 'datetime') {
+    if (value == 'now') {
+      var now = new Date();
+      value = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+          .toISOString().substring(0, 16);
+    } else {
+      value = value.split('-').slice(0, 3).join('-');
+    }
     var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
       type: 'datetime-local',
-      value: value.split('-').slice(0, 3).join('-')
+      value: value
     });
     goog.dom.appendChild(parent, dataInput);
     return function() { return dataInput.value; };
