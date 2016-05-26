@@ -489,6 +489,13 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
 
       var sourceType = editable.getAttribute('data-jekylledit-source');
       if (sourceType == 'content') {
+        // fix image alts
+        goog.array.forEach(
+            goog.dom.getElementsByTagNameAndClass(
+            goog.dom.TagName.IMG, undefined, editable), function(img) {
+              img.alt = langData['metadata']['title'] || ' ';
+            });
+
         langData['content'] = goog.global['toMarkdown'](editable.innerHTML);
       } else {
         langData['metadata'][sourceType] = editable.textContent;
