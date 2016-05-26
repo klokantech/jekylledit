@@ -139,10 +139,10 @@ class Sites:
         created = []
         for key, medio in media.items():
             if not '/' in key:
-                filename = config['media'] + '/' + key
+                filename = self.repository.path(config['media'] + '/' + key)
             else:
-                filename = key
-            with open(self.repository.path(filename), 'wb+') as fm:
+                filename = self.repository.path(key)
+            with open(filename, 'wb+') as fm:
                 fm.write(b64decode(medio['data']))
                 created.append(filename)
         return created
