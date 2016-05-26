@@ -72,7 +72,7 @@ class Gitkit:
         config = {
             'apiKey': self.api_key,
             'widgetUrl': self.url_for('widget'),
-            'signInSuccessUrl': self.url_for('sign_in_success'),
+            'signInSuccessUrl': self.url_for('sign_in_success', site_id=''),
             'signOutUrl': self.url_for('sign_out'),
             'oobActionUrl': self.url_for('oob_action'),
             'signInOptions': self.sign_in_options,
@@ -93,12 +93,12 @@ class Gitkit:
                 ctx.gitkit_client = client
             return client
 
-    def url_for(self, name):
+    def url_for(self, name, **values):
         try:
             endpoint = self.endpoints[name]
         except KeyError:
             return None
-        return url_for(endpoint, _external=True)
+        return url_for(endpoint, _external=True, **values)
 
 
 def account_to_dict(account):
