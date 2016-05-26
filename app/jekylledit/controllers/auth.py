@@ -150,8 +150,8 @@ def sign_in_success(site_id):
     account.name = gitkit_account['name']
     account.photo_url = gitkit_account['photo_url']
     db.session.flush()
+    login_user(account)
     if account.email_verified:
-        login_user(account)
         db.session.commit()
         return render_template('auth/close-window.html', message='You have signed in.')
     oob_link = gitkit.get_email_verification_link(email)
