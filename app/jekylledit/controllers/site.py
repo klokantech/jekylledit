@@ -21,6 +21,7 @@ def commit(repository, filenames):
     with repository.transaction():
         repository.execute(['add'] + filenames)
         repository.execute([
+            '-c', 'user.name=JekyllEdit',
             '-c', 'user.email={}'.format(current_user.email),
             'commit',
             '-m', 'File {} updated'.format(filenames[0]),
