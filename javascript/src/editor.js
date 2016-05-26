@@ -515,11 +515,14 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
 
   var missingRequiredFields = [];
   goog.object.forEach(this.languages_, function(lang, langId) {
+    if (!!postData[langId]['metadata']['jekylledit_copyof']) {
+      return;
+    }
     goog.object.forEach(lang.fields, function(el, k) {
       if (el['required']) {
         var value = postData[langId]['metadata'][k];
         if (!value || value.length == 0) {
-          missingRequiredFields[k] = true;
+          missingRequiredFields[k + ' [' + langId + ']'] = true;
         }
       }
     }, this);

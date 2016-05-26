@@ -162,14 +162,10 @@ klokantech.jekylledit.lang.data_ = {
     'fr': 'Créer variante "%s" de ce post'
   },
   'editor_required_missing': {
-    'en': 'These fields are required and need to be ' +
-        'filled in all languages: %s',
-    'de': 'Diese Felder sind Pflichtfelder und müssen ' +
-        'in allen Sprachen ausgefüllt werden: %s',
-    'it': 'Questi campi sono obbligatori e devono essere ' +
-        'compilati in tutte le lingue: %s',
-    'fr': 'Ces champs sont obligatoires et doivent être ' +
-        'remplis dans toutes les langues: %s'
+    'en': 'The following fields are required: %s',
+    'de': 'Die folgenden Felder sind erforderlich: %s',
+    'it': 'Sono necessari i seguenti campi: %s',
+    'fr': 'Les champs suivants sont requis: %s'
   },
   'editor_saved': {
     'en': 'Changes saved!',
