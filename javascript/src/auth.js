@@ -170,6 +170,7 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
 
 
 /**
+ * @param {string} message
  * @private
  */
 klokantech.jekylledit.Auth.prototype.showNotAuthorized_ = function(message) {
