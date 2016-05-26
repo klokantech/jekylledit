@@ -551,7 +551,8 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
 
   // deduplicate images
   var extracted = {};
-  postData = klokantech.jekylledit.utils.extractImages(postData, extracted);
+  postData = klokantech.jekylledit.utils.extractImages(postData, extracted,
+                                                       this.config_['media']);
   var result = {
     'post': postData,
     'media': extracted

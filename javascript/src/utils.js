@@ -210,11 +210,12 @@ klokantech.jekylledit.utils.Extractable;
  * Deduplicates inline base64 images.
  * @param {klokantech.jekylledit.utils.Extractable} lookIn
  * @param {Object} extracted
+ * @param {string} mediaPath
  * @param {goog.crypt.Hash=} opt_hasher
  * @return {klokantech.jekylledit.utils.Extractable} Modified lookIn
  */
 klokantech.jekylledit.utils.extractImages =
-    function(lookIn, extracted, opt_hasher) {
+    function(lookIn, extracted, mediaPath, opt_hasher) {
   var hasher = opt_hasher || new goog.crypt.Md5();
   if (goog.isString(lookIn)) {
     return lookIn.replace(klokantech.jekylledit.utils.BASE64_IMAGE_REGEXP,
@@ -230,16 +231,16 @@ klokantech.jekylledit.utils.extractImages =
           }
 
           extracted[identifier] = {
-            'data': base64stripped,
-            'placeholder': '_je_placeholder:{' + identifier + '}'
+            'data': base64stripped
           };
 
-          return extracted[identifier]['placeholder'];
+          return mediaPath + '/' + identifier;
         });
   } else {
     goog.object.forEach(lookIn, function(value, key) {
       lookIn[key] =
-          klokantech.jekylledit.utils.extractImages(value, extracted, hasher);
+          klokantech.jekylledit.utils.extractImages(
+              value, extracted, mediaPath, hasher);
     });
     return lookIn;
   }
