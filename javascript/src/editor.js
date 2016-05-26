@@ -357,6 +357,9 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
                       el['label'], this.config_['languages']);
       var labelEl = goog.dom.createDom(goog.dom.TagName.LABEL, undefined,
                                        (label || k) + ':');
+      if (el['required']) {
+        goog.dom.classlist.add(labelEl, 'je-editor-side-label-required');
+      }
       var inputValue = (meta[k] || el['value']).toString();
       if (this.inlineFields_[k]) {
         var value = goog.dom.createDom(goog.dom.TagName.SPAN,
