@@ -44,12 +44,22 @@ klokantech.jekylledit.JekyllEdit.prototype.setAdminBtn = function(btn) {
   var repo = btn.getAttribute('data-jekylledit-repo');
   var path = btn.getAttribute('data-jekylledit-path');
   var lang = btn.getAttribute('data-jekylledit-lang');
-  goog.events.listen(btn, goog.events.EventType.CLICK, function(e) {
-    klokantech.jekylledit.lang.setLanguage(lang);
+  klokantech.jekylledit.lang.setLanguage(lang);
+
+  var start = goog.bind(function() {
     klokantech.jekylledit.utils.installStyle(
         klokantech.jekylledit.BASE_URL + 'static/styles/jekylledit.css');
     this.initPopup(repo, path);
-  }, false, this);
+  }, this);
+
+  goog.events.listen(btn, goog.events.EventType.CLICK, function(e) {
+    start();
+    e.preventDefault();
+  });
+
+  if (location.hash == '#sign-in') {
+    start();
+  }
 };
 
 
