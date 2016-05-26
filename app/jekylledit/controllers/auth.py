@@ -114,8 +114,7 @@ def widget():
         endpoint, values = url_adapter.match(url.path, 'GET')
         if endpoint != 'auth.sign_in_success':
             abort(400)
-        site_id = values['site_id']
-        site = synchronize(site_id)
+        site = synchronize(values['site_id'])
         return render_template('auth/widget.html', options=site.gitkit_options)
     url = urlparse(request.referrer)
     if url.netloc != request.host:
@@ -130,6 +129,8 @@ def widget():
     if challenge is None:
         abort(400)
     base_url = Sites(challenge.site_id).get_base_url()
+    if not base_url.endswith('/'):
+        base_url += '/'
     return redirect('{}#sign-in'.format(base_url))
 
 
