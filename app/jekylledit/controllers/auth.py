@@ -13,7 +13,7 @@ from flask.ext.principal import Identity, Permission, PermissionDenied, Principa
 from ..ext.identitytoolkit import Gitkit
 from itsdangerous import URLSafeTimedSerializer
 
-from ..model import Account, Repository, Roles, Site, db
+from ..model import Account, Challenge, Repository, Roles, Site, Sites, db
 from .base import app, mailgun, jsonp
 
 
@@ -70,6 +70,8 @@ def authorization_required(*roles):
     def decorator(func):
         @wraps(func)
         def wrapper(**values):
+            if not current_user.email_verified:
+                abort(403)
             site_id = values['site_id']
             synchronize(site_id)
             needs = [(role, site_id) for role in roles]
@@ -84,26 +86,11 @@ def permission_denied(exc):
     return 'Forbidden', 403
 
 
-@app.template_global()
-def auth_url_for(endpoint, **values):
-    if endpoint == 'widget':
-        if app.config['DEVELOPMENT']:
-            values.setdefault('next', request.url)
-            return url_for('auth.widget', **values)
-        next = values.pop('next', request.url)
-        values['next'] = url_for(
-            'auth.sign_in_success',
-            next=next,
-            _external=True)
-        return url_for('auth.widget', **values)
-    if endpoint == 'sign_out':
-        return url_for('auth.sign_out', **values)
-    raise Exception('Invalid enpoint: {}'.format(endpoint))
-
-
 @blueprint.route('/widget', methods={'GET', 'POST'})
 def widget():
-    if app.config['DEVELOPMENT'] and request.method == 'POST':
+    if app.config['DEVELOPMENT']:
+        if request.method == 'GET':
+            return render_template('auth/widget.html')
         email = request.form['email']
         account = Account.query.filter_by(email=email).one_or_none()
         if account is None:
@@ -115,43 +102,39 @@ def widget():
             db.session.flush()
         login_user(account)
         db.session.commit()
-        return redirect(request.args.get('next', request.url_root))
-    if not app.config['DEVELOPMENT']:
-        url_adapter = _request_ctx_stack.top.url_adapter
-        next = request.args.get('next')
-        if next is not None:
-            url = urlparse(next)
-            if url.netloc != request.host:
-                abort(400)
-            endpoint, __ = url_adapter.match(url.path, 'GET')
-            if endpoint != 'auth.sign_in_success':
-                abort(400)
-            query = parse_qs(url.query)
-            next = query.get('next')
-            if next is None:
-                abort(400)
-            url = urlparse(next[0])
-            if url.netloc != request.host:
-                abort(400)
-            endpoint, values = url_adapter.match(url.path, 'GET')
-            if endpoint != 'auth.site_authenticated':
-                abort(400)
-            site_id = values['site_id']
-            site = synchronize(site_id)
-            options = site.gitkit_options
-        elif request.args.get('mode') == 'select':
-            return render_template(
-                'auth/close-window.html',
-                 message='You can only sign in to a specific site.')
-        else:
-            options = None
-    else:
-        options = None
-    return render_template('auth/widget.html', options=options or {})
+        return render_template('auth/close-window.html', message='You have signed in.')
+    if request.args.get('mode') != 'select':
+        return render_template('auth/widget.html', options={})
+    url_adapter = _request_ctx_stack.top.url_adapter
+    next = request.args.get('next')
+    if next:
+        url = urlparse(next)
+        if url.netloc != request.host:
+            abort(400)
+        endpoint, values = url_adapter.match(url.path, 'GET')
+        if endpoint != 'auth.sign_in_success':
+            abort(400)
+        site_id = values['site_id']
+        site = synchronize(site_id)
+        return render_template('auth/widget.html', options=site.gitkit_options)
+    url = urlparse(request.referrer)
+    if url.netloc != request.host:
+        abort(400)
+    endpoint, __ = url_adapter.match(url.path, 'GET')
+    if endpoint != request.endpoint:
+        abort(400)
+    oob_code = parse_qs(url.query).get('oobCode')
+    if not oob_code or len(oob_code) != 1:
+        abort(400)
+    challenge = Challenge.query.get(oob_code[0])
+    if challenge is None:
+        abort(400)
+    base_url = Sites(challenge.site_id).get_base_url()
+    return redirect('{}#sign-in'.format(base_url))
 
 
-@blueprint.route('/sign-in-success')
-def sign_in_success():
+@blueprint.route('/site/<site_id>/sign-in-success')
+def sign_in_success(site_id):
     token = gitkit.verify_token()
     if token is None:
         abort(400)
@@ -160,21 +143,27 @@ def sign_in_success():
     if account is None:
         account = Account(id=token['id'])
         db.session.add(account)
-    account.email = gitkit_account['email']
+    email = gitkit_account['email']
+    account.email = email
     account.email_verified = gitkit_account['email_verified']
     account.name = gitkit_account['name']
     account.photo_url = gitkit_account['photo_url']
-    if not account.email_verified:
-        if account.email_challenged is None:
-            send_email_challenge(account)
-        db.session.flush()
-        response = redirect(url_for('.verify_email', id=account.id))
-        db.session.commit()
-        return response
     db.session.flush()
-    login_user(account)
+    if account.email_verified:
+        login_user(account)
+        db.session.commit()
+        return render_template('auth/close-window.html', message='You have signed in.')
+    oob_link = gitkit.get_email_verification_link(email)
+    challenge = Challenge(
+        oob_code=parse_qs(urlparse(oob_link).query)['oobCode'][0],
+        site_id=site_id,
+        account_id=account.id,
+        moment=datetime.utcnow())
+    db.session.add(challenge)
     db.session.commit()
-    return redirect(request.args.get('next', request.url_root))
+    text = render_template('auth/verify-email.txt', oob_link=oob_link)
+    send(email, 'Verify email address', text)
+    return render_template('auth/close-window.html', message='Email verification link sent.')
 
 
 @blueprint.route('/sign-out')
@@ -185,15 +174,6 @@ def sign_out():
     if not app.config['DEVELOPMENT']:
         gitkit.delete_token(response)
     return response
-
-
-@blueprint.route('/account/<id>/verify-email', methods={'GET', 'POST'})
-def verify_email(id):
-    account = Account.query.get_or_404(id)
-    if request.method == 'POST' and not account.email_verified:
-        send_email_challenge(account)
-        db.session.commit()
-    return render_template('auth/verify-email.html', account=account)
 
 
 @blueprint.route('/oob-action')
@@ -220,46 +200,30 @@ def oob_action():
 @jsonp
 def site_token(site_id):
     synchronize(site_id)
-    if not current_user.is_authenticated:
-        next = url_for('.site_authenticated', site_id=site_id, _external=True)
-        location = auth_url_for('widget', mode='select', next=next, _external=True)
-        return jsonify({
-            'status_code': 401,
-            'location': location,
-        })
-    for roles in current_user.roles:
-        if roles.site_id == site_id:
-            return jsonify({
-                'status_code': 200,
-                'access_token': token_serializer.dumps(current_user.id),
-                'account': {
-                    'email': current_user.email,
-                    'name': current_user.name,
-                    'roles': roles.roles,
-                },
-                'sign_out': url_for('.sign_out', _external=True),
-            })
-    return jsonify({
-        'status_code': 403,
-        'account': {
-            'email': current_user.email,
-            'name': current_user.name
-        },
+    next = url_for('.sign_in_success', site_id=site_id, _external=True)
+    response = {
+        'sign_in': url_for('.widget', mode='select', next=next, _external=True),
         'sign_out': url_for('.sign_out', _external=True),
-    })
-
-
-@blueprint.route('/site/<site_id>/authenticated')
-def site_authenticated(site_id):
-    return render_template('auth/close-window.html', message='You have signed in.')
-
-
-def send_email_challenge(account):
-    text = render_template(
-        'auth/verify-email.txt',
-        oob_link=gitkit.get_email_verification_link(account.email))
-    send(account.email, 'Verify email address', text)
-    account.email_challenged = datetime.utcnow()
+    }
+    user = current_user._get_current_object()
+    if not user.is_authenticated:
+        response['status_code'] = 401
+        return jsonify(response)
+    response['account'] = {
+        'email': user.email,
+        'email_verified': user.email_verified,
+        'name': user.name,
+    }
+    for roles in user.roles:
+        if roles.site_id == site_id:
+            response['account']['roles'] = roles.roles
+            break
+    if not user.email_verified or 'roles' not in response['account']:
+        response['status_code'] = 403
+        return jsonify(response)
+    response['status_code'] = 200
+    response['access_token'] = token_serializer.dumps(user.id)
+    return jsonify(response)
 
 
 def send(recipient, subject, text):

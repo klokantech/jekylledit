@@ -203,6 +203,13 @@ klokantech.jekylledit.lang.data_ = {
     'it': 'Riprova',
     'fr': 'Recommencez'
   },
+   /* XXX Fill in texts. */
+  'login_email_not_verified': {
+    'en': 'Your email address has not been verified yet.',
+    'de': 'TODO',
+    'it': 'TODO',
+    'fr': 'TODO'
+  },
   'login_not_authorized': {
     'en': 'You are not authorized to modify this site!',
     'de': 'Sie sind nicht zu ändern berechtigt diese Seite!',

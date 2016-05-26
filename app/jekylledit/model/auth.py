@@ -19,15 +19,20 @@ class Account(UserMixin, db.Model):
     id = db.Column(db.Unicode, primary_key=True)
     email = db.Column(db.Unicode, unique=True, nullable=False)
     email_verified = db.Column(db.Boolean, default=False, nullable=False)
-    email_challenged = db.Column(db.DateTime)
     name = db.Column(db.Unicode)
     photo_url = db.Column(db.Unicode)
 
     roles = db.relationship('Roles')
 
-    @property
-    def is_active(self):
-        return self.email_verified
+
+class Challenge(db.Model):
+
+    __tablename__ = 'challenge'
+
+    oob_code = db.Column(db.Unicode, primary_key=True)
+    site_id = db.Column(db.Unicode, db.ForeignKey('site.id'), nullable=False)
+    account_id = db.Column(db.Unicode, db.ForeignKey('account.id'), nullable=False)
+    moment = db.Column(db.DateTime, nullable=False)
 
 
 class Roles(db.Model):

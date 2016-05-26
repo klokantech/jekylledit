@@ -3,7 +3,7 @@ from datetime import date
 
 import frontmatter
 
-from flask import json, jsonify, request, abort
+from flask import json, jsonify, request
 from flask.ext.cors import cross_origin
 from flask.ext.login import current_user, login_required
 from flask.ext.principal import Permission
