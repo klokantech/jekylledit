@@ -170,13 +170,14 @@ klokantech.jekylledit.Auth.prototype.showLoginBtn_ =
 
 
 /**
+ * @param {string} message
  * @private
  */
-klokantech.jekylledit.Auth.prototype.showNotAuthorized_ = function() {
+klokantech.jekylledit.Auth.prototype.showNotAuthorized_ = function(message) {
   goog.dom.removeChildren(this.element_);
   goog.dom.appendChild(this.element_,
       goog.dom.createDom(goog.dom.TagName.DIV, undefined,
-          klokantech.jekylledit.lang.get('login_not_authorized')));
+          klokantech.jekylledit.lang.get(message)));
 };
 
 
@@ -189,17 +190,21 @@ klokantech.jekylledit.Auth.prototype.checkLogin_ =
     function(callback, opt_retry) {
   this.tokenJsonp_.send(undefined, goog.bind(function(data) {
         var statusCode = data['status_code'];
-        this.signOutUrl_ = data['sign_out'] || null;
+        this.signInUrl_ = data['sign_in'];
+        this.signOutUrl_ = data['sign_out'];
         this.accountData_ = data['account'] || {};
         if (statusCode == 200) {
           this.accessToken_ = data['access_token'];
           goog.dom.removeNode(this.element_);
           callback(true);
         } else if (statusCode == 401) {
-          this.signInUrl_ = data['location'];
           this.showLoginBtn_(callback, opt_retry);
         } else if (statusCode == 403) {
-          this.showNotAuthorized_();
+          if (!this.accountData_['email_verified']) {
+            this.showNotAuthorized_('login_email_not_verified');
+          } else {
+            this.showNotAuthorized_('login_not_authorized');
+          }
           callback(false);
         }
       }, this));

@@ -3,7 +3,7 @@ from datetime import date
 
 import frontmatter
 
-from flask import json, jsonify, request, abort
+from flask import json, jsonify, request
 from flask.ext.cors import cross_origin
 from flask.ext.login import current_user, login_required
 from flask.ext.principal import Permission
@@ -21,6 +21,7 @@ def commit(repository, filenames):
     with repository.transaction():
         repository.execute(['add'] + filenames)
         repository.execute([
+            '-c', 'user.name=JekyllEdit',
             '-c', 'user.email={}'.format(current_user.email),
             'commit',
             '-m', 'File {} updated'.format(filenames[0]),

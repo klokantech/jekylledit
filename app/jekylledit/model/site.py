@@ -1,12 +1,14 @@
-import os.path, os
+import json
+import os
+import os.path
+import yaml
 from base64 import b64decode
-
 import frontmatter
-
-from flask import json
 
 from contextlib import contextmanager
 from subprocess import Popen, PIPE
+
+import frontmatter
 
 
 class Repository:
@@ -55,12 +57,12 @@ class Sites:
         self.name = name
         self.repository = Repository(name)
 
-    def get_config(self, filename = None):
+    def get_config(self, filename=None):
         if filename is None:
             filename = 'jekylledit.json'
         with self.repository.open(filename, 'r') as fp:
             self.config = json.load(fp)
-            if not 'languages' in self.config:
+            if 'languages' not in self.config:
                 self.config.update({'languages': ['en']})
             return self.config
 
@@ -77,7 +79,7 @@ class Sites:
                     drafts.append({
                         'author': post.metadata['author'],
                         'category': category,
-                        'date' : post.metadata['date'],
+                        'date': post.metadata['date'],
                         'filename': os.path.join(category, f),
                         'title': post.metadata['title']
                     })
@@ -144,3 +146,8 @@ class Sites:
                 fm.write(b64decode(medio['data']))
                 created.append(filename)
         return created
+
+    def get_base_url(self):
+        with self.repository.open('_config.yaml', 'r') as fp:
+            config = yaml.load(fp)
+        return config['baseurl']
