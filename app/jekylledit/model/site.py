@@ -1,4 +1,5 @@
 import os.path, os
+from base64 import b64decode
 
 import frontmatter
 
@@ -130,3 +131,16 @@ class Sites:
             fp.truncate()
             frontmatter.dump(post, fp)
             return filename
+
+    def save_media(self, media):
+        config = self.get_config()
+        created = []
+        for key, medio in media.items():
+            if not '/' in key:
+                filename = config['media'] + '/' + key
+            else:
+                filename = key
+            with open(self.repository.path(filename), 'wb+') as fm:
+                fm.write(b64decode(medio['data']))
+                created.append(filename)
+        return created

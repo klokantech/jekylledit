@@ -53,12 +53,14 @@ def site_file(site_id, file_id):
 
     # Save new post
     if request.method == 'POST':
-        data = request.get_json()
-        postData = data['post']
-        media = data['media'] # TODO
-        title = postData[languages[0]]['metadata']['title'].replace(' ', '-').lower()
-
         tocommit = []
+        data = request.get_json()
+        # Save images
+        imgpaths = site.save_media(data['media'])
+        tocommit.extend(imgpaths)
+        # Save post
+        postData = data['post']
+        title = postData[languages[0]]['metadata']['title'].replace(' ', '-').lower()
         for language in languages:
             langdata = postData[language]
             today = date.today().strftime('%Y-%m-%d')
@@ -69,16 +71,19 @@ def site_file(site_id, file_id):
         commit(repository, tocommit)
         return 'OK'
 
-    # Save content of post to file
+    # Update post
     elif request.method == 'PUT':
         filename = b64decode(file_id).decode()
         filemask = filename.rsplit('-', 1)[0] + '-{}.' \
         + filename.rsplit('.', 1)[1]
 
-        data = request.get_json()
-        postData = data['post']
-        media = data['media'] # TODO
         tocommit = []
+        data = request.get_json()
+        # Save images
+        imgpaths = site.save_media(data['media'])
+        tocommit.extend(imgpaths)
+        # Save posts
+        postData = data['post']
         for language in languages:
             langdata = postData[language]
             lfilename = filemask.format(language)
@@ -88,7 +93,7 @@ def site_file(site_id, file_id):
         commit(repository, tocommit)
         return 'OK'
 
-    # Return post in all languages
+    # Return post
     else:
         filename = b64decode(file_id).decode()
         filemask = filename.rsplit('-', 1)[0] + '-{}.' \
