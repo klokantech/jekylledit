@@ -210,6 +210,10 @@ def site_token(site_id):
     if not user.is_authenticated:
         response['status_code'] = 401
         return jsonify(response)
+    if not user.email_verified:
+        gitkit_account = gitkit.get_account_by_id(user.id)
+        user.email_verified = gitkit_account['email_verified']
+        db.session.commit()
     response['account'] = {
         'email': user.email,
         'email_verified': user.email_verified,
