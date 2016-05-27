@@ -297,7 +297,7 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
   } else {
     var uniquePostId = goog.string.getRandomString();
 
-    this.publishCheckbox_.checked = false;
+    this.publishCheckbox_.checked = !this.publishCheckbox_.disabled;
 
     goog.object.forEach(this.languages_, function(lang, langId) {
       lang.data = {
