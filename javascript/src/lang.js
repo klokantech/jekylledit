@@ -204,8 +204,8 @@ klokantech.jekylledit.lang.data_ = {
     'fr': 'Recommencez'
   },
   'login_email_not_verified': {
-    'en': 'Your email address has not been verified yet.',
-    'de': 'Ihre E-Mail-Adresse wurde noch nicht überprüft.',
+    'en': 'Please check your email and click on the confirmation link.',
+    'de': 'Bitte überprüfen Sie Ihre E-Mail und klicken Sie auf den Bestätigungslink.',
     'it': 'Il tuo indirizzo e-mail non è stato ancora verificato.',
     'fr': 'Votre adresse e-mail n\'a pas encore été vérifiée.'
   },
