@@ -139,14 +139,32 @@ klokantech.jekylledit.utils.createField =
     goog.dom.appendChild(parent, select);
     return function() { return select.value; };
   } else if (type == 'multichoice') {
+    var values = field['values'];
+    var mc;
     var span = goog.dom.createDom(goog.dom.TagName.SPAN, 'je-multichoice');
-    var mc = new kt.MultiComplete(
-        span, /** @type {Array} */(field['values']) || [], undefined, true);
-    goog.array.forEach(/** @type {Array} */(value) || [], function(opt) {
-      mc.addValue(opt);
-    });
     goog.dom.appendChild(parent, span);
-    return function() { return mc.getValues(); };
+
+    var initMC = function() {
+      var showAll = values.length < 10; // show all values if less than 10
+      mc = new kt.MultiComplete(
+          span, /** @type {Array} */(values) || [], true,
+          showAll, fields['allow_custom'] || false);
+      goog.array.forEach(/** @type {Array} */(value) || [], function(opt) {
+        mc.addValue(opt);
+      });
+    };
+
+    if (goog.isString(values)) {
+      var getter_ = null;
+      goog.net.XhrIo.send(/** @type {string} */(values), function(e) {
+        var xhr = e.target;
+        values = xhr.getResponseJson();
+        initMC();
+      });
+    } else {
+      initMC();
+    }
+    return function() { return mc ? mc.getValues() : []; };
   } else if (type == 'media') {
     var file = goog.dom.createDom(goog.dom.TagName.INPUT, {
       'type': 'file',
