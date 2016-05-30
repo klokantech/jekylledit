@@ -446,13 +446,23 @@ klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
           editable.contentEditable = true;
 
           // HOOK to allow only simple text (no newlines, no pasting)
+          var fixContent = function(editable) {
+            var textContent = editable.textContent;
+            editable.innerHTML = '';
+            editable.textContent = textContent;
+          };
+          // FF adds <br>s for no reason (not visible).
+          // So we reformat only on blur OR on input when there's
+          // a lot of children (probably some complicated pase).
           goog.events.listen(editable, goog.events.EventType.INPUT,
               function(e) {
-                if (goog.dom.getChildren(editable).length > 0) {
-                  var textContent = editable.textContent;
-                  editable.innerHTML = '';
-                  editable.textContent = textContent;
+                if (goog.dom.getChildren(editable).length > 4) {
+                  fixContent(editable);
                 }
+              });
+          goog.events.listen(editable, goog.events.EventType.BLUR,
+              function(e) {
+                fixContent(editable);
               });
         } else {
           editable.removeAttribute('data-jekylledit-source');
