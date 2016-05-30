@@ -49,16 +49,21 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
    */
   this.actions_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-actions');
 
-  var saveBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+  /**
+   * @type {!Element}
+   * @private
+   */
+  this.saveBtn_ = goog.dom.createDom(goog.dom.TagName.DIV,
       'je-btn je-btn-save', klokantech.jekylledit.lang.get('popup_save'));
+
   var cancelBtn = goog.dom.createDom(goog.dom.TagName.DIV,
       'je-btn je-btn-cancel', klokantech.jekylledit.lang.get('popup_cancel'));
-  goog.dom.append(this.actions_, cancelBtn, saveBtn);
+  goog.dom.append(this.actions_, cancelBtn);
   goog.events.listen(cancelBtn, goog.events.EventType.CLICK, function(e) {
     this.setVisible(false);
     this.clearPages_();
   }, false, this);
-  goog.events.listen(saveBtn, goog.events.EventType.CLICK, function(e) {
+  goog.events.listen(this.saveBtn_, goog.events.EventType.CLICK, function(e) {
     if (goog.isDef(this.activePage_)) {
       var page = this.pages_[this.activePage_];
       if (page) {
@@ -92,7 +97,8 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
    */
   this.userNav_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-popup-user');
 
-  goog.dom.append(this.element_, this.userNav_, this.nav_, this.content_);
+  goog.dom.append(this.element_, this.userNav_, this.nav_,
+                  this.content_, this.actions_);
 
   /**
    * @type {!Element}
@@ -158,8 +164,9 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
     goog.dom.removeChildren(this.userNav_);
     goog.dom.removeChildren(this.nav_);
     goog.dom.removeChildren(this.content_);
-    goog.dom.removeNode(this.actions_);
+    goog.dom.removeNode(this.saveBtn_);
     this.doesNeedClearLoad_ = true;
+    this.config_ = null;
     this.auth_.logout(goog.bind(function() {
       this.auth_.login(goog.bind(this.onLogin_, this));
     }, this));
@@ -304,8 +311,8 @@ klokantech.jekylledit.Popup.prototype.initEditor_ = function(category, opt_cb) {
  * @private
  */
 klokantech.jekylledit.Popup.prototype.startPage_ = function(id) {
-  if (!this.actions_.parentElement) {
-    goog.dom.append(this.element_, this.actions_);
+  if (!this.saveBtn_.parentElement) {
+    goog.dom.append(this.actions_, this.saveBtn_);
   }
 
   var page = this.pages_[id];
