@@ -148,7 +148,7 @@ klokantech.jekylledit.utils.createField =
       var showAll = values.length < 10; // show all values if less than 10
       mc = new kt.MultiComplete(
           span, /** @type {Array} */(values) || [], true,
-          showAll, fields['allow_custom'] || false);
+          showAll, !!field['allow_custom']);
       goog.array.forEach(/** @type {Array} */(value) || [], function(opt) {
         mc.addValue(opt);
       });
