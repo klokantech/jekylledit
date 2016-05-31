@@ -74,16 +74,27 @@ klokantech.jekylledit.Profile.prototype.loadClear = function(opt_callback) {
 
         var fields = (this.config_['profile'] || {})['fields'] || {};
 
-        goog.object.forEach(fields, function(el, k) {
-          var label = klokantech.jekylledit.lang.getFrom(
-                          el['label'], this.config_['languages']);
-          var labelEl = goog.dom.createDom(goog.dom.TagName.LABEL, undefined,
-          (label || k) + ':');
-          goog.dom.appendChild(this.element_, labelEl);
-          var value = data[k];
-          el['_je_getval'] = klokantech.jekylledit.utils.createField(
-                                 el, value, this.element_);
-        }, this);
+        if (goog.isDefAndNotNull(data['id'])) {
+          goog.object.forEach(fields, function(el, k) {
+            var label = klokantech.jekylledit.lang.getFrom(
+                            el['label'], this.config_['languages']);
+            var labelEl = goog.dom.createDom(goog.dom.TagName.LABEL, undefined,
+            (label || k) + ':');
+            goog.dom.appendChild(this.element_, labelEl);
+            var value = data[k];
+            el['_je_getval'] = klokantech.jekylledit.utils.createField(
+                                   el, value, this.element_);
+          }, this);
+        } else {
+          goog.dom.appendChild(this.element_,
+              goog.dom.createDom(goog.dom.TagName.DIV, undefined,
+                  goog.string.format(
+                      klokantech.jekylledit.lang.get('profile_does_not_exist'),
+                      this.auth_.getUserEmail()
+                  )
+              )
+          );
+        }
 
         if (opt_callback) {
           opt_callback();

@@ -216,6 +216,12 @@ klokantech.jekylledit.lang.data_ = {
     'it': 'Non sei autorizzato a modificare questo sito!',
     'fr': 'Vous n\'êtes pas autorisé à modifier ce site!'
   },
+  'profile_does_not_exist': {
+    'en': 'Profile for user "%s" does not exist.',
+    'de': 'Profil für den Benutzer "%s" existiert nicht.',
+    'it': 'Profilo per l\'utente "%s" non esiste.',
+    'fr': 'Profil de l\'utilisateur "%s" n\'existe pas.'
+  },
   'profile_saved': {
     'en': 'Changes saved!',
     'de': 'Änderungen gespeichert!',
