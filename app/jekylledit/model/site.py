@@ -108,7 +108,8 @@ class Sites:
                     break
             fp.seek(0)
             fp.truncate()
-            json.dump(users, fp)
+            json.dump(users, fp,
+                      sort_keys=True, indent=2, separators=(',', ': '))
 
     def create_post(self, filename, data):
         with self.repository.open(filename, 'w+') as fp:

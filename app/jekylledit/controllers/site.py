@@ -143,7 +143,8 @@ def site_translation(site_id):
     elif request.method == 'PUT':
         data = request.get_json()
         with repository.open(TRANSLATIONS_FILE, 'w') as fp:
-            json.dump(data, fp)
+            json.dump(data, fp,
+                      sort_keys=True, indent=2, separators=(',', ': '))
         # Commit changes
         commit(repository, [TRANSLATIONS_FILE])
         return 'OK'
