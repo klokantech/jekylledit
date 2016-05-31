@@ -13,6 +13,7 @@ services:
     restart: always
     environment:
       - FLASK_SECRET_KEY="<<< Production key >>>"
+      - GITHUB_SECRET="<<< Github webhook secret >>>"
       - GITKIT_API_KEY="<<< API KEY >>>"
       - GITKIT_CLIENT_ID="<<< Client ID >>>"
       - GITKIT_PROJECT_ID="<<< Project ID >>>"

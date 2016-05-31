@@ -1,9 +1,11 @@
 from base64 import b64decode
 from datetime import date
+from hashlib import sha1
 
 import frontmatter
+import hmac
 
-from flask import json, jsonify, request
+from flask import abort, json, jsonify, request
 from flask.ext.cors import cross_origin
 from flask.ext.login import current_user, login_required
 from flask.ext.principal import Permission
@@ -175,7 +177,22 @@ def user_profile(site_id, user_id):
 
 @app.route('/site/<site_id>/update', methods=['POST'])
 def update(site_id):
-    # TODO: Secure
+    secret = app.config.get('GITHUB_SECRET')
+    if secret:
+        header_signature = request.headers.get('X-Hub-Signature')
+        if header_signature is None:
+            abort(403)
+
+        sha_name, signature = header_signature.split('=')
+        if sha_name != 'sha1':
+            abort(501)
+
+        mac = hmac.new(str(secret), msg=request.data, digestmod=sha1)
+        if not hmac.compare_digest(str(mac.hexdigest()), str(signature)):
+            abort(403)
+    else:
+        abort(501) # not properly configured
+
     repository = Repository(site_id)
     with repository.transaction():
         repository.execute(['pull'])
