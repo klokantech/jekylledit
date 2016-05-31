@@ -322,7 +322,7 @@ klokantech.jekylledit.Popup.prototype.startPage_ = function(id) {
     page.start();
   }
 
-  var activeBtn = document.querySelector('.je-btn-active');
+  var activeBtn = this.root_.querySelector('.je-btn-active');
   if (activeBtn) {
     goog.dom.classlist.remove(activeBtn, 'je-btn-active');
   }

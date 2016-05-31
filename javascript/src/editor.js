@@ -392,13 +392,10 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
  * @private
  */
 klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
-  var editables = document.querySelectorAll(
-      klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
   goog.object.forEach(this.languages_, function(lang, langId) {
+    var editables = lang.content.querySelectorAll(
+        klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
     goog.array.forEach(editables, function(editable) {
-      if (!goog.dom.contains(lang.content, editable)) {
-        return;
-      }
 
       var sourceType = editable.getAttribute('data-jekylledit-source');
       // wysiwyg for content, simple contentEditable for the rest
@@ -478,8 +475,6 @@ klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
 klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
   var postData = {};
 
-  var editables = document.querySelectorAll(
-      klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
   goog.object.forEach(this.languages_, function(lang, langId) {
     var langData = {
       'metadata': goog.object.clone(lang.data['metadata']),
@@ -492,11 +487,9 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
       langData['metadata'][k] = valueGetter ? valueGetter() : el['value'];
     }, this);
 
+    var editables = lang.content.querySelectorAll(
+        klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
     goog.array.forEach(editables, function(editable) {
-      if (!goog.dom.contains(lang.content, editable)) {
-        return;
-      }
-
       var sourceType = editable.getAttribute('data-jekylledit-source');
       if (sourceType == 'content') {
         // fix image alts
