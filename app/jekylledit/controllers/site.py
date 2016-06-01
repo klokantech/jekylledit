@@ -10,7 +10,7 @@ from flask import abort, json, jsonify, request, render_template
 from flask.ext.cors import cross_origin
 from flask.ext.login import current_user, login_required
 from flask.ext.principal import Permission
-from pid import PidFile
+from pid import PidFile, PidFileAlreadyLockedError
 
 from ..model import Repository, Roles, Sites
 from .base import app, mailgun
