@@ -242,7 +242,7 @@ def update(site_id):
         if sha_name != 'sha1':
             abort(501)
 
-        mac = hmac.new(str(secret), msg=request.data, digestmod=sha1)
+        mac = hmac.new(bytes(secret, 'utf-8'), msg=request.data, digestmod=sha1)
         if not hmac.compare_digest(str(mac.hexdigest()), str(signature)):
             abort(403)
     else:
