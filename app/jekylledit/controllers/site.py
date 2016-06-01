@@ -33,12 +33,19 @@ def commit(repository, filenames):
         if not app.config['DEVELOPMENT']:
             repository.execute(['push'])
 
-def site_lock(f):
+def site_lock(f, tries=5, delay=0.2):
     @wraps(f)
     def decorated_function(**values):
         site_id = values['site_id']
-        with PidFile(piddir='/var/www/jekylledit', pidname=site_id + '.lock'):
-            return f(**values)
+
+        local_tries, local_delay = tries, delay
+        while local_tries > 0:
+            try:
+                with PidFile(piddir='/var/www/jekylledit', pidname=site_id + '.lock'):
+                    return f(**values)
+            except PidFileAlreadyLockedError:
+                local_tries -= 1
+                local_delay *= 2
     return decorated_function
 
 #site config response
