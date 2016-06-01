@@ -1,6 +1,7 @@
 from base64 import b64decode
 from datetime import date
 from hashlib import sha1
+from functools import wraps
 
 import frontmatter
 import hmac
@@ -9,6 +10,7 @@ from flask import abort, json, jsonify, request, render_template
 from flask.ext.cors import cross_origin
 from flask.ext.login import current_user, login_required
 from flask.ext.principal import Permission
+from pid import PidFile
 
 from ..model import Repository, Roles, Sites
 from .base import app, mailgun
@@ -31,12 +33,20 @@ def commit(repository, filenames):
         if not app.config['DEVELOPMENT']:
             repository.execute(['push'])
 
+def site_lock(f):
+    @wraps(f)
+    def decorated_function(**values):
+        site_id = values['site_id']
+        with PidFile(piddir='/var/www/jekylledit', pidname=site_id + '.lock'):
+            return f(**values)
+    return decorated_function
 
 #site config response
 @app.route('/site/<site_id>/config')
 @cross_origin()
 @login_required
 @authorization_required('contributor', 'administrator')
+@site_lock
 def site_config(site_id):
     site = Sites(site_id)
     config = site.get_config()
@@ -48,6 +58,7 @@ def site_config(site_id):
 @cross_origin()
 @login_required
 @authorization_required('contributor', 'administrator')
+@site_lock
 def site_file(site_id, file_id):
     repository = Repository(site_id)
     site = Sites(site_id)
@@ -153,6 +164,7 @@ def site_file(site_id, file_id):
 @cross_origin()
 @login_required
 @authorization_required('contributor', 'administrator')
+@site_lock
 def drafts(site_id):
     site = Sites(site_id)
     drafts = site.get_drafts('_posts')
@@ -169,6 +181,7 @@ def drafts(site_id):
 @cross_origin()
 @login_required
 @authorization_required('contributor', 'administrator')
+@site_lock
 def site_translation(site_id):
     repository = Repository(site_id)
     if request.method == 'GET':
@@ -190,6 +203,7 @@ def site_translation(site_id):
 @cross_origin()
 @login_required
 @authorization_required('contributor', 'administrator')
+@site_lock
 def user_profile(site_id, user_id):
     site = Sites(site_id)
     #  Get current user
@@ -209,6 +223,7 @@ def user_profile(site_id, user_id):
 
 
 @app.route('/site/<site_id>/update', methods=['POST'])
+@site_lock
 def update(site_id):
     secret = app.config.get('GITHUB_SECRET')
     if secret:

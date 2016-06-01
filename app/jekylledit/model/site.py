@@ -7,7 +7,6 @@ import frontmatter
 
 from contextlib import contextmanager
 from subprocess import Popen, PIPE
-from pid import PidFile
 
 import frontmatter
 
@@ -29,13 +28,12 @@ class Repository:
 
     @contextmanager
     def transaction(self):
-        with PidFile(piddir='/var/www/jekylledit', pidname=self.name + '.lock'):
-            head = self.execute(['rev-parse', '--verify', '-q', 'HEAD']).strip()
-            try:
-                yield self
-            except:
-                self.execute(['reset', '--hard', head])
-                raise
+        head = self.execute(['rev-parse', '--verify', '-q', 'HEAD']).strip()
+        try:
+            yield self
+        except:
+            self.execute(['reset', '--hard', head])
+            raise
 
     def execute(self, args):
         cmd = [
