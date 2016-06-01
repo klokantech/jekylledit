@@ -5,13 +5,13 @@ from hashlib import sha1
 import frontmatter
 import hmac
 
-from flask import abort, json, jsonify, request
+from flask import abort, json, jsonify, request, render_template
 from flask.ext.cors import cross_origin
 from flask.ext.login import current_user, login_required
 from flask.ext.principal import Permission
 
-from ..model import Repository, Sites
-from .base import app
+from ..model import Repository, Roles, Sites
+from .base import app, mailgun
 from .auth import authorization_required
 
 
@@ -63,15 +63,48 @@ def site_file(site_id, file_id):
         tocommit.extend(imgpaths)
         # Save post
         postData = data['post']
-        title = postData[languages[0]]['metadata']['title'].replace(' ', '-').lower()
+        postIsDraft = False
+        title = postData[languages[0]]['metadata']['title']
+        filetitle = title.replace(' ', '-').lower()
         for language in languages:
             langdata = postData[language]
             today = date.today().strftime('%Y-%m-%d')
-            lfilename = '_posts/' + today + '-' + title + '-' + language + '.md'
+            lfilename = '_posts/' + today + '-' + filetitle + '-' + language + '.md'
             site.create_post(lfilename, langdata)
             tocommit.append(lfilename)
+            if langdata['metadata'].get('published') == False:
+                postIsDraft = True
         # Commit changes
         commit(repository, tocommit)
+
+        # Notify admins about new draft
+        if mailgun and postIsDraft:
+            roles = Roles.query.filter_by(site_id=site_id).all()
+            recipients = []
+            for role in roles:
+                if role.email != current_user.email and \
+                   'administrator' in role.roles:
+                    recipients.append(role.email)
+
+            if len(recipients) > 0:
+                base_url = site.get_base_url()
+                if not base_url.endswith('/'):
+                    base_url += '/'
+
+                text = render_template(
+                    'new-draft.txt',
+                    author=current_user.email,
+                    title=title,
+                    site_id=site_id,
+                    signin='{}#sign-in'.format(base_url)
+                )
+                mailgun.send({
+                    'from': 'no-reply@{}'.format(mailgun.domain),
+                    'to': ','.join(recipients),
+                    'subject': '[{}] New draft submitted ({})'.format(site_id, title),
+                    'text': text,
+                })
+
         return 'OK'
 
     # Update post

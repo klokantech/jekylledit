@@ -1,0 +1,4 @@
+User "{{ author }}" just submitted a new draft "{{ title }}".
+You can review, edit and publish the post in the {{ site_id }} administration.
+
+Administration link: {{ signin }}
