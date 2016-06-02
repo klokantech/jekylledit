@@ -18,10 +18,12 @@ goog.require('klokantech.jekylledit.utils');
  * @param {Object} config
  * @param {string} repo
  * @param {function(string)} catStarter
+ * @param {function()} opsRefresher
  * @constructor
  * @implements {klokantech.jekylledit.AbstractPage}
  */
-klokantech.jekylledit.Dashboard = function(auth, config, repo, catStarter) {
+klokantech.jekylledit.Dashboard = function(auth, config, repo,
+                                           catStarter, opsRefresher) {
   /**
    * @type {klokantech.jekylledit.Auth}
    * @private
@@ -45,6 +47,12 @@ klokantech.jekylledit.Dashboard = function(auth, config, repo, catStarter) {
    * @private
    */
   this.element_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-dash');
+
+  /**
+   * @type {function()}
+   * @private
+   */
+  this.opsRefresher_ = opsRefresher;
 
   /**
    * @type {!Element}
@@ -100,6 +108,18 @@ klokantech.jekylledit.Dashboard.prototype.start = function() {
 
 
 /** @inheritDoc */
+klokantech.jekylledit.Dashboard.prototype.getValidOps = function() {
+  if (this.editor_) {
+    return this.editor_.getValidOps();
+  } else {
+    return {
+      cancel: true
+    };
+  }
+};
+
+
+/** @inheritDoc */
 klokantech.jekylledit.Dashboard.prototype.loadClear = function(opt_callback) {
   klokantech.jekylledit.utils.replaceWithSpinner(this.drafts_);
 
@@ -133,6 +153,7 @@ klokantech.jekylledit.Dashboard.prototype.loadClear = function(opt_callback) {
               goog.dom.appendChild(this.drafts_,
                                          this.editor_.getElement());
               this.editor_.start();
+              if (this.opsRefresher_) this.opsRefresher_();
             }, this));
             e.preventDefault();
           }, false, this);
@@ -159,5 +180,15 @@ klokantech.jekylledit.Dashboard.prototype.save = function(opt_callback) {
     if (opt_callback) {
       opt_callback(false);
     }
+  }
+};
+
+
+/** @inheritDoc */
+klokantech.jekylledit.Dashboard.prototype.remove = function(opt_callback) {
+  if (this.editor_) {
+    return this.editor_.remove(opt_callback);
+  } else {
+    opt_callback(false);
   }
 };

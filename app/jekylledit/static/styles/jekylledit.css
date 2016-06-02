@@ -287,6 +287,13 @@
   font-size: 12px;
   line-height: 12px;
 }
+.je-popup-actions .je-btn-remove{
+  color: #fff;
+  background: #dd3311;
+}
+.je-popup-actions .je-btn-remove:hover{
+  background: #dd5522;
+}
 .je-popup-actions .je-btn-save{
   color: #fff;
   background: #289adf;

@@ -78,6 +78,15 @@ klokantech.jekylledit.Translations.prototype.start = function() {
 
 
 /** @inheritDoc */
+klokantech.jekylledit.Translations.prototype.getValidOps = function() {
+  return {
+    cancel: true,
+    save: true
+  };
+};
+
+
+/** @inheritDoc */
 klokantech.jekylledit.Translations.prototype.loadClear =
     function(opt_callback) {
   klokantech.jekylledit.utils.replaceWithSpinner(this.table_);
@@ -148,3 +157,7 @@ klokantech.jekylledit.Translations.prototype.save = function(opt_callback) {
       }
   );
 };
+
+
+/** @inheritDoc */
+klokantech.jekylledit.Translations.prototype.remove = goog.nullFunction;

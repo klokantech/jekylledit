@@ -61,7 +61,7 @@ def site_config(site_id):
 
 
 # Handle working with posts
-@app.route('/site/<site_id>/<file_id>', methods=['GET', 'POST', 'PUT'])
+@app.route('/site/<site_id>/<file_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @cross_origin()
 @login_required
 @authorization_required('contributor', 'administrator')
@@ -146,6 +146,24 @@ def site_file(site_id, file_id):
             site.edit_post(lfilename, langdata)
             tocommit.append(lfilename)
             # Commit changes
+        commit(repository, tocommit)
+        return 'OK'
+
+    # Remove post
+    elif request.method == 'DELETE':
+        if not Permission(('administrator', site_id)):
+            abort(403)
+        filename = b64decode(file_id).decode()
+        if not repository.is_path_in(filename):
+            abort(403)
+        filemask = filename.rsplit('-', 1)[0] + '-{}.' \
+        + filename.rsplit('.', 1)[1]
+
+        tocommit = []
+        for language in languages:
+            lfilename = filemask.format(language)
+            site.remove_post(lfilename)
+            tocommit.append(lfilename)
         commit(repository, tocommit)
         return 'OK'
 

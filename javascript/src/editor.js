@@ -333,6 +333,16 @@ klokantech.jekylledit.Editor.prototype.start = function() {
 };
 
 
+/** @inheritDoc */
+klokantech.jekylledit.Editor.prototype.getValidOps = function() {
+  return {
+    cancel: true,
+    save: true,
+    remove: !!this.path_ && !this.publishCheckbox_.disabled
+  };
+};
+
+
 /**
  * @private
  */
@@ -584,4 +594,24 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
         'content-type': 'application/json'
       }
   );
+};
+
+
+/** @inheritDoc */
+klokantech.jekylledit.Editor.prototype.remove = function(opt_callback) {
+  if (this.path_ &&
+      confirm(klokantech.jekylledit.lang.get('editor_remove_confirm'))) {
+    var path = goog.crypt.base64.encodeString(this.path_);
+    this.auth_.sendRequest('site/' + this.repo_ + '/' + path,
+        goog.bind(function(e) {
+          if (!e.target.isSuccess()) {
+            alert(klokantech.jekylledit.lang.get('editor_save_error'));
+          }
+          if (opt_callback) {
+            opt_callback(e.target.isSuccess());
+          }
+        }, this), 'DELETE');
+  } else {
+    opt_callback(false);
+  }
 };

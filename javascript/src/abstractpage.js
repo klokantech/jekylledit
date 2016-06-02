@@ -35,3 +35,15 @@ klokantech.jekylledit.AbstractPage.prototype.start = goog.abstractMethod;
  * @param {function(boolean)=} opt_callback when done
  */
 klokantech.jekylledit.AbstractPage.prototype.save = goog.abstractMethod;
+
+
+/**
+ * @param {function(boolean)=} opt_callback when done
+ */
+klokantech.jekylledit.AbstractPage.prototype.remove = goog.abstractMethod;
+
+
+/**
+ * @return {!Object.<string, boolean>}
+ */
+klokantech.jekylledit.AbstractPage.prototype.getValidOps = goog.abstractMethod;

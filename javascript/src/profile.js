@@ -45,6 +45,12 @@ klokantech.jekylledit.Profile = function(auth, config, repo) {
    */
   this.element_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-profile');
 
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.editable_ = false;
+
   this.loadClear();
 };
 
@@ -58,6 +64,15 @@ klokantech.jekylledit.Profile.prototype.getElement = function() {
 /** @inheritDoc */
 klokantech.jekylledit.Profile.prototype.start = function() {
   this.loadClear();
+};
+
+
+/** @inheritDoc */
+klokantech.jekylledit.Profile.prototype.getValidOps = function() {
+  return {
+    cancel: true,
+    save: this.editable_
+  };
 };
 
 
@@ -85,6 +100,7 @@ klokantech.jekylledit.Profile.prototype.loadClear = function(opt_callback) {
             el['_je_getval'] = klokantech.jekylledit.utils.createField(
                                    el, value, this.element_);
           }, this);
+          this.editable_ = true;
         } else {
           goog.dom.appendChild(this.element_,
               goog.dom.createDom(goog.dom.TagName.DIV, undefined,
@@ -94,6 +110,7 @@ klokantech.jekylledit.Profile.prototype.loadClear = function(opt_callback) {
                   )
               )
           );
+          this.editable_ = false;
         }
 
         if (opt_callback) {
@@ -133,3 +150,7 @@ klokantech.jekylledit.Profile.prototype.save = function(opt_callback) {
       }
   );
 };
+
+
+/** @inheritDoc */
+klokantech.jekylledit.Profile.prototype.remove = goog.nullFunction;

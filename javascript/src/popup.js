@@ -56,10 +56,24 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
   this.saveBtn_ = goog.dom.createDom(goog.dom.TagName.DIV,
       'je-btn je-btn-save', klokantech.jekylledit.lang.get('popup_save'));
 
-  var cancelBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+  /**
+   * @type {!Element}
+   * @private
+   */
+  this.cancelBtn_ = goog.dom.createDom(goog.dom.TagName.DIV,
       'je-btn je-btn-cancel', klokantech.jekylledit.lang.get('popup_cancel'));
-  goog.dom.append(this.actions_, cancelBtn);
-  goog.events.listen(cancelBtn, goog.events.EventType.CLICK, function(e) {
+
+  /**
+   * @type {!Element}
+   * @private
+   */
+  this.removeBtn_ = goog.dom.createDom(goog.dom.TagName.DIV,
+      'je-btn je-btn-remove', klokantech.jekylledit.lang.get('popup_remove'));
+
+  goog.dom.append(this.actions_, this.cancelBtn_,
+                  this.removeBtn_, this.saveBtn_);
+
+  goog.events.listen(this.cancelBtn_, goog.events.EventType.CLICK, function(e) {
     this.setVisible(false);
     this.clearPages_();
   }, false, this);
@@ -70,6 +84,19 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
         goog.dom.classlist.add(this.element_, 'je-btn-saving');
         page.save(goog.bind(function(success) {
           goog.dom.classlist.remove(this.element_, 'je-btn-saving');
+          if (success) {
+            this.setVisible(false);
+            this.doesNeedClearLoad_ = true;
+          }
+        }, this));
+      }
+    }
+  }, false, this);
+  goog.events.listen(this.removeBtn_, goog.events.EventType.CLICK, function(e) {
+    if (goog.isDef(this.activePage_)) {
+      var page = this.pages_[this.activePage_];
+      if (page) {
+        page.remove(goog.bind(function(success) {
           if (success) {
             this.setVisible(false);
             this.doesNeedClearLoad_ = true;
@@ -149,6 +176,8 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
    * @private
    */
   this.doesNeedClearLoad_ = false;
+
+  this.updateValidActions_();
 };
 
 
@@ -164,12 +193,14 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
     goog.dom.removeChildren(this.userNav_);
     goog.dom.removeChildren(this.nav_);
     goog.dom.removeChildren(this.content_);
-    goog.dom.removeNode(this.saveBtn_);
+    this.activePage_ = undefined;
     this.doesNeedClearLoad_ = true;
     this.config_ = null;
     this.auth_.logout(goog.bind(function() {
       this.auth_.login(goog.bind(this.onLogin_, this));
     }, this));
+
+    this.updateValidActions_();
   }, false, this);
   var userString = this.auth_.getUserEmail();
   if (this.auth_.getUserName().length) {
@@ -193,7 +224,7 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
         this.pages_['dash/'] = new klokantech.jekylledit.Dashboard(
             this.auth_, this.config_, this.repo_, goog.bind(function(cat) {
               this.startPage_('editor/' + (cat || ''));
-            }, this));
+            }, this), goog.bind(this.updateValidActions_, this));
         var dashBtn = goog.dom.createDom(goog.dom.TagName.DIV,
             'je-btn je-btn-dash',
             klokantech.jekylledit.lang.get('popup_btn_dash'));
@@ -331,6 +362,20 @@ klokantech.jekylledit.Popup.prototype.startPage_ = function(id) {
   }
 
   this.activePage_ = id;
+
+  this.updateValidActions_();
+};
+
+
+/**
+ * @private
+ */
+klokantech.jekylledit.Popup.prototype.updateValidActions_ = function() {
+  var page = this.pages_[this.activePage_ || null];
+  var ops = page ? page.getValidOps() : {cancel: true};
+  goog.style.setElementShown(this.cancelBtn_, !!ops.cancel);
+  goog.style.setElementShown(this.saveBtn_, !!ops.save);
+  goog.style.setElementShown(this.removeBtn_, !!ops.remove);
 };
 
 

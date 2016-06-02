@@ -110,6 +110,12 @@ klokantech.jekylledit.lang.data_ = {
     'it': 'Annulla',
     'fr': 'Annuler'
   },
+  'popup_remove': {
+    'en': 'Remove',
+    'de': 'Entfernen',
+    'it': 'Rimuovere',
+    'fr': 'Retirer'
+  },
   'popup_btn_edit': {
     'en': 'Edit',
     'de': 'Bearbeiten',
@@ -166,6 +172,12 @@ klokantech.jekylledit.lang.data_ = {
     'de': 'Die folgenden Felder sind erforderlich: %s',
     'it': 'Sono necessari i seguenti campi: %s',
     'fr': 'Les champs suivants sont requis: %s'
+  },
+  'editor_remove_confirm': {
+    'en': 'Do you really want to remove this post?',
+    'de': 'Wollen Sie wirklich diesen Beitrag zu entfernen?',
+    'it': 'Vuoi davvero eliminare questo post?',
+    'fr': 'Voulez-vous vraiment supprimer ce post?'
   },
   'editor_saved': {
     'en': 'Changes saved!',

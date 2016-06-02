@@ -29,6 +29,10 @@ class Repository:
         # Python in Docker has ASCII as default encoding.
         return open(self.path(filename), mode, encoding='utf-8')
 
+    def remove(self, filename):
+        # Python in Docker has ASCII as default encoding.
+        return os.remove(self.path(filename))
+
     @contextmanager
     def transaction(self):
         head = self.execute(['rev-parse', '--verify', '-q', 'HEAD']).strip()
@@ -140,6 +144,9 @@ class Sites:
             fp.truncate()
             frontmatter.dump(post, fp)
             return filename
+
+    def remove_post(self, filename):
+        self.repository.remove(filename)
 
     def save_media(self, media):
         config = self.get_config()
