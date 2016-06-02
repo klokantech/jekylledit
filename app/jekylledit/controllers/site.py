@@ -179,11 +179,13 @@ def site_file(site_id, file_id):
 def drafts(site_id):
     site = Sites(site_id)
     drafts = site.get_drafts('_posts')
-    if Permission(('administrator', site_id)):
+    if not Permission(('administrator', site_id)):
         email = current_user.email
+        drafts_filtered = []
         for draft in drafts:
-            if draft['author'] is not email:
-                drafts.remove(draft)
+            if draft['author'] == email:
+                drafts_filtered.append(draft)
+        drafts = drafts_filtered
     return json.dumps(drafts)
 
 

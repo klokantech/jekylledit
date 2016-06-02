@@ -70,23 +70,26 @@ class Sites:
             return self.config
 
     def get_drafts(self, category=None):
-        drafts = []
+        drafts = {}
         directory = self.repository.path(category)
         files = os.listdir(directory)
+        files.sort()
         for f in files:
             filename = os.path.join(directory, f)
             with self.repository.open(filename, 'r') as fp:
                 post = frontmatter.load(fp)
                 if 'published' in post.metadata \
                 and post.metadata['published'] is False:
-                    drafts.append({
-                        'author': post.metadata['author'],
-                        'category': category,
-                        'date': post.metadata['date'],
-                        'filename': os.path.join(category, f),
-                        'title': post.metadata['title']
-                    })
-        return drafts
+                    fmask = f.rsplit('-', 1)[0] + '-__.' + f.rsplit('.', 1)[1]
+                    if not drafts.get(fmask):
+                        drafts[fmask] = {
+                            'author': post.metadata['author'],
+                            'category': category,
+                            'date': post.metadata['date'],
+                            'filename': os.path.join(category, fmask),
+                            'title': post.metadata['title']
+                        }
+        return list(drafts.values())
 
     def get_users(self):
         with self.repository.open(self.USERS_FILE, 'r') as fp:
