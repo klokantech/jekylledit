@@ -20,7 +20,10 @@ class Repository:
         directory = os.path.join('/var/www/jekylledit', self.name)
         if filename is None:
             return directory
-        return os.path.join(directory, filename)
+        return os.path.normpath(os.path.join(directory, filename))
+
+    def is_path_in(self, file):
+        return self.path(file).startswith(self.path())
 
     def open(self, filename, mode):
         # Python in Docker has ASCII as default encoding.

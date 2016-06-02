@@ -128,6 +128,8 @@ def site_file(site_id, file_id):
     # Update post
     elif request.method == 'PUT':
         filename = b64decode(file_id).decode()
+        if not repository.is_path_in(filename):
+            abort(403)
         filemask = filename.rsplit('-', 1)[0] + '-{}.' \
         + filename.rsplit('.', 1)[1]
 
@@ -150,6 +152,8 @@ def site_file(site_id, file_id):
     # Return post
     else:
         filename = b64decode(file_id).decode()
+        if not repository.is_path_in(filename):
+            abort(403)
         filemask = filename.rsplit('-', 1)[0] + '-{}.' \
         + filename.rsplit('.', 1)[1]
 
