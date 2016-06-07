@@ -5,6 +5,7 @@ from functools import wraps
 
 import frontmatter
 import hmac
+from unicodedata import normalize
 
 from flask import abort, json, jsonify, request, render_template
 from flask.ext.cors import cross_origin
@@ -83,11 +84,20 @@ def site_file(site_id, file_id):
         postData = data['post']
         postIsDraft = False
         title = postData[languages[0]]['metadata']['title']
-        filetitle = title.replace(' ', '-').lower()
-        for language in languages:
+        normtitle = normalize('NFKD', title).encode('ascii', 'ignore').decode()
+        slugtitle = normtitle.replace(' ', '-').lower()
+        for i, language in enumerate(languages):
             langdata = postData[language]
+            if not 'permalink' in langdata['metadata']:
+                permalink = '/' + slugtitle + '/'
+                if 'category' in langdata['metadata']:
+                    permalink = '/' + langdata['metadata']['category'] + permalink
+                if i != 0:
+                    # Fist language is without linkprefix
+                    permalink += '/' + language + permalink
+                langdata['metadata']['permalink'] = permalink
             today = date.today().strftime('%Y-%m-%d')
-            lfilename = '_posts/' + today + '-' + filetitle + '-' + language + '.md'
+            lfilename = '_posts/' + today + '-' + slugtitle + '-' + language + '.md'
             site.create_post(lfilename, langdata)
             tocommit.append(lfilename)
             if langdata['metadata'].get('published') == False:
