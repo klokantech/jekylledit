@@ -240,13 +240,15 @@ def user_profile(site_id, user_id):
     #  Get current user
     # JE uses emails as identificators
     if user_id == 'current':
-        user_id = current_user.email
+        user = current_user.email
+    else:
+        user = b64decode(user_id).decode()
     if request.method == 'GET':
-        user = site.get_user(user_id)
-        return jsonify(user)
+        userdata = site.get_user(user)
+        return jsonify(userdata)
     elif request.method == 'PUT':
         data = request.get_json()
-        data['id'] = user_id
+        data['id'] = user
         site.edit_user(data)
         # Commit changes
         commit(site.repository, [USERS_FILE])
