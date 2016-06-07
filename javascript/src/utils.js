@@ -10,6 +10,7 @@ goog.require('goog.array');
 goog.require('goog.crypt.Md5');
 goog.require('goog.dom');
 goog.require('goog.net.jsloader');
+goog.require('kt.DateInput');
 goog.require('kt.MultiComplete');
 
 
@@ -99,7 +100,7 @@ klokantech.jekylledit.utils.cloneNodes = function(origin, destination) {
 /**
  * @param {Object.<string, *>} field
  * @param {?*} currentValue
- * @param {Node} parent
+ * @param {!Node} parent
  * @return {function(): *} Value getter
  */
 klokantech.jekylledit.utils.createField =
@@ -108,17 +109,72 @@ klokantech.jekylledit.utils.createField =
   var value = goog.isDefAndNotNull(currentValue) ?
               currentValue : field['value'];
   if (type == 'datetime') {
+    var pattern = 'yyyy-MM-ddTHH:mm';
+    var dateValue;
     if (value == 'now') {
-      value = new Date().toISOString().substring(0, 16);
-    } else {
-      value = value.split('-').slice(0, 3).join('-');
+      dateValue = new Date();
+    } else if (value && value.length > 9) {
+      dateValue = new Date(0);
+      var parser = new goog.i18n.DateTimeParse(pattern);
+      parser.parse(/** @type {string} */(value), dateValue);
+
+      var timezoneValue = value.substr(-6) || '+00:00';
+      var timezoneOffset = parseInt(timezoneValue.substr(4, 2), 10);
+      timezoneOffset += 60 * parseInt(timezoneValue.substr(1, 2), 10);
+      timezoneOffset *= timezoneValue[0] == '-' ? -1 : 1;
+
+      var hereOffset = (new Date).getTimezoneOffset();
+
+      dateValue = new Date(dateValue.getTime() +
+          60000 * (timezoneOffset - hereOffset));
     }
-    var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
-      type: 'datetime-local',
-      value: value
+    var dateInputEl = goog.dom.createDom(goog.dom.TagName.INPUT, {
+      'class': 'je-datetime-date',
+      type: 'text'
     });
-    goog.dom.appendChild(parent, dataInput);
-    return function() { return dataInput.value; };
+    var dateInput = new kt.DateInput(dateInputEl,
+        goog.i18n.DateTimeFormat.Format.MEDIUM_DATE);
+    if (dateValue) {
+      dateInput.setDate(dateValue);
+    }
+
+    var hourInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
+      'class': 'je-datetime-hours',
+      type: 'number',
+      min: 0,
+      max: 24,
+      step: 1,
+      value: dateValue ? dateValue.getHours() : ''
+    });
+    var minInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
+      'class': 'je-datetime-mins',
+      type: 'number',
+      min: 0,
+      max: 59,
+      step: 1,
+      value: dateValue ? dateValue.getMinutes() : ''
+    });
+
+    goog.dom.append(parent, dateInputEl, ' ', hourInput, ':', minInput);
+    return function() {
+      var date = dateInput.getDate();
+      if (!date) {
+        return '';
+      }
+      var value = new Date(date.getTime());
+      value.setHours(hourInput.value || 0);
+      value.setMinutes(minInput.value || 0);
+
+      var formatter = new goog.i18n.DateTimeFormat(pattern);
+      var result = formatter.format(value);
+
+      var timezoneOffset = value.getTimezoneOffset();
+      result += (timezoneOffset < 0 ? '-' : '+') +
+          goog.string.format('%02f:%02f',
+              Math.floor(Math.abs(timezoneOffset) / 60),
+              Math.floor(Math.abs(timezoneOffset) % 60));
+      return result;
+    };
   } else if (type == 'boolean') {
     var dataInput = goog.dom.createDom(goog.dom.TagName.INPUT, {
       type: 'checkbox',
