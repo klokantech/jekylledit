@@ -126,7 +126,36 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
     goog.dom.removeNode(createLangDialog);
 
     var lang = this.languages_[activeTabLang];
+    var otherLang = this.languages_[lang.fields['jekylledit_copyof']];
+    if (!otherLang) {
+      var bestLang = goog.array.find(langs, function(el) {
+        return !this.languages_[el].is_copy;
+      }, this);
+      otherLang = this.languages_[bestLang];
+    }
     lang.is_copy = false;
+    if (otherLang) {
+      var langData = lang.data;
+
+      goog.object.forEach(otherLang.fields, function(el, k) {
+        var valueGetter = el['_je_getval'];
+        langData['metadata'][k] = valueGetter ? valueGetter() : el['value'];
+      }, this);
+
+      var editables = otherLang.content.querySelectorAll(
+          klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
+      goog.array.forEach(editables, function(editable) {
+        var sourceType = editable.getAttribute('data-jekylledit-source');
+        if (sourceType == 'content') {
+          langData['content'] = goog.global['toMarkdown'](editable.innerHTML);
+        } else {
+          langData['metadata'][sourceType] = editable.textContent;
+        }
+      }, this);
+
+      this.startEditor_(activeTabLang);
+      this.initSidebar_(activeTabLang);
+    }
     goog.dom.classlist.remove(lang.tab, 'disabled');
     goog.dom.classlist.remove(lang.tabBtn, 'disabled');
   }, false, this);
@@ -344,11 +373,15 @@ klokantech.jekylledit.Editor.prototype.getValidOps = function() {
 
 
 /**
+ * @param {string=} opt_langOnly
  * @private
  */
-klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
+klokantech.jekylledit.Editor.prototype.initSidebar_ = function(opt_langOnly) {
   var skipFields = [];//'lang', 'post_id', 'jekylledit_copyof'];
   goog.object.forEach(this.languages_, function(lang, langId) {
+    if (opt_langOnly && langId != opt_langOnly) {
+      return;
+    }
     goog.dom.removeChildren(lang.side);
 
     var editable = goog.dom.createDom(goog.dom.TagName.DIV,
@@ -399,10 +432,14 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function() {
 
 
 /**
+ * @param {string=} opt_langOnly
  * @private
  */
-klokantech.jekylledit.Editor.prototype.startEditor_ = function() {
+klokantech.jekylledit.Editor.prototype.startEditor_ = function(opt_langOnly) {
   goog.object.forEach(this.languages_, function(lang, langId) {
+    if (opt_langOnly && langId != opt_langOnly) {
+      return;
+    }
     var editables = lang.content.querySelectorAll(
         klokantech.jekylledit.Editor.EDITABLES_SELECTOR);
     goog.array.forEach(editables, function(editable) {
