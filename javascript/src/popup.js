@@ -284,7 +284,8 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
 
         // profile
         this.pages_['profile/'] = new klokantech.jekylledit.Profile(
-            this.auth_, this.config_, this.repo_);
+            this.auth_, this.config_, this.repo_,
+            goog.bind(this.updateValidActions_, this));
         var profBtn = goog.dom.createDom(goog.dom.TagName.DIV,
             'je-btn je-btn-profile',
             klokantech.jekylledit.lang.get('popup_btn_profile'));

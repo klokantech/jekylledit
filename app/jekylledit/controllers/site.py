@@ -271,7 +271,10 @@ def user_profile(site_id, user_id):
     if user_id == 'current':
         user = current_user.email
     else:
-        user = b64decode(user_id).decode()
+        if Permission(('administrator', site_id)):
+            user = b64decode(user_id).decode()
+        else:
+            abort(403)
     if request.method == 'GET':
         userdata = site.get_user(user)
         return jsonify(userdata)

@@ -419,6 +419,10 @@
 .je-profile{
   padding: 30px;
 }
+.je-profile-data {
+  margin-top:10px;
+  border-top:1px solid #ccc;
+}
 
 .je-dash-empty {
   padding:10px;
