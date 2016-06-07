@@ -158,7 +158,11 @@ klokantech.jekylledit.utils.createField =
       var getter_ = null;
       goog.net.XhrIo.send(/** @type {string} */(values), function(e) {
         var xhr = e.target;
-        values = xhr.getResponseJson();
+        try {
+          values = xhr.getResponseJson();
+        } catch (e) {
+          values = [];
+        }
         initMC();
       });
     } else {
