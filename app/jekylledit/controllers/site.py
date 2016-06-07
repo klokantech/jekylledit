@@ -229,7 +229,26 @@ def site_translation(site_id):
         return 'OK'
 
 
-#user proflies
+#user profiles
+@app.route('/site/<site_id>/users', methods=['GET'])
+@cross_origin()
+@login_required
+@authorization_required('administrator')
+@site_lock
+def user_profiles(site_id):
+    site = Sites(site_id)
+    #  Get users list
+    if Permission(('administrator', site_id)):
+        usersdata = site.get_users()
+        users = []
+        for user in usersdata:
+            data = {'id': user['id'], 'username': user['id']}
+            if 'username' in user:
+              data['username'] = user['username']
+            users.append(data)
+        return json.dumps(users)
+
+
 @app.route('/site/<site_id>/user/<user_id>/profile', methods=['GET', 'PUT'])
 @cross_origin()
 @login_required
