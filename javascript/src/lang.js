@@ -106,7 +106,7 @@ klokantech.jekylledit.lang.data_ = {
   },
   'popup_cancel': {
     'en': 'Cancel',
-    'de': 'Stornieren',
+    'de': 'Abbrechen',
     'it': 'Annulla',
     'fr': 'Annuler'
   },
@@ -148,7 +148,7 @@ klokantech.jekylledit.lang.data_ = {
   },
   'editor_publish': {
     'en': 'Publish this post',
-    'de': 'Veröffentlichen diesen Beitrag',
+    'de': 'Diesen Beitrag veröffentlichen',
     'it': 'Pubblicare questo post',
     'fr': 'Publier ce post'
   },
@@ -272,7 +272,7 @@ klokantech.jekylledit.lang.data_ = {
   },
   'dash_drafts_empty': {
     'en': 'There are currently no drafts waiting to be published.',
-    'de': 'Es gibt zur Zeit wartet keine Zugluft veröffentlicht werden.',
+    'de': 'Zur Zeit warten keine Entwürfe darauf veröffentlicht zu werden',
     'it': 'Attualmente non ci sono correnti d\'aria in attesa di ' +
         'essere pubblicato.',
     'fr': 'Il n\'y a pas de courants qui attendent d\'être publié.'
