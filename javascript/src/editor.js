@@ -164,7 +164,7 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
    * @type {function(string)}
    * @private
    */
-  this.changeLangugeTab_ = goog.bind(function(langId) {
+  this.changeLanguageTab_ = goog.bind(function(langId) {
     goog.array.forEach(tabBtns, function(tabBtn) {
       goog.dom.classlist.remove(tabBtn, 'active');
     });
@@ -216,7 +216,7 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
       if (e.target != tabBtn) {
         return;
       }
-      this.changeLangugeTab_(langId);
+      this.changeLanguageTab_(langId);
 
       e.preventDefault();
     }, false, this);
@@ -285,7 +285,7 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
             goog.dom.classlist.enable(lang.tab, 'disabled', lang.is_copy);
             goog.dom.classlist.enable(lang.tabBtn, 'disabled', lang.is_copy);
             if (lang.is_copy) {
-              this.changeLangugeTab_(copyof);
+              this.changeLanguageTab_(copyof);
             }
             anyPublished = lang.data['metadata']['published'] != false;
 
