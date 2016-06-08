@@ -422,6 +422,20 @@
 .je-profile-data {
   margin-top:10px;
   border-top:1px solid #ccc;
+  position:relative
+}
+.je-profile-group {
+  position:absolute;
+  max-width:500px;
+}
+.je-profile-group input, .je-profile-group select {
+  width:100%;
+  height:auto !important;
+  padding: 2px 6px !important;
+}
+.je-profile-group label {
+  font-weight:bold;
+  font-size:1.1em;
 }
 
 .je-dash-empty {

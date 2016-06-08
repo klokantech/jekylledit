@@ -185,16 +185,46 @@ klokantech.jekylledit.Profile.prototype.showProfile_ =
 
         var fields = (this.config_['profile'] || {})['fields'] || {};
 
+        var groups = [], groupCount = 0;
+
         if (goog.isDefAndNotNull(data['id'])) {
-          goog.object.forEach(fields, function(el, k) {
+          var keys = goog.object.getKeys(fields);
+          keys.sort(function(a, b) {
+            var orderA = fields[a]['order'] || 0;
+            var orderB = fields[b]['order'] || 0;
+            if (orderA != orderB) {
+              return a - b;
+            } else {
+              a.localeCompare(b);
+            }
+          });
+
+          goog.array.forEach(keys, function(k) {
+            var el = fields[k];
+            var groupId = el['group'] || 0;
+            if (!groups[groupId]) {
+              groups[groupId] = goog.dom.createDom(goog.dom.TagName.DIV,
+                                                   'je-profile-group');
+              groupCount++;
+            }
+            var group = groups[groupId];
+
             var label = klokantech.jekylledit.lang.getFrom(
                             el['label'], this.config_['languages']);
             var labelEl = goog.dom.createDom(goog.dom.TagName.LABEL, undefined,
             (label || k) + ':');
-            goog.dom.appendChild(this.dataEl_, labelEl);
+            goog.dom.appendChild(group, labelEl);
             var value = data[k];
             el['_je_getval'] = klokantech.jekylledit.utils.createField(
-                                   el, value, this.dataEl_);
+                                   el, value, group);
+          }, this);
+
+          var groupI = 0;
+          goog.array.forEach(groups, function(group) {
+            group.style.left = Math.floor(groupI * 100 / groupCount) + '%';
+            group.style.width = Math.floor(100 / groupCount - 1) + '%';
+            goog.dom.appendChild(this.dataEl_, group);
+            groupI++;
           }, this);
           this.editable_ = true;
         } else {
