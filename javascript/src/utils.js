@@ -154,7 +154,7 @@ klokantech.jekylledit.utils.createField =
       step: 1,
       value: dateValue ? dateValue.getMinutes() : ''
     });
-    var timeSep = goog.dom.createDom(goog.dom.TagName.SPAN,{
+    var timeSep = goog.dom.createDom(goog.dom.TagName.SPAN, {
       'class': 'je-datetime-sep'
     }, ':');
 
