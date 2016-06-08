@@ -154,8 +154,11 @@ klokantech.jekylledit.utils.createField =
       step: 1,
       value: dateValue ? dateValue.getMinutes() : ''
     });
+    var timeSep = goog.dom.createDom(goog.dom.TagName.SPAN,{
+      'class': 'je-datetime-sep'
+    }, ':');
 
-    goog.dom.append(parent, dateInputEl, ' ', hourInput, ':', minInput);
+    goog.dom.append(parent, dateInputEl, ' ', hourInput, timeSep, minInput);
     return function() {
       var date = dateInput.getDate();
       if (!date) {

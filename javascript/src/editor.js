@@ -399,7 +399,7 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function(opt_langOnly) {
       var label = klokantech.jekylledit.lang.getFrom(
                       el['label'], this.config_['languages']);
       var labelEl = goog.dom.createDom(goog.dom.TagName.LABEL, undefined,
-                                       (label || k) + ':');
+                                       label || k);
       if (el['required']) {
         goog.dom.classlist.add(labelEl, 'je-editor-side-label-required');
       }
@@ -421,7 +421,7 @@ klokantech.jekylledit.Editor.prototype.initSidebar_ = function(opt_langOnly) {
 
     goog.object.forEach(meta, function(el, k) {
       if (!lang.fields[k] && !goog.array.contains(skipFields, k)) {
-        var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k + ':');
+        var label = goog.dom.createDom(goog.dom.TagName.LABEL, {}, k);
         var dataInput = goog.dom.createDom(goog.dom.TagName.DIV, {},
             meta[k].toString());
         goog.dom.append(extra, label, dataInput);
