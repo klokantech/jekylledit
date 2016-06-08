@@ -569,6 +569,8 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
       // fix special fields
       postData[langId]['metadata']['lang'] = langId;
       postData[langId]['metadata']['jekylledit_copyof'] = copyof;
+      postData[langId]['metadata']['permalink'] =
+          lang.data['metadata']['permalink'];
     }
     postData[langId]['metadata']['published'] = this.publishCheckbox_.checked;
   }, this);
