@@ -93,8 +93,8 @@ def site_file(site_id, file_id):
                 if 'category' in langdata['metadata']:
                     permalink = '/' + langdata['metadata']['category'] + permalink
                 if i != 0:
-                    # Fist language is without linkprefix
-                    permalink += '/' + language + permalink
+                    # First language is not displayed in permalink
+                    permalink = '/' + language + permalink
                 langdata['metadata']['permalink'] = permalink
             today = date.today().strftime('%Y-%m-%d')
             lfilename = '_posts/' + today + '-' + slugtitle + '-' + language + '.md'
