@@ -7,6 +7,7 @@
 goog.provide('klokantech.jekylledit.Profile');
 
 goog.require('goog.dom');
+goog.require('goog.string');
 goog.require('klokantech.jekylledit.AbstractPage');
 goog.require('klokantech.jekylledit.lang');
 goog.require('klokantech.jekylledit.utils');
@@ -195,7 +196,7 @@ klokantech.jekylledit.Profile.prototype.showProfile_ =
             if (orderA != orderB) {
               return a - b;
             } else {
-              a.localeCompare(b);
+              return goog.string.caseInsensitiveCompare(a, b);
             }
           });
 
