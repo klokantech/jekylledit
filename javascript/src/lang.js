@@ -147,10 +147,28 @@ klokantech.jekylledit.lang.data_ = {
     'fr': 'Dashboard'
   },
   'editor_publish': {
-    'en': 'Publish this post',
-    'de': 'Diesen Beitrag veröffentlichen',
-    'it': 'Pubblicare questo post',
-    'fr': 'Publier ce post'
+    'en': 'Publish',
+    'de': 'Veröffentlichen',
+    'it': 'Pubblicare',
+    'fr': 'Publier'
+  },
+  'editor_revert_to_draft': {
+    'en': 'Revert to draft',
+    'de': 'Zurück zu Entwurf',
+    'it': 'Ripristina di redigere',
+    'fr': 'Rétablir le brouillon'
+  },
+  'editor_published': {
+    'en': 'Post published!',
+    'de': 'Post veröffentlicht!',
+    'it': 'Post pubblicato!',
+    'fr': 'Poster publié!'
+  },
+  'editor_reverted_to_draft': {
+    'en': 'Post reverted to draft!',
+    'de': 'Beitrag zurückgekehrt zu Entwurf!',
+    'it': 'Messaggio ritornato alla redazione!',
+    'fr': 'Poster revient à rédiger!'
   },
   'editor_create_lang': {
     'en': 'This post does not exist in this language yet. ' +

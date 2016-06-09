@@ -100,6 +100,14 @@ klokantech.jekylledit.Auth.prototype.getUserRoles = function() {
 
 
 /**
+ * @return {boolean}
+ */
+klokantech.jekylledit.Auth.prototype.isAdmin = function() {
+  return goog.array.contains(this.getUserRoles(), 'administrator');
+};
+
+
+/**
  * @param {Function} callback Called when the user authorizes.
  *                            May not be called at all.
  */

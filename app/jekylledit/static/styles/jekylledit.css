@@ -49,17 +49,6 @@
   bottom:0;
   background:#fff;
 }
-.je-editor-publish {
-  position:absolute;
-  top:0;
-  right:0;
-  line-height: 38px;
-  margin-right: 20px;
-}
-.je-editor-publish input {
-  vertical-align:text-bottom;
-  margin-right:5px;
-}
 .je-editor-tabbtns {
   position:absolute;
   top:0;
@@ -294,26 +283,28 @@
 .je-popup-actions .je-btn-remove:hover{
   background: #dd5522;
 }
-.je-popup-actions .je-btn-save{
+.je-popup-actions .je-btn-save, .je-popup-actions .je-btn-special{
   color: #fff;
   background: #289adf;
 }
-.je-popup-actions .je-btn-save:hover{
+.je-popup-actions .je-btn-save:hover, .je-popup-actions .je-btn-special:hover{
   background: #005d8e;
 }
-.je-btn-saving {
+.je-saving, .je-special-working {
   pointer-events:none;
 }
-.je-btn-saving .je-popup-actions .je-btn-cancel {
-  pointer-events:auto;
+.je-popup-actions .je-btn-cancel {
+  pointer-events:auto !important;
 }
-.je-btn-saving .je-popup-actions .je-btn-save {
+.je-saving .je-popup-actions .je-btn-save,
+.je-special-working .je-popup-actions .je-btn-special {
   background:#005d8e;
   opacity:0.8;
   color:rgba(255,255,255,0.8);
   pointer-events:none;
 }
-.je-btn-saving .je-popup-actions .je-btn-save:before {
+.je-saving .je-popup-actions .je-btn-save:before,
+.je-special-working .je-popup-actions .je-btn-special:before {
   content:' ';
   display:inline-block;
   margin:-0.3em;

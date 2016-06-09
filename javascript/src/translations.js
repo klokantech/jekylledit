@@ -160,4 +160,8 @@ klokantech.jekylledit.Translations.prototype.save = function(opt_callback) {
 
 
 /** @inheritDoc */
+klokantech.jekylledit.Translations.prototype.special = goog.nullFunction;
+
+
+/** @inheritDoc */
 klokantech.jekylledit.Translations.prototype.remove = goog.nullFunction;

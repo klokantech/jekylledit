@@ -114,7 +114,7 @@ klokantech.jekylledit.Profile.prototype.loadClear = function(opt_callback) {
   goog.dom.removeChildren(this.usersEl_);
   klokantech.jekylledit.utils.replaceWithSpinner(this.dataEl_);
 
-  var isAdmin = goog.array.contains(this.auth_.getUserRoles(), 'administrator');
+  var isAdmin = this.auth_.isAdmin();
 
   goog.style.setElementShown(this.usersEl_, isAdmin);
 
@@ -166,7 +166,7 @@ klokantech.jekylledit.Profile.prototype.loadClear = function(opt_callback) {
  */
 klokantech.jekylledit.Profile.prototype.showProfile_ =
     function(opt_userId, opt_callback) {
-  if (!goog.array.contains(this.auth_.getUserRoles(), 'administrator')) {
+  if (!this.auth_.isAdmin()) {
     opt_userId = undefined;
     this.usersEl_.value = 'current';
   }
@@ -282,6 +282,10 @@ klokantech.jekylledit.Profile.prototype.save = function(opt_callback) {
       }
   );
 };
+
+
+/** @inheritDoc */
+klokantech.jekylledit.Profile.prototype.special = goog.nullFunction;
 
 
 /** @inheritDoc */

@@ -70,8 +70,15 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
   this.removeBtn_ = goog.dom.createDom(goog.dom.TagName.DIV,
       'je-btn je-btn-remove', klokantech.jekylledit.lang.get('popup_remove'));
 
+  /**
+   * @type {!Element}
+   * @private
+   */
+  this.specialBtn_ = goog.dom.createDom(goog.dom.TagName.DIV,
+      'je-btn je-btn-special', '');
+
   goog.dom.append(this.actions_, this.cancelBtn_,
-                  this.removeBtn_, this.saveBtn_);
+                  this.removeBtn_, this.saveBtn_, this.specialBtn_);
 
   goog.events.listen(this.cancelBtn_, goog.events.EventType.CLICK, function(e) {
     this.setVisible(false);
@@ -81,9 +88,9 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
     if (goog.isDef(this.activePage_)) {
       var page = this.pages_[this.activePage_];
       if (page) {
-        goog.dom.classlist.add(this.element_, 'je-btn-saving');
+        goog.dom.classlist.add(this.element_, 'je-saving');
         page.save(goog.bind(function(success) {
-          goog.dom.classlist.remove(this.element_, 'je-btn-saving');
+          goog.dom.classlist.remove(this.element_, 'je-saving');
           if (success) {
             this.setVisible(false);
             this.doesNeedClearLoad_ = true;
@@ -105,6 +112,22 @@ klokantech.jekylledit.Popup = function(repo, path, editableContent) {
       }
     }
   }, false, this);
+  goog.events.listen(this.specialBtn_, goog.events.EventType.CLICK,
+      function(e) {
+        if (goog.isDef(this.activePage_)) {
+          var page = this.pages_[this.activePage_];
+          if (page) {
+            goog.dom.classlist.add(this.element_, 'je-special-working');
+            page.special(goog.bind(function(success) {
+              goog.dom.classlist.remove(this.element_, 'je-special-working');
+              if (success) {
+                this.setVisible(false);
+                this.doesNeedClearLoad_ = true;
+              }
+            }, this));
+          }
+        }
+      }, false, this);
 
   /**
    * @type {!Element}
@@ -376,7 +399,11 @@ klokantech.jekylledit.Popup.prototype.updateValidActions_ = function() {
   var ops = page ? page.getValidOps() : {cancel: true};
   goog.style.setElementShown(this.cancelBtn_, !!ops.cancel);
   goog.style.setElementShown(this.saveBtn_, !!ops.save);
+  goog.style.setElementShown(this.specialBtn_, !!ops.special);
   goog.style.setElementShown(this.removeBtn_, !!ops.remove);
+
+  goog.dom.setTextContent(this.specialBtn_,
+                          goog.isString(ops.special) ? ops.special : '');
 };
 
 

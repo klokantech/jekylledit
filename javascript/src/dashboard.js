@@ -185,10 +185,24 @@ klokantech.jekylledit.Dashboard.prototype.save = function(opt_callback) {
 
 
 /** @inheritDoc */
+klokantech.jekylledit.Dashboard.prototype.special = function(opt_callback) {
+  if (this.editor_) {
+    return this.editor_.special(opt_callback);
+  } else {
+    if (opt_callback) {
+      opt_callback(false);
+    }
+  }
+};
+
+
+/** @inheritDoc */
 klokantech.jekylledit.Dashboard.prototype.remove = function(opt_callback) {
   if (this.editor_) {
     return this.editor_.remove(opt_callback);
   } else {
-    opt_callback(false);
+    if (opt_callback) {
+      opt_callback(false);
+    }
   }
 };

@@ -73,17 +73,10 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
   this.element_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-editor');
 
   /**
-   * @type {!Element}
+   * @type {boolean}
    * @private
    */
-  this.publishCheckbox_ = goog.dom.createDom(goog.dom.TagName.INPUT, {
-    'type': 'checkbox'
-  });
-
-  var publishCheckboxBox = goog.dom.createDom(goog.dom.TagName.LABEL,
-      'je-editor-publish',
-      this.publishCheckbox_,
-      klokantech.jekylledit.lang.get('editor_publish'));
+  this.publish_ = false;
 
   /**
    * @type {!Element}
@@ -97,8 +90,7 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
    */
   this.tabs_ = goog.dom.createDom(goog.dom.TagName.DIV, 'je-editor-tabs');
 
-  goog.dom.append(this.element_, publishCheckboxBox,
-                  this.tabbtns_, this.tabs_);
+  goog.dom.append(this.element_, this.tabbtns_, this.tabs_);
 
   /**
    * @type {!Object.<string, {content: !Element, side: !Element,
@@ -261,9 +253,6 @@ klokantech.jekylledit.Editor.prototype.getElement = function() {
 
 /** @inheritDoc */
 klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
-  this.publishCheckbox_.disabled =
-      !goog.array.contains(this.auth_.getUserRoles(), 'administrator');
-
   if (this.path_) {
     this.auth_.sendRequest(
         'site/' + this.repo_ + '/' + goog.crypt.base64.encodeString(this.path_),
@@ -315,7 +304,7 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
                 klokantech.jekylledit.Editor.DEFAULT_EMPTY_CONTENT;
           }, this);
 
-          this.publishCheckbox_.checked = anyPublished;
+          this.publish_ = anyPublished;
 
           this.start();
 
@@ -326,7 +315,7 @@ klokantech.jekylledit.Editor.prototype.loadClear = function(opt_callback) {
   } else {
     var uniquePostId = goog.string.getRandomString();
 
-    this.publishCheckbox_.checked = !this.publishCheckbox_.disabled;
+    this.publish_ = false;
 
     goog.object.forEach(this.languages_, function(lang, langId) {
       lang.data = {
@@ -364,10 +353,13 @@ klokantech.jekylledit.Editor.prototype.start = function() {
 
 /** @inheritDoc */
 klokantech.jekylledit.Editor.prototype.getValidOps = function() {
+  var isAdmin = this.auth_.isAdmin();
   return {
     cancel: true,
     save: true,
-    remove: !!this.path_ && !this.publishCheckbox_.disabled
+    remove: isAdmin && !!this.path_,
+    special: isAdmin && (klokantech.jekylledit.lang.get(
+        this.publish_ ? 'editor_revert_to_draft' : 'editor_publish'))
   };
 };
 
@@ -518,8 +510,15 @@ klokantech.jekylledit.Editor.prototype.startEditor_ = function(opt_langOnly) {
 };
 
 
-/** @inheritDoc */
-klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
+/**
+ * @param {function(boolean)=} opt_callback
+ * @param {boolean=} opt_publish
+ */
+klokantech.jekylledit.Editor.prototype.save =
+    function(opt_callback, opt_publish) {
+  if (goog.isDef(opt_publish)) {
+    this.publish_ = opt_publish;
+  }
   var postData = {};
 
   goog.object.forEach(this.languages_, function(lang, langId) {
@@ -572,7 +571,7 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
       postData[langId]['metadata']['permalink'] =
           lang.data['metadata']['permalink'];
     }
-    postData[langId]['metadata']['published'] = this.publishCheckbox_.checked;
+    postData[langId]['metadata']['published'] = this.publish_;
   }, this);
 
   var missingRequiredFields = [];
@@ -621,8 +620,10 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
   this.auth_.sendRequest('site/' + this.repo_ + '/' + path,
       goog.bind(function(e) {
         if (e.target.isSuccess()) {
-          alert(klokantech.jekylledit.lang.get(
-                    this.path_ ? 'editor_saved' : 'editor_created'));
+          var messageId = goog.isDef(opt_publish) ?
+          (this.publish_ ? 'editor_published' : 'editor_reverted_to_draft') :
+          (this.path_ ? 'editor_saved' : 'editor_created');
+          alert(klokantech.jekylledit.lang.get(messageId));
         } else {
           alert(klokantech.jekylledit.lang.get('editor_save_error'));
         }
@@ -633,6 +634,12 @@ klokantech.jekylledit.Editor.prototype.save = function(opt_callback) {
         'content-type': 'application/json'
       }
   );
+};
+
+
+/** @inheritDoc */
+klokantech.jekylledit.Editor.prototype.special = function(opt_callback) {
+  return this.save(opt_callback, !this.publish_);
 };
 
 
