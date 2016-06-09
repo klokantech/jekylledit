@@ -194,7 +194,7 @@ klokantech.jekylledit.Profile.prototype.showProfile_ =
             var orderA = fields[a]['order'] || 0;
             var orderB = fields[b]['order'] || 0;
             if (orderA != orderB) {
-              return a - b;
+              return orderA - orderB;
             } else {
               return goog.string.caseInsensitiveCompare(a, b);
             }
