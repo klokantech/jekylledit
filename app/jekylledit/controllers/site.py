@@ -230,6 +230,8 @@ def site_translation(site_id):
             translations = json.load(fp)
         return jsonify(translations)
     elif request.method == 'PUT':
+        if not Permission(('administrator', site_id)):
+            abort(403)
         data = request.get_json()
         with repository.open(TRANSLATIONS_FILE, 'w') as fp:
             json.dump(data, fp,

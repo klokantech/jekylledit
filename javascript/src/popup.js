@@ -294,16 +294,19 @@ klokantech.jekylledit.Popup.prototype.onLogin_ = function(authorized) {
         }, this);
 
         // translations
-        this.pages_['translations/'] = new klokantech.jekylledit.Translations(
-            this.auth_, this.config_, this.repo_);
-        var transBtn = goog.dom.createDom(goog.dom.TagName.DIV,
-            'je-btn je-btn-trans',
-            klokantech.jekylledit.lang.get('popup_btn_trans'));
-        this.pageBtns_['translations/'] = transBtn;
-        goog.dom.appendChild(this.nav_, transBtn);
-        goog.events.listen(transBtn, goog.events.EventType.CLICK, function(e) {
-          this.startPage_('translations/');
-        }, false, this);
+        if (this.auth_.isAdmin()) {
+          this.pages_['translations/'] = new klokantech.jekylledit.Translations(
+              this.auth_, this.config_, this.repo_);
+          var transBtn = goog.dom.createDom(goog.dom.TagName.DIV,
+              'je-btn je-btn-trans',
+              klokantech.jekylledit.lang.get('popup_btn_trans'));
+          this.pageBtns_['translations/'] = transBtn;
+          goog.dom.appendChild(this.nav_, transBtn);
+          goog.events.listen(transBtn, goog.events.EventType.CLICK,
+              function(e) {
+            this.startPage_('translations/');
+          }, false, this);
+        }
 
         // profile
         this.pages_['profile/'] = new klokantech.jekylledit.Profile(
