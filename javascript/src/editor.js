@@ -655,6 +655,7 @@ klokantech.jekylledit.Editor.prototype.remove = function(opt_callback) {
           }
           if (opt_callback) {
             opt_callback(e.target.isSuccess());
+            window.location = '/';
           }
         }, this), 'DELETE');
   } else {
