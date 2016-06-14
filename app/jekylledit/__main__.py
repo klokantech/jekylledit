@@ -1,5 +1,3 @@
-from shutil import copytree
-
 from flask.ext.migrate import MigrateCommand
 from flask.ext.script import Manager, Server, Shell
 
@@ -19,12 +17,6 @@ def shell_context():
         'db': db,
         'model': model,
     }
-
-
-@manager.command
-def export_static(target):
-    """Export the static directory."""
-    copytree(app.static_folder, target)
 
 
 def main():
