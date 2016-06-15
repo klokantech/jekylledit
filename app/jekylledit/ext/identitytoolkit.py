@@ -58,11 +58,8 @@ class Gitkit:
         response.set_cookie(self.params['cookie_name'], expires=0)
 
     def get_oob_result(self):
-        token = self.token
-        if token is None:
-            return None
         return self.client.GetOobResult(
-            request.form, request.remote_addr, token)
+            request.form, request.remote_addr, self.token)
 
     @property
     def token(self):
