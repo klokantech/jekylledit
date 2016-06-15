@@ -177,7 +177,7 @@ def sign_out():
     return response
 
 
-@blueprint.route('/oob-action')
+@blueprint.route('/oob-action', methods={'POST'})
 def oob_action():
     result = gitkit.get_oob_result()
     if result['action'] == 'changeEmail':
