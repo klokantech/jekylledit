@@ -13,7 +13,7 @@ from flask.ext.principal import Identity, Permission, PermissionDenied, Principa
 from ..ext.identitytoolkit import Gitkit
 from itsdangerous import URLSafeTimedSerializer
 
-from ..model import Account, Challenge, Repository, Roles, Site, Sites, db
+from ..model import Account, OobAction, Repository, Roles, Site, Sites, db
 from .base import app, mailgun, jsonp
 
 
@@ -125,10 +125,10 @@ def widget():
     oob_code = parse_qs(url.query).get('oobCode')
     if not oob_code or len(oob_code) != 1:
         abort(400)
-    challenge = Challenge.query.get(oob_code[0])
-    if challenge is None:
+    action = OobAction.query.get(oob_code[0])
+    if action is None:
         abort(400)
-    base_url = Sites(challenge.site_id).get_base_url()
+    base_url = Sites(action.site_id).get_base_url()
     if not base_url.endswith('/'):
         base_url += '/'
     return redirect('{}#sign-in'.format(base_url))
@@ -155,12 +155,11 @@ def sign_in_success(site_id):
         db.session.commit()
         return render_template('auth/close-window.html', message='You have signed in.')
     oob_link = gitkit.get_email_verification_link(email)
-    challenge = Challenge(
+    action = OobAction(
         oob_code=parse_qs(urlparse(oob_link).query)['oobCode'][0],
         site_id=site_id,
-        account_id=account.id,
         moment=datetime.utcnow())
-    db.session.add(challenge)
+    db.session.add(action)
     db.session.commit()
     text = render_template('auth/verify-email.txt', oob_link=oob_link)
     send(email, 'Verify email address', text)
@@ -179,7 +178,29 @@ def sign_out():
 
 @blueprint.route('/oob-action', methods={'POST'})
 def oob_action():
+    url_adapter = _request_ctx_stack.top.url_adapter
+    url = urlparse(request.referrer)
+    if url.netloc != request.host:
+        abort(400)
+    endpoint, __ = url_adapter.match(url.path, 'GET')
+    if endpoint != 'auth.widget':
+        abort(400)
+    next = parse_qs(url.query).get('next')
+    if not next or len(next) != 1:
+        abort(400)
+    url = urlparse(next[0])
+    if url.netloc != request.host:
+        abort(400)
+    endpoint, values = url_adapter.match(url.path, 'GET')
+    if endpoint != 'auth.sign_in_success':
+        abort(400)
     result = gitkit.get_oob_result()
+    action = OobAction(
+        oob_code=parse_qs(urlparse(result['oob_link']).query)['oobCode'][0],
+        site_id=values['site_id'],
+        moment=datetime.utcnow())
+    db.session.add(action)
+    db.session.commit()
     if result['action'] == 'changeEmail':
         text = render_template(
             'auth/change-email.txt',

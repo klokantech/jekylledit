@@ -25,16 +25,6 @@ class Account(UserMixin, db.Model):
     roles = db.relationship('Roles')
 
 
-class Challenge(db.Model):
-
-    __tablename__ = 'challenge'
-
-    oob_code = db.Column(db.Unicode, primary_key=True)
-    site_id = db.Column(db.Unicode, db.ForeignKey('site.id'), nullable=False)
-    account_id = db.Column(db.Unicode, db.ForeignKey('account.id'), nullable=False)
-    moment = db.Column(db.DateTime, nullable=False)
-
-
 class Roles(db.Model):
 
     __tablename__ = 'roles'
@@ -42,3 +32,12 @@ class Roles(db.Model):
     email = db.Column(db.Unicode, db.ForeignKey('account.email'), primary_key=True)
     site_id = db.Column(db.Unicode, db.ForeignKey('site.id'), primary_key=True, index=True)
     roles = db.Column(JSON, nullable=False)
+
+
+class OobAction(db.Model):
+
+    __tablename__ = 'oob_action'
+
+    oob_code = db.Column(db.Unicode, primary_key=True)
+    site_id = db.Column(db.Unicode, db.ForeignKey('site.id'), nullable=False)
+    moment = db.Column(db.DateTime, nullable=False)
