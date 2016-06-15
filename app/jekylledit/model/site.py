@@ -114,7 +114,8 @@ class Sites:
             users = json.load(fp)
             for idx, user in enumerate(users):
                 if user['id'] == data['id']:
-                    users[idx] = data
+                    for key, value in data.items():
+                        users[idx][key] = value
                     break
             fp.seek(0)
             fp.truncate()
