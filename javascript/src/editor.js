@@ -139,7 +139,8 @@ klokantech.jekylledit.Editor = function(auth, config, category, repo,
       goog.array.forEach(editables, function(editable) {
         var sourceType = editable.getAttribute('data-jekylledit-source');
         if (sourceType == 'content') {
-          langData['content'] = goog.global['toMarkdown'](editable.innerHTML);
+          langData['content'] =
+              goog.global['toMarkdown'](editable.innerHTML || ' ');
         } else {
           langData['metadata'][sourceType] = editable.textContent;
         }
@@ -545,7 +546,8 @@ klokantech.jekylledit.Editor.prototype.save =
               img.alt = langData['metadata']['title'] || ' ';
             });
 
-        langData['content'] = goog.global['toMarkdown'](editable.innerHTML);
+        langData['content'] =
+            goog.global['toMarkdown'](editable.innerHTML || ' ');
       } else {
         langData['metadata'][sourceType] = editable.textContent;
       }
