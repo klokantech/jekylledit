@@ -5,7 +5,6 @@ from functools import wraps
 
 import frontmatter
 import hmac
-from unicodedata import normalize
 
 from flask import abort, json, jsonify, request, render_template
 from flask.ext.cors import cross_origin
@@ -14,7 +13,7 @@ from flask.ext.principal import Permission
 from pid import PidFile, PidFileAlreadyLockedError
 
 from ..model import Repository, Roles, Sites
-from .base import app, mailgun
+from .base import app, mailgun, normalizeUnicode
 from .auth import authorization_required
 
 
@@ -84,8 +83,8 @@ def site_file(site_id, file_id):
         postData = data['post']
         postIsDraft = False
         title = postData[languages[0]]['metadata']['title']
-        normtitle = normalize('NFKD', title).encode('ascii', 'ignore').decode()
-        slugtitle = normtitle.replace(' ', '-').lower()
+        nu = normalizeUnicode('identifier')
+        slugtitle = nu.code(title).lower()
         for i, language in enumerate(languages):
             langdata = postData[language]
             if not 'permalink' in langdata['metadata']:
