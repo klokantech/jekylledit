@@ -242,7 +242,7 @@ klokantech.jekylledit.lang.data_ = {
   },
   'login_not_authorized': {
     'en': 'You are not authorized to modify this site!',
-    'de': 'Sie sind nicht zu ändern berechtigt diese Seite!',
+    'de': 'Sie sind nicht berechtigt diese Seite zu ändern!',
     'it': 'Non sei autorizzato a modificare questo sito!',
     'fr': 'Vous n\'êtes pas autorisé à modifier ce site!'
   },
