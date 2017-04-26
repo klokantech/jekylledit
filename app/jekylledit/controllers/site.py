@@ -84,7 +84,7 @@ def site_file(site_id, file_id):
         postIsDraft = False
         title = postData[languages[0]]['metadata']['title']
         nu = normalizeUnicode('identifier')
-        slugtitle = nu.code(title).lower()
+        slugtitle = nu.code(title).lower().replace(':','-')
         for i, language in enumerate(languages):
             langdata = postData[language]
             if not 'permalink' in langdata['metadata']:
