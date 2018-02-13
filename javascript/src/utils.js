@@ -18,7 +18,7 @@ goog.require('kt.MultiComplete');
  * @type {string} Base path where to load other resources.
  */
 klokantech.jekylledit.BASE_URL = goog.DEBUG ? 'http://localhost:8000/' :
-                                 'http://jekylledit.klokantech.com/';
+                                 '//jekylledit.klokantech.com/';
 
 
 /**
