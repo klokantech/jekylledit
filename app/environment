@@ -1,0 +1,4 @@
+FLASK_DEBUG=1
+FLASK_SECRET_KEY=asdfaoifsud
+SQLALCHEMY_DATABASE_URI=sqlite:////mnt/jekylledit.sqlite
+SQLALCHEMY_ECHO=1
