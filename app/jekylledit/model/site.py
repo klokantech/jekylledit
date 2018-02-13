@@ -8,8 +8,6 @@ import frontmatter
 from contextlib import contextmanager
 from subprocess import Popen, PIPE
 
-import frontmatter
-
 
 class Repository:
 
@@ -130,7 +128,7 @@ class Sites:
             if 'content' in data:
                 #TODO: parse from media
                 post.content = data['content']
-            frontmatter.dump(post, fp)
+            fp.write(frontmatter.dumps(post))
             return filename
 
     def edit_post(self, filename, data):
@@ -143,7 +141,7 @@ class Sites:
                 post.content = data['content']
             fp.seek(0)
             fp.truncate()
-            frontmatter.dump(post, fp)
+            fp.write(frontmatter.dumps(post))
             return filename
 
     def remove_post(self, filename):
