@@ -1,0 +1,12 @@
+function deactivate {
+    export PS1="$_OLD_PS1"
+    unset _OLD_PS1
+    unset -f deactivate flask
+}
+
+function flask {
+    docker-compose run --rm --no-deps app flask "$@"
+}
+
+_OLD_PS1="$PS1"
+export PS1="[active] $PS1"
