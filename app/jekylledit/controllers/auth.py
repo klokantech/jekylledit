@@ -8,8 +8,8 @@ from urllib.parse import urlparse, parse_qs
 
 from flask import Blueprint, _request_ctx_stack, abort, jsonify, make_response, \
     redirect, render_template, request, url_for
-from flask.ext.login import LoginManager, current_user, login_user, logout_user
-from flask.ext.principal import Identity, Permission, PermissionDenied, Principal
+from flask_login import LoginManager, current_user, login_user, logout_user
+from flask_principal import Identity, Permission, PermissionDenied, Principal
 from ..ext.identitytoolkit import Gitkit
 from itsdangerous import URLSafeTimedSerializer
 
@@ -20,7 +20,7 @@ from .base import app, mailgun, jsonp
 blueprint = Blueprint('auth', __name__)
 login_manager = LoginManager(app)
 principal = Principal(app, use_sessions=False, skip_static=True)
-if not app.config['DEVELOPMENT']:
+if not app.debug:
     gitkit = Gitkit(app, {
         'widget': 'auth.widget',
         'sign_in_success': 'auth.sign_in_success',
@@ -88,7 +88,7 @@ def permission_denied(exc):
 
 @blueprint.route('/widget', methods={'GET', 'POST'})
 def widget():
-    if app.config['DEVELOPMENT']:
+    if app.debug:
         if request.method == 'GET':
             return render_template('auth/widget.html')
         email = request.form['email']
@@ -171,7 +171,7 @@ def sign_out():
     logout_user()
     text = render_template('auth/close-window.html', message='You have signed out.')
     response = make_response(text)
-    if not app.config['DEVELOPMENT']:
+    if not app.debug:
         gitkit.delete_token(response)
     return response
 

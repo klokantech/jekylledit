@@ -1,6 +1,10 @@
-FROM debian:8
+FROM debian:9
 ENV DEBIAN_FRONTEND noninteractive
-
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
+ENV VIRTUAL_ENV=/usr/local
+ENV FLASK_APP=/usr/local/src/jekylledit/jekylledit/__init__.py
+WORKDIR /usr/local/src/jekylledit
 EXPOSE 8000
 
 RUN apt-get -qq update && apt-get -qq -y --no-install-recommends install \
@@ -16,15 +20,10 @@ RUN apt-get -qq update && apt-get -qq -y --no-install-recommends install \
     rsync \
     ssh
 
-COPY requirements.txt /venv/requirements.txt
-RUN python3 -m venv /venv \
-&& /venv/bin/pip install -r /venv/requirements.txt \
-&& /venv/bin/pip freeze > /venv/requirements-freezed.txt
+COPY requirements.txt /tmp/requirements.txt
+RUN python3 -m venv /usr/local \
+&& /usr/local/bin/pip install -r /tmp/requirements.txt
 
 RUN git config --global push.default matching
 
-COPY . /venv/app
-
-ARG VERSION
-ARG SETUP_MODE
-RUN /venv/app/setup.sh $VERSION $SETUP_MODE
+COPY jekylledit /usr/local/src/jekylledit/jekylledit

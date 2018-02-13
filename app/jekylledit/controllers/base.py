@@ -5,7 +5,7 @@ from functools import lru_cache, wraps
 from urllib.parse import urlparse
 
 from flask import Flask, request, url_for
-from flask.ext.babel import Babel
+from flask_babel import Babel
 from ..ext.mailgun import Mailgun
 from ..ext.normalizeUnicode import normalizeUnicode
 
@@ -15,7 +15,7 @@ app.config.from_object('{}.settings'.format(app.import_name))
 
 
 babel = Babel(app)
-if not app.config['DEVELOPMENT']:
+if not app.debug:
     mailgun = Mailgun(app)
 else:
     mailgun = None
@@ -51,7 +51,7 @@ def mtime(dir, path):
 
 @app.template_global()
 def url_for_js(name):
-    if app.config['DEVELOPMENT']:
+    if app.debug:
         host = urlparse(request.url).hostname
         return 'http://%s:9810/compile?id=%s-debug' % (host, name)
     return url_for('static', filename='js/{}.js'.format(name))

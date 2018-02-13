@@ -1,11 +1,10 @@
 from os import environ
 
-DEBUG = environ.get('FLASK_DEBUG', False)
-DEVELOPMENT = environ.get('FLASK_DEVELOPMENT', False)
+DEBUG = bool(int(environ.get('FLASK_DEBUG', 0)))
 PROPAGATE_EXCEPTIONS = True
 SECRET_KEY = environ['FLASK_SECRET_KEY']
 
-if not DEVELOPMENT:
+if not DEBUG:
     GITHUB_SECRET = environ['GITHUB_SECRET']
     GITKIT_API_KEY = environ['GITKIT_API_KEY']
     GITKIT_CLIENT_ID = environ['GITKIT_CLIENT_ID']
@@ -17,8 +16,5 @@ if not DEVELOPMENT:
     MAILGUN_DOMAIN = environ['MAILGUN_DOMAIN']
 
 SQLALCHEMY_DATABASE_URI = environ['SQLALCHEMY_DATABASE_URI']
-if 'SQLALCHEMY_ECHO' in environ:
-    SQLALCHEMY_ECHO = environ['SQLALCHEMY_ECHO'].lower() == 'true'
-else:
-    SQLALCHEMY_ECHO = DEBUG
+SQLALCHEMY_ECHO = bool(int(environ.get('SQLALCHEMY_ECHO', DEBUG)))
 SQLALCHEMY_TRACK_MODIFICATIONS = False

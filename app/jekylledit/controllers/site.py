@@ -7,9 +7,9 @@ import frontmatter
 import hmac
 
 from flask import abort, json, jsonify, request, render_template
-from flask.ext.cors import cross_origin
-from flask.ext.login import current_user, login_required
-from flask.ext.principal import Permission
+from flask_cors import cross_origin
+from flask_login import current_user, login_required
+from flask_principal import Permission
 from pid import PidFile, PidFileAlreadyLockedError
 
 from ..model import Repository, Roles, Sites
@@ -30,8 +30,9 @@ def commit(repository, filenames):
             'commit',
             '-m', 'File {} updated'.format(filenames[0]),
         ])
-        if not app.config['DEVELOPMENT']:
+        if not app.debug:
             repository.execute(['push'])
+
 
 def site_lock(f, tries=5, delay=0.2):
     @wraps(f)
@@ -47,6 +48,7 @@ def site_lock(f, tries=5, delay=0.2):
                 local_tries -= 1
                 local_delay *= 2
     return decorated_function
+
 
 #site config response
 @app.route('/site/<site_id>/config')

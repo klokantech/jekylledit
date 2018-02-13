@@ -1,7 +1,7 @@
 import json
 
-from flask.ext.migrate import Migrate
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy.types import TypeDecorator
 
