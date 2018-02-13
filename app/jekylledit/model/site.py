@@ -150,13 +150,13 @@ class Sites:
     def save_media(self, media):
         config = self.get_config()
         created = []
-        for key, medio in media.items():
-            if not '/' in key:
+        for key, medium in media.items():
+            if '/' not in key:
                 filename = self.repository.path(config['media'] + '/' + key)
             else:
                 filename = self.repository.path(key)
             with open(filename, 'wb+') as fm:
-                fm.write(b64decode(medio['data']))
+                fm.write(b64decode(medium['data']))
                 created.append(filename)
         return created
 

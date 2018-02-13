@@ -138,7 +138,7 @@ def site_file(site_id, file_id):
 
     # Update post
     elif request.method == 'PUT':
-        filename = b64decode(file_id).decode()
+        filename = decode_filename(file_id)
         if not repository.is_path_in(filename):
             abort(403)
         filemask = filename.rsplit('-', 1)[0] + '-{}.' \
@@ -164,7 +164,7 @@ def site_file(site_id, file_id):
     elif request.method == 'DELETE':
         if not Permission(('administrator', site_id)):
             abort(403)
-        filename = b64decode(file_id).decode()
+        filename = decode_filename(file_id)
         if not repository.is_path_in(filename):
             abort(403)
         filemask = filename.rsplit('-', 1)[0] + '-{}.' \
@@ -180,7 +180,7 @@ def site_file(site_id, file_id):
 
     # Return post
     else:
-        filename = b64decode(file_id).decode()
+        filename = decode_filename(file_id)
         if not repository.is_path_in(filename):
             abort(403)
         filemask = filename.rsplit('-', 1)[0] + '-{}.' \
@@ -197,6 +197,10 @@ def site_file(site_id, file_id):
         return jsonify({
             'post': postData
         })
+
+
+def decode_filename(file_id):
+    return b64decode(file_id + '===').decode()
 
 
 # Response related drafts
