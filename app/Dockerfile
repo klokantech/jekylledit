@@ -27,3 +27,4 @@ RUN python3 -m venv /usr/local \
 RUN git config --global push.default matching
 
 COPY jekylledit /usr/local/src/jekylledit/jekylledit
+COPY migrations /usr/local/src/jekylledit/migrations
