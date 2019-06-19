@@ -12,8 +12,9 @@ from flask_login import current_user, login_required
 from flask_principal import Permission
 from pid import PidFile, PidFileAlreadyLockedError
 
+from ..ext import normalizeUnicode
 from ..model import Repository, Roles, Sites
-from .base import app, mailgun, normalizeUnicode
+from .base import app, mailgun
 from .auth import authorization_required
 
 

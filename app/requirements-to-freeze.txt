@@ -1,13 +1,13 @@
 Flask
 Flask-Babel
 Flask-CORS
+Flask-Firebase
 Flask-Login
 Flask-Migrate
 Flask-Principal
 Flask-Script
 Flask-SQLAlchemy
 Flask-WTF
-identity-toolkit-python-client
 pid
 python-frontmatter
 requests

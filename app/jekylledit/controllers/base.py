@@ -7,12 +7,10 @@ from urllib.parse import urlparse
 from flask import Flask, request, url_for
 from flask_babel import Babel
 from ..ext.mailgun import Mailgun
-from ..ext.normalizeUnicode import normalizeUnicode
 
 
 app = Flask('jekylledit')
 app.config.from_object('{}.settings'.format(app.import_name))
-
 
 babel = Babel(app)
 if not app.debug:
