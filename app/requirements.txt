@@ -18,7 +18,7 @@ Flask-SQLAlchemy==2.4.0
 Flask-WTF==0.14.2
 idna==2.8
 itsdangerous==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 Mako==1.0.12
 MarkupSafe==1.1.1
 pid==2.2.3
